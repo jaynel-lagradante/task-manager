@@ -1,17 +1,25 @@
 import { styled } from '@mui/material/styles';
-import { Tabs } from '@mui/material';
-
-// export const GridContainer = styled(Grid)(({ theme }) => ({
-//     minHeight: '100vh',
-//     width: '100vw',
-//     margin: 0,
-// }));
+import { Badge, Box, Tabs } from '@mui/material';
 
 export const MenuTabs = styled(Tabs)(({ theme }) => ({
     '& .MuiTabs-flexContainer button': {
-        // minWidth: 'auto',
-        // padding: '6px 16px',
-        // margin: '0 8px',
         textTransform: 'none',
     },
+}));
+
+export const DeleteButtonBadge = styled(Badge)(({ theme }) => ({
+    '& .MuiBadge-badge': {
+      right: -3,
+      top: 18,
+      padding: '0 4px',
+        backgroundColor: '#62C6FF',
+        color: '#fff',
+
+    },
+}));
+
+export const CuztomizedHeaderBox = styled(Box)(({ theme }) => ({
+    width: 60,
+    border: '1px solid #E0E0E0',
+    borderRadius: 10,
 }));

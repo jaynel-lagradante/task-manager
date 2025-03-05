@@ -125,7 +125,7 @@ const RegisterComponent: React.FC = () => {
                 helperText={passwordError}
                 FormHelperTextProps={{
                     sx: {
-                        color: passwordCheck ===  3 ? '#1976d2' : 'red', 
+                        color: passwordCheck ===  3 ? '#027CEC' : 'red', 
                     },
                 }}
                 InputProps={{

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Container, Typography, Button, Box, Select, MenuItem, FormControl, InputLabel,
-    Paper,
+    Typography, Box, Select, MenuItem, FormControl, InputLabel, Paper,
+    IconButton,
+    Checkbox,
 } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid'; // Import DataGrid
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import EditIcon from './../assets/Icons/Edit.svg';
 import { useNavigate } from 'react-router-dom';
 import { DeleteTask, GetTasks } from '../services/TaskService';
@@ -12,28 +13,29 @@ import NotStartedIcon from './../assets/Icons/Not Started.svg';
 import InProgressIcon from './../assets/Icons/In Progress.svg';
 import CompleteIcon from './../assets/Icons/Complete.svg';
 import CancelledIcon from './../assets/Icons/Cancelled.svg';
-
-interface Task {
-    id: string;
-    title: string;
-    due_date: string;
-    priority: string;
-    status: string;
-    user_id: string;
-    description: string;
-    attachments: Buffer | null;
-    created_at: Date;
-    updated_at: Date;
-    date_completed: Date;
-}
+import NewTaskButtonIcon from './../assets/Buttons/Button_New Task.svg';
+import DeleteActiveIcon from './../assets/Icons/Delete_active.svg';
+import { CuztomizedHeaderBox, DeleteButtonBadge } from '../layouts/DashboardStyles';
+import DeleteInactiveIcon from './../assets/Icons/Delete_inactive.svg';
+import { Task } from '../types/TaskInterface';
+import DeleteConfirmationModal from './DeleteConfirmationModalComponent';
 
 const TaskListComponent: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const navigate = useNavigate();
     const [priorityFilter, setPriorityFilter] = useState('All');
     const [statusFilter, setStatusFilter] = useState('All');
+    const [selectedRows, setSelectedRows] = useState<string[]>([])
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const isAuthenticated = !!localStorage.getItem('token');
 
     useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login'); 
+            return;
+        }
+
         const fetchTasks = async () => {
             try {
                 const fetchedTasks = await GetTasks();
@@ -44,17 +46,7 @@ const TaskListComponent: React.FC = () => {
             }
         };
         fetchTasks();
-    }, [navigate]);
-
-    const handleDelete = async (taskId: string) => {
-        try {
-            await DeleteTask(taskId);
-            const updatedTasks = tasks.filter((task) => task.id !== taskId);
-            setTasks(updatedTasks);
-        } catch (error) {
-            console.error('Error deleting task:', error);
-        }
-    };
+    }, [navigate, isAuthenticated]);
 
     const handleEdit = (taskId: string) => {
         navigate(`/edit-task/${taskId}`);
@@ -66,11 +58,75 @@ const TaskListComponent: React.FC = () => {
         return priorityMatch && statusMatch;
     });
 
+    const handleDeleteSelected = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            for (const taskId of selectedRows) {
+                await DeleteTask(taskId);
+            }
+            const updatedTasks = tasks.filter((task) => {
+                if (task.id) {
+                    return !selectedRows.includes(task.id);
+                }
+                return true;
+            });
+            setTasks(updatedTasks);
+            setSelectedRows([]);
+            setIsModalOpen(false); // Close modal after delete
+        } catch (error) {
+            console.error('Error deleting selected tasks:', error);
+        }
+    };
+
     const columns: GridColDef[] = [
+        {
+            field: 'selection',
+            width: 75,
+            sortable: false,
+            renderHeader: () => (
+                selectedRows.length > 0 ? (
+                    <CuztomizedHeaderBox>
+                        <DeleteButtonBadge badgeContent={selectedRows.length} color="primary">
+                            <IconButton onClick={handleDeleteSelected}>
+                                <img src={DeleteActiveIcon} alt="Delete" style={{ height: '20px' }} />
+                            </IconButton>
+                        </DeleteButtonBadge>
+                    </CuztomizedHeaderBox>
+                ) : (
+                    <Box>
+                        <IconButton disabled>
+                            <img src={DeleteInactiveIcon} alt="Delete" style={{ height: '20px' }} />
+                        </IconButton>
+                    </Box>
+                )
+            ),
+            renderCell: (params) => (
+                <Checkbox 
+                    checked={selectedRows.includes(params.row.id)}
+                    onChange={(e) => {
+                        if (e.target.checked) {
+                            setSelectedRows([...selectedRows, params.row.id]);
+                        } else {
+                            setSelectedRows(selectedRows.filter((id) => id !== params.row.id));
+                        }
+                    }}
+                />
+            ),
+            headerAlign: 'center',
+            align: 'center',
+            filterable: false,
+            disableColumnMenu: true,
+        },
         { field: 'title', headerName: 'Title', flex: 1},
         { field: 'due_date', headerName: 'Due Date', flex: 1 },
         { field: 'priority', headerName: 'Priority', flex: 1 },
-        // { field: 'status', headerName: 'Status', flex: 1 },
         {
             field: 'status',
             headerName: 'Status',
@@ -104,7 +160,7 @@ const TaskListComponent: React.FC = () => {
         {
             field: 'actions',
             headerName: '',
-            width: 100,
+            width: 50,
             sortable: false,
             renderCell: (params) => (
                 <img
@@ -117,9 +173,13 @@ const TaskListComponent: React.FC = () => {
         },
     ];
 
+    if (!isAuthenticated) {
+        return null;
+    }
+
     return (
         <DashboardComponent>
-            <Paper sx={{ padding: '16px', backgroundColor: '#f0f0f0' }}>
+            <Paper sx={{ padding: '16px', backgroundColor: '#F2F8FD' }}>
                 <Typography variant="h4" gutterBottom>
                     To-do
                 </Typography>
@@ -145,20 +205,30 @@ const TaskListComponent: React.FC = () => {
                             </Select>
                         </FormControl>
                     </Box>
-                    <Button variant="outlined" color="primary" onClick={() => navigate('/create-task')}>
-                        New Task
-                    </Button>
+                    <IconButton onClick={() => navigate('/create-task')}>
+                        <img src={NewTaskButtonIcon} alt="New Task" style={{ height: '40px' }} />
+                    </IconButton>
                 </Box>
-                <div style={{ height: 400, width: '100%', marginTop: '20px' }}>
+                <div style={{ height: '100%', width: '100%', marginTop: '20px' }}>
                     <DataGrid
                         rows={filteredTasks}
                         columns={columns}
                         getRowId={(row) => row.id}
-                        checkboxSelection
+                        // pagination={false} // Disable pagination
+                        hideFooterSelectedRowCount // Hide "row selected" label
+                        hideFooterPagination // Hide pagination controls
+                        // checkboxSelection
                         // disableSelectionOnClick
                     />
                 </div>
             </Paper>
+
+            <DeleteConfirmationModal
+                open={isModalOpen}
+                onClose={handleCloseModal}
+                onConfirm={handleConfirmDelete}
+                count={selectedRows.length}
+            />
         </DashboardComponent>
     );
 };
