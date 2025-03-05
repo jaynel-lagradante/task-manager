@@ -26,7 +26,7 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({children}) => {
 
     return (
         <Grid container style={{ height: '100vh' }}>
-            <Grid item xs={12} sm={2} style={{ backgroundColor: '#f0f0f0', padding: '16px' }}>
+            <Grid item xs={12} sm={2} style={{ backgroundColor: '#fffff', padding: '16px' }}>
                 <Box display="flex" flexDirection="column">
                     <Box display="flex" justifyContent="flex-start" width="100%" marginBottom="16px">
                         <img src={LogoHeader} alt="Logo" style={{ height: '60px' }} />
