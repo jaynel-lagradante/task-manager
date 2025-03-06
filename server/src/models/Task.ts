@@ -9,7 +9,6 @@ class Task extends Model {
     public status!: string;
     public user_id!: string;
     public description!: string;
-    // public attachments!: Buffer;
     public created_at!: Date;
     public updated_at!: Date;
     public date_completed!: Date;
@@ -23,9 +22,7 @@ Task.init(
         priority: { type: DataTypes.STRING(20), allowNull: false },
         status: { type: DataTypes.STRING(20), allowNull: false },
         user_id: { type: DataTypes.STRING(50), allowNull: false },
-        // description: { type: DataTypes.STRING(255), allowNull: false },
         description: { type: DataTypes.TEXT, allowNull: false },
-        // attachments: { type: DataTypes.BLOB },
         created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
         updated_at: { type: DataTypes.DATE },
         date_completed: { type: DataTypes.DATE },

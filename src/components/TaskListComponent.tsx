@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Typography, Box, Select, MenuItem, FormControl, InputLabel, Paper,
+    Typography, Box, Select, MenuItem, FormControl, InputLabel,
     IconButton,
     Checkbox,
 } from '@mui/material';
@@ -179,55 +179,53 @@ const TaskListComponent: React.FC = () => {
 
     return (
         <DashboardComponent>
-            <Paper sx={{ padding: '16px', backgroundColor: '#F2F8FD' }}>
-                <Typography variant="h4" gutterBottom>
-                    To-do
-                </Typography>
-                <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
-                    <Box display="flex" gap={2}>
-                        <FormControl>
-                            <InputLabel>Priority</InputLabel>
-                            <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
-                                <MenuItem value="All">All</MenuItem>
-                                <MenuItem value="Low">Low</MenuItem>
-                                <MenuItem value="High">High</MenuItem>
-                                <MenuItem value="Critical">Critical</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <FormControl>
-                            <InputLabel>Status</InputLabel>
-                            <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                                <MenuItem value="All">All</MenuItem>
-                                <MenuItem value="Not Started">Not Started</MenuItem>
-                                <MenuItem value="In Progress">In Progress</MenuItem>
-                                <MenuItem value="Complete">Complete</MenuItem>
-                                <MenuItem value="Cancelled">Cancelled</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-                    <IconButton onClick={() => navigate('/create-task')}>
-                        <img src={NewTaskButtonIcon} alt="New Task" style={{ height: '40px' }} />
-                    </IconButton>
+            <Typography variant="h4" gutterBottom>
+                To-do
+            </Typography>
+            <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+                <Box display="flex" gap={2}>
+                    <FormControl>
+                        <InputLabel>Priority</InputLabel>
+                        <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
+                            <MenuItem value="All">All</MenuItem>
+                            <MenuItem value="Low">Low</MenuItem>
+                            <MenuItem value="High">High</MenuItem>
+                            <MenuItem value="Critical">Critical</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControl>
+                        <InputLabel>Status</InputLabel>
+                        <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                            <MenuItem value="All">All</MenuItem>
+                            <MenuItem value="Not Started">Not Started</MenuItem>
+                            <MenuItem value="In Progress">In Progress</MenuItem>
+                            <MenuItem value="Complete">Complete</MenuItem>
+                            <MenuItem value="Cancelled">Cancelled</MenuItem>
+                        </Select>
+                    </FormControl>
                 </Box>
-                <div style={{ height: '100%', width: '100%', marginTop: '20px' }}>
-                    <DataGrid
-                        rows={filteredTasks}
-                        columns={columns}
-                        getRowId={(row) => row.id}
-                        // pagination={false} // Disable pagination
-                        hideFooterSelectedRowCount // Hide "row selected" label
-                        hideFooterPagination // Hide pagination controls
-                        // checkboxSelection
-                        // disableSelectionOnClick
-                    />
-                </div>
-            </Paper>
-
+                <IconButton onClick={() => navigate('/create-task')}>
+                    <img src={NewTaskButtonIcon} alt="New Task" style={{ height: '40px' }} />
+                </IconButton>
+            </Box>
+            <div style={{ height: '85%', width: '100%', marginTop: '20px', backgroundColor: 'white' }}>
+                <DataGrid
+                    rows={filteredTasks}
+                    columns={columns}
+                    getRowId={(row) => row.id}
+                    // pagination={false} // Disable pagination
+                    hideFooterSelectedRowCount // Hide "row selected" label
+                    hideFooterPagination // Hide pagination controls
+                    // checkboxSelection
+                    // disableSelectionOnClick
+                />
+            </div>
             <DeleteConfirmationModal
                 open={isModalOpen}
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
-                count={selectedRows.length}
+                firstLabel={`${selectedRows.length} Task${selectedRows.length !== 1 ? 's' : ''} will be deleted.`}
+                secondLabel={null}
             />
         </DashboardComponent>
     );

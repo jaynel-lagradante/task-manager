@@ -1,6 +1,5 @@
-// src/types/task.ts
-// import { Dayjs } from 'dayjs';
 import { Moment } from 'moment';
+import { Subtask } from './SubTaskInterface';
 
 export interface Task {
     id?: string;
@@ -12,4 +11,5 @@ export interface Task {
     user_id?: string;
     created_at?: Date;
     updated_at?: Date;
+    subtasks?: Subtask[];
 }

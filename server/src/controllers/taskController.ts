@@ -10,7 +10,7 @@ export const createTask = async (req: Request, res: Response) => {
         const createdAt = new Date();
 
         await Task.create({ id, title, due_date, priority, status, description, attachments, user_id: userId, created_at: createdAt });
-        res.status(201).json({ message: 'Task created successfully' });
+        res.status(201).json({ message: 'Task created successfully', id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });

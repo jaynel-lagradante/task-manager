@@ -1,11 +1,11 @@
 import express from 'express';
-import { createSubtask, deleteSubtask, getSubtasks, updateSubtask } from '../controllers/subtaskController';
+import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../controllers/subtaskController';
 
 const router = express.Router();
 
-router.post('/', createSubtask);
+router.post('/', createSubtasks);
 router.get('/:taskId', getSubtasks);
-router.put('/:id', updateSubtask);
+router.put('/', updateSubtasks);
 router.delete('/:id', deleteSubtask);
 
 export default router;

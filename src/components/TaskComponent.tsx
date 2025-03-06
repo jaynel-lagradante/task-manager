@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import {
     TextField,
-    Button,
     Container,
     Typography,
     Box,
@@ -13,16 +11,23 @@ import {
     MenuItem,
     Divider,
     IconButton,
+    Paper,
+    Grid,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import moment, { Moment } from 'moment';
 import { Task } from '../types/TaskInterface';
-import { CreateTask, UpdateTask, UploadFiles } from '../services/TaskService';
+import { CreateTask, GetTaskById, UpdateTask, UploadFiles } from '../services/TaskService';
 import DashboardComponent from './DashboardComponent';
-import Subtask from './SubTaskComponent';
+import SubtaskComponent from './SubTaskComponent';
 import NewSubtaskIcon from './../assets/Buttons/Button_New Subtask_selected.svg'; 
+import { FormContainer } from '../layouts/TaskStyles';
+import SaveButton from './../assets/Buttons/Button_Save.svg'; 
+import CancelButton from './../assets/Buttons/Button_Cancel.svg'; 
+import { createSubtasks, deleteSubtask, getSubtasks } from '../services/SubtaskService';
+import { Subtask } from '../types/SubTaskInterface';
 // import Attachment from './Attachment';
 
 const TaskComponent: React.FC = () => {
@@ -34,15 +39,17 @@ const TaskComponent: React.FC = () => {
         priority: 'Low',
         status: 'Not Started',
         description: '',
+        subtasks: [],
         // attachments: null,
     });
     const [error, setError] = useState('');
     const [dateCreated] = useState(moment());
     const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-    const [subtasks, setSubtasks] = useState<{ title: string; status: string }[]>([]);
+    const [subtasks, setSubtasks] = useState<Subtask[]>([]);
 
     useEffect(() => {
         const fetchTask = async () => {
+            // debugger;
             const token = localStorage.getItem('token');
             if (!token) {
                 navigate('/login');
@@ -50,14 +57,15 @@ const TaskComponent: React.FC = () => {
             }
             if (id) {
                 try {
-                    const response = await axios.get(`http://localhost:5000/tasks/${id}`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    });
+                    const data = await GetTaskById(id);
+                    const subtasksData = await getSubtasks(id);
                     setTask({
-                        ...response.data,
-                        due_date: response.data.due_date ? moment(response.data.due_date) : null,
+                        ...data,
+                        due_date: data.due_date ? moment(data.due_date) : null,
                     });
-                    setSubtasks(response.data.subtasks || []);
+                    if(subtasksData) {
+                        setSubtasks(subtasksData || []);
+                    }
                 } catch (err: any) {
                     setError(err.response?.data?.message || 'Failed to fetch task');
                     navigate('/login');
@@ -100,7 +108,6 @@ const TaskComponent: React.FC = () => {
                 priority: task.priority,
                 status: task.status,
                 description: task.description,
-                // subtasks,
             };
 
             let response;
@@ -109,6 +116,9 @@ const TaskComponent: React.FC = () => {
             } else {
                 response = await CreateTask(taskData);
             }
+
+            const subtaskData = await createSubtasks(id ?? response.id, subtasks);
+            setSubtasks(subtaskData.createdSubtasks);
 
             // File upload logic
             if (selectedFiles && selectedFiles.length > 0) {
@@ -138,7 +148,7 @@ const TaskComponent: React.FC = () => {
     };
 
     const handleAddSubtask = () => {
-        setSubtasks([...subtasks, { title: '', status: 'Not Started' }]);
+        setSubtasks([...subtasks, { title: '', status: 'Not Done' }]);
     };
 
     const handleSubtaskTitleChange = (index: number, title: string) => {
@@ -149,126 +159,144 @@ const TaskComponent: React.FC = () => {
         setSubtasks(subtasks.map((subtask, i) => i === index ? { ...subtask, status } : subtask));
     };
 
-    const handleDeleteSubtask = (index: number) => {
-        setSubtasks(subtasks.filter((_, i) => i !== index));
+    const handleDeleteSubtask = async (index: number, subtaskId: string | null) => {
+        if (subtaskId) {
+            try {
+                await deleteSubtask(subtaskId); // Use the API delete function
+                setSubtasks(subtasks.filter((subtask) => subtask?.id !== subtaskId)); // Update state
+            } catch (error) {
+                console.error("Error deleting subtask:", error);
+                // Handle error (e.g., show a message to the user)
+            }
+        } else {
+            setSubtasks(subtasks.filter((_, i) => i !== index)); // Remove by index if no ID
+        }
     };
-
 
     return (
         <DashboardComponent>
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-                <Container maxWidth="md">
-                    <Box mt={4}>
-                        <Typography variant="h4" gutterBottom>
-                            {id ? 'Edit Task' : 'Create Task'}
-                        </Typography>
-                        {error && <Typography color="error">{error}</Typography>}
-                        <form onSubmit={handleSubmit}>
-                            <TextField
-                                label="Title"
-                                name="title"
-                                value={task.title}
-                                onChange={handleInputChange}
-                                fullWidth
-                                margin="normal"
-                                multiline
-                                rows={3}
-                            />
-                            <TextField
-                                label="Date Created"
-                                value={dateCreated.format('YYYY-MM-DD')}
-                                fullWidth
-                                margin="normal"
-                                disabled
-                            />
-                            <DatePicker
-                                label="Due Date"
-                                value={task.due_date}
-                                onChange={(date) => handleDateChange(date)}
-                                slotProps={{ textField: { fullWidth: true, margin: 'normal' } }}
-                            />
-                            <FormControl fullWidth margin="normal">
-                                <InputLabel id="priority-label">Priority</InputLabel>
-                                <Select
-                                    labelId="priority-label"
-                                    name="priority"
-                                    value={task.priority}
-                                    onChange={handleSelectChange}
-                                    label="Priority"
-                                >
-                                    <MenuItem value="Low">Low</MenuItem>
-                                    <MenuItem value="High">High</MenuItem>
-                                    <MenuItem value="Critical">Critical</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <FormControl fullWidth margin="normal">
-                                <InputLabel id="status-label">Status</InputLabel>
-                                <Select
-                                    labelId="status-label"
-                                    name="status"
-                                    value={task.status}
-                                    onChange={handleSelectChange}
-                                    label="Status"
-                                >
-                                    <MenuItem value="Not Started">Not Started</MenuItem>
-                                    <MenuItem value="In Progress">In Progress</MenuItem>
-                                    <MenuItem value="Complete">Complete</MenuItem>
-                                    <MenuItem value="Cancelled">Cancelled</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <TextField
-                                label="Details"
-                                name="description"
-                                value={task.description}
-                                onChange={handleInputChange}
-                                fullWidth
-                                margin="normal"
-                                multiline
-                                rows={3}
-                            />
-                            {/* <FormControl fullWidth margin="normal">
-                                <InputLabel htmlFor="attachment-input">Attachment</InputLabel>
-                                <Input id="attachment-input" type="file" onChange={handleFileChange} />
-                                {task.attachments && <FormHelperText>Selected file: {task.attachments.name}</FormHelperText>}
-                            </FormControl> */}
-                            {/* <FormControl fullWidth margin="normal">
-                                <InputLabel htmlFor="attachment-input">Attachment</InputLabel>
-                                <Input id="attachment-input" type="file" onChange={handleFileChange} />
-                                {selectedFiles && <FormHelperText>Selected {selectedFiles.length} files</FormHelperText>}
-                            </FormControl> */}
-                            {/* { id && <Attachment taskId={id}></Attachment> }  */}
-                            
-                        </form>
+            <FormContainer>
+                <Typography variant="h6" gutterBottom>
+                    Back | View Task / Edit
+                </Typography>
+                <Paper style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', height: '100%' }}>
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <Container maxWidth="md" style={{  paddingBottom: '16px' }}>
+                            <Box mt={4}>
+                                {error && <Typography color="error">{error}</Typography>}
+                                <form onSubmit={handleSubmit}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} sm={3}>
+                                            <FormControl fullWidth margin="normal">
+                                                <InputLabel id="priority-label">Priority</InputLabel>
+                                                <Select
+                                                    labelId="priority-label"
+                                                    name="priority"
+                                                    value={task.priority}
+                                                    onChange={handleSelectChange}
+                                                    label="Priority"
+                                                >
+                                                    <MenuItem value="Low">Low</MenuItem>
+                                                    <MenuItem value="High">High</MenuItem>
+                                                    <MenuItem value="Critical">Critical</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={12} sm={3}>
+                                            <FormControl fullWidth margin="normal">
+                                                <InputLabel id="status-label">Status</InputLabel>
+                                                <Select
+                                                    labelId="status-label"
+                                                    name="status"
+                                                    value={task.status}
+                                                    onChange={handleSelectChange}
+                                                    label="Status"
+                                                >
+                                                    <MenuItem value="Not Started">Not Started</MenuItem>
+                                                    <MenuItem value="In Progress">In Progress</MenuItem>
+                                                    <MenuItem value="Complete">Complete</MenuItem>
+                                                    <MenuItem value="Cancelled">Cancelled</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Title"
+                                                name="title"
+                                                value={task.title}
+                                                onChange={handleInputChange}
+                                                fullWidth
+                                                margin="normal"
+                                                multiline
+                                                rows={3}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                label="Date Created"
+                                                value={dateCreated.format('YYYY-MM-DD')}
+                                                fullWidth
+                                                margin="normal"
+                                                disabled
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <DatePicker
+                                                label="Due Date"
+                                                value={task.due_date}
+                                                onChange={(date) => handleDateChange(date)}
+                                                slotProps={{ textField: { fullWidth: true, margin: 'normal' } }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Details"
+                                                name="description"
+                                                value={task.description}
+                                                onChange={handleInputChange}
+                                                fullWidth
+                                                margin="normal"
+                                                multiline
+                                                rows={3}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </form>
 
-                        <Divider style={{ width: '100%', marginTop: '32px' }} />
-                        
-                        <Box mt={2} display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: '16px', marginTop: '4px' }}>
-                            <Typography variant="h6" gutterBottom>Subtask</Typography>
-                            {/* <Button onClick={handleAddSubtask} variant="outlined">
-                                Add Subtask
-                            </Button> */}
-                            <IconButton onClick={handleAddSubtask}>
-                                <img src={NewSubtaskIcon} alt="Add Subtask" style={{ height: '40px' }} />
-                            </IconButton>
-                        </Box>
-                        
-                        {subtasks.map((subtask, index) => (
-                            <Subtask
-                                key={index}
-                                index={index}
-                                title={subtask.title}
-                                status={subtask.status}
-                                onTitleChange={handleSubtaskTitleChange}
-                                onStatusChange={handleSubtaskStatusChange}
-                                onDelete={handleDeleteSubtask}
-                            />
-                        ))}
-                    </Box>
-                    <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '16px' }}>
-                        Save
-                    </Button>
-                </Container>
-            </LocalizationProvider>
+                                <Divider style={{ width: '100%', marginTop: '32px' }} />
+
+                                <Box mt={2} display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: '16px', marginTop: '4px' }}>
+                                    <Typography variant="h6" gutterBottom>Subtask</Typography>
+                                    <IconButton onClick={handleAddSubtask}>
+                                        <img src={NewSubtaskIcon} alt="Add Subtask" style={{ height: '40px' }} />
+                                    </IconButton>
+                                </Box>
+
+                                {subtasks.map((subtask, index) => (
+                                    <SubtaskComponent
+                                        key={index}
+                                        subtask={subtask}
+                                        index={index}
+                                        onTitleChange={handleSubtaskTitleChange}
+                                        onStatusChange={handleSubtaskStatusChange}
+                                        onDelete={() => handleDeleteSubtask(index, subtask.id ?? null)}
+                                    />
+                                ))}
+                            </Box>
+                        </Container>
+                    </LocalizationProvider>
+                </Paper>
+
+                <Box display="flex" justifyContent="flex-end" marginTop="32px" marginRight="16px">
+                    <IconButton onClick={() => navigate('/')}>
+                        <img src={CancelButton} alt="Add Subtask" style={{ height: '40px' }} />
+                    </IconButton>
+
+                    <IconButton onClick={handleSubmit}>
+                        <img src={SaveButton} alt="Add Subtask" style={{ height: '40px' }} />
+                    </IconButton>
+                </Box>
+            </FormContainer>
         </DashboardComponent>
     );
 };

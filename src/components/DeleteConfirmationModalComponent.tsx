@@ -9,10 +9,11 @@ interface DeleteConfirmationModalProps {
     open: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    count: number;
+    firstLabel: string | null;
+    secondLabel: string | null;
 }
 
-const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ open, onClose, onConfirm, count }) => {
+const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ open, onClose, onConfirm, firstLabel, secondLabel }) => {
     return (
         <Modal open={open} onClose={onClose}>
             <Box
@@ -32,8 +33,15 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ open,
             >
                 <img src={AlertIcon} alt="Alert" style={{ height: '60px', marginBottom: '16px' }} />
                 <Typography variant="h6" component="h2" gutterBottom>
-                    {`${count} Task${count !== 1 ? 's' : ''} will be deleted.`}
+                    {firstLabel}
                 </Typography>
+                {
+                    secondLabel && (
+                        <Typography variant="h6" component="h2" gutterBottom style={{ textDecoration: 'underline' }}>
+                            {secondLabel}
+                        </Typography>
+                    )
+                }
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center'}}>
                     <IconButton onClick={onClose}>
                         <img src={CancelIcon} alt="Cancel" style={{ height: '40px' }} />

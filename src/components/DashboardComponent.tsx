@@ -4,7 +4,7 @@ import { Grid, Tab, Box, Divider, Avatar, Typography } from '@mui/material';
 import { Logout } from './../services/AuthService';
 import LogoHeader from './../assets/Logo Header.svg';
 import AvatarIcon from './../assets/Icons/Avatar.svg';
-import { MenuTabs } from '../layouts/DashboardStyles';
+import { CuztomzedContainer, MenuTabs } from '../layouts/DashboardStyles';
 
 interface DashboardComponentProps {
     children: ReactNode;
@@ -47,10 +47,10 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({children}) => {
                     </MenuTabs>
                 </Box>
             </Grid>
-            <Grid item xs={12} sm={10} style={{ padding: '16px' }}>
-                <Box>
+            <Grid item xs={12} sm={10} style={{ padding: '16px'}}>
+                <CuztomzedContainer>
                     {children}
-                </Box>
+                </CuztomzedContainer>
             </Grid>
         </Grid>
     );
