@@ -63,9 +63,36 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const signInUsingGoogle = async (req: Request, res: Response) => {
+    try { 
+        const { userInfo } = req.body;
+        const { name, email, sub } = userInfo.data;
+        if (!sub) {
+            res.status(400).json({ message: 'Google ID is required' });
+            return;
+        }
+
+        let account = await Account.findOne({ where: { google_id: sub } });
+
+        if (!account) {
+            account = await Account.create({
+                id: uuidv4(),
+                username: email || name || 'GoogleUser',
+                google_id: sub,
+                created_at: new Date(),
+            });
+        }
+
+        const jwtToken = jwt.sign({ id: account.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        res.json({ token: jwtToken });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const signInUsingGoogleWithOAuth = async (req: Request, res: Response) => {
     const { token } = req.body;
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-    console.log(token)
 
     if (!token) {
         res.status(400).json({ message: 'Token is required' });
@@ -89,7 +116,7 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
         if (!account) {
             account = await Account.create({
                 id: uuidv4(),
-                username: payload.name || payload.email || 'GoogleUser',
+                username: payload.email || payload.name || 'GoogleUser',
                 google_id: payload.sub,
                 created_at: new Date(),
             });
