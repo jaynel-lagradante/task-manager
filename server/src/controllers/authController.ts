@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
-// import passport from 'passport';
+import { OAuth2Client } from 'google-auth-library'; 
 
 dotenv.config();
 
@@ -21,11 +21,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             res.status(401).json({ message: 'Invalid credentials' });
             return;
         }
-        const passwordMatch = await bcrypt.compare(password, account.password);
-
-        if (!passwordMatch) {
-            res.status(401).json({ message: 'Invalid credentials' });
-            return;
+        if(account.password) {
+            const passwordMatch = await bcrypt.compare(password, account.password);
+            if (!passwordMatch) {
+                res.status(401).json({ message: 'Invalid credentials' });
+                return;
+            }
         }
 
         const token = jwt.sign({ id: account.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
@@ -61,12 +62,44 @@ export const register = async (req: Request, res: Response) => {
     }
 };
 
-// export const googleAuth = (req: Request, res: Response) => {
-//     const token = jwt.sign({ id: (req.user as any).id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-//     res.redirect(`http://localhost:3000/login?token=${token}`);
-// };
+export const signInUsingGoogle = async (req: Request, res: Response) => {
+    const { token } = req.body;
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    console.log(token)
 
-// export const facebookAuth = (req: Request, res: Response) => {
-//     const token = jwt.sign({ id: (req.user as any).id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-//     res.redirect(`http://localhost:3000/login?token=${token}`);
-// };
+    if (!token) {
+        res.status(400).json({ message: 'Token is required' });
+        return;
+    }
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+
+        if (!payload) {
+            res.status(401).json({ message: 'Invalid token' });
+            return;
+        }
+
+        let account = await Account.findOne({ where: { google_id: payload.sub } });
+
+        if (!account) {
+            account = await Account.create({
+                id: uuidv4(),
+                username: payload.name || payload.email || 'GoogleUser',
+                google_id: payload.sub,
+                created_at: new Date(),
+            });
+        }
+
+        const jwtToken = jwt.sign({ id: account.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        res.json({ token: jwtToken });
+
+    } catch (error) {
+        console.error('Error verifying Google token:', error);
+        res.status(401).json({ message: 'Error verifying Google token' });
+    }
+};

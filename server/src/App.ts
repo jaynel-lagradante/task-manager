@@ -8,13 +8,12 @@ import fileRoutes from './routes/fileRoutes';
 import passport from 'passport';
 import './auth/jwtStrategy'; // Initialize JWT strategy
 import cors from 'cors';
-// import './auth/googleStrategy'; // Initialize Google strategy
-// import './auth/facebookStrategy'; // Initialize Facebook strategy
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+
 app.use(passport.initialize());
 const corsOptions = {
     origin: 'http://localhost:3000', // Allow requests from this origin
@@ -34,8 +33,6 @@ app.use('/auth', authRoutes);
 app.use('/tasks', passport.authenticate('jwt', { session: false }), taskRoutes); // Protected routes
 app.use('/subtasks', passport.authenticate('jwt', { session: false }), subtaskRoutes); // Protected routes
 app.use('/upload', passport.authenticate('jwt', { session: false }), fileRoutes); // Protected routes
-// app.use('/tasks', taskRoutes); // Protected routes
-// app.use('/subtasks', subtaskRoutes); // Protected routes
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

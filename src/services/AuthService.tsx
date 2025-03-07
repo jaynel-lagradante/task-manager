@@ -21,6 +21,16 @@ export const Register = async (credentials: { username: string; password: string
     }
 };
 
+export const GoogleAuth = async (token: string) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/google`, { token });
+        localStorage.setItem('token', response.data.token);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const Logout = () => {
     localStorage.removeItem('token');
 };
