@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 import { OAuth2Client } from 'google-auth-library'; 
+import axios from 'axios';
 
 dotenv.config();
 
@@ -29,7 +30,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             }
         }
 
-        const token = jwt.sign({ id: account.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        const token = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, { expiresIn: '1h' });
         res.json({ token });
     } catch (error) {
         console.error(error);
@@ -64,44 +65,21 @@ export const register = async (req: Request, res: Response) => {
 
 export const signInUsingGoogle = async (req: Request, res: Response) => {
     try { 
-        const { userInfo } = req.body;
-        const { name, email, sub } = userInfo.data;
-        if (!sub) {
-            res.status(400).json({ message: 'Google ID is required' });
-            return;
-        }
+        const { code } = req.body;
+        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-        let account = await Account.findOne({ where: { google_id: sub } });
+        const userInfo = await axios.post('https://oauth2.googleapis.com/token', {
+            client_id: process.env.GOOGLE_CLIENT_ID,
+            client_secret: process.env.GOOGLE_CLIENT_SECRET,
+            code,
+            grant_type: 'authorization_code',
+            redirect_uri: 'http://localhost:3000', // Must match Google console settings
+        });
 
-        if (!account) {
-            account = await Account.create({
-                id: uuidv4(),
-                username: email || name || 'GoogleUser',
-                google_id: sub,
-                created_at: new Date(),
-            });
-        }
+        const {id_token} = userInfo.data;
 
-        const jwtToken = jwt.sign({ id: account.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-        res.json({ token: jwtToken });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-};
-
-export const signInUsingGoogleWithOAuth = async (req: Request, res: Response) => {
-    const { token } = req.body;
-    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-    if (!token) {
-        res.status(400).json({ message: 'Token is required' });
-        return;
-    }
-
-    try {
         const ticket = await client.verifyIdToken({
-            idToken: token,
+            idToken: id_token,
             audience: process.env.GOOGLE_CLIENT_ID,
         });
         const payload = ticket.getPayload();
@@ -112,19 +90,19 @@ export const signInUsingGoogleWithOAuth = async (req: Request, res: Response) =>
         }
 
         let account = await Account.findOne({ where: { google_id: payload.sub } });
+        const username = payload.email || payload.name || 'GoogleUser';
 
         if (!account) {
             account = await Account.create({
                 id: uuidv4(),
-                username: payload.email || payload.name || 'GoogleUser',
+                username,
                 google_id: payload.sub,
                 created_at: new Date(),
             });
         }
 
-        const jwtToken = jwt.sign({ id: account.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        const jwtToken = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, { expiresIn: '1h' });
         res.json({ token: jwtToken });
-
     } catch (error) {
         console.error('Error verifying Google token:', error);
         res.status(401).json({ message: 'Error verifying Google token' });

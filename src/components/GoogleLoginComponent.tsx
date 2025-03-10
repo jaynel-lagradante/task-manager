@@ -5,21 +5,21 @@ import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { GoogleAuth } from '../services/AuthService';
 
-
 const GoogleLoginComponent: React.FC = () => {
     const navigate = useNavigate();
 
     const GoogleLoginButton = () => {
         const handleGoogleAuth = useGoogleLogin({
           onSuccess: async (credentialResponse: any) => {
-            if (credentialResponse && credentialResponse.access_token) {
-                await GoogleAuth(credentialResponse.access_token); 
+            if (credentialResponse && credentialResponse.code) {
+                await GoogleAuth(credentialResponse.code); 
                 navigate('/');
             } else {
                 console.error('Credential not found in response');
             }
-          },
-          onError: () => console.log("Login Failed"),
+            },
+            onError: () => console.log("Login Failed"),
+            flow: 'auth-code',
         });
     
         return (
@@ -37,24 +37,9 @@ const GoogleLoginComponent: React.FC = () => {
         );
       };
 
-    //   const onSuccess = async (credentialResponse: any) => { // Type the credentialResponse
-    //     console.log(credentialResponse);
-    //     if (credentialResponse && credentialResponse.credential) {
-    //         await GoogleAuth(credentialResponse.credential); // Pass the credential (token)
-    //         navigate('/');
-    //     } else {
-    //         console.error('Credential not found in response');
-    //     }
-    // };
-
-    // const onError = () => {
-    //     console.log('Login Failed');
-    // };
-
     return (
-        <GoogleOAuthProvider clientId='52818097788-vtui6hcvtsg7g2t659h5v3al5ttl33p1.apps.googleusercontent.com'>
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>
             <GoogleLoginButton></GoogleLoginButton>
-            {/* <GoogleLogin onSuccess={onSuccess} onError={onError} /> */}
         </GoogleOAuthProvider>
     );
 };

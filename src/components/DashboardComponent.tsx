@@ -13,7 +13,7 @@ interface DashboardComponentProps {
 const DashboardComponent: React.FC<DashboardComponentProps> = ({children}) => {
     const [value, setValue] = useState(0);
     const navigate = useNavigate();
-    const username = "John Doe";
+    const username = localStorage.getItem('username');
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
