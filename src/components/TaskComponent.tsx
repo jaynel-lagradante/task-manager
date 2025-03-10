@@ -117,8 +117,12 @@ const TaskComponent: React.FC = () => {
                 response = await CreateTask(taskData);
             }
 
-            const subtaskData = await createSubtasks(id ?? response.id, subtasks);
-            setSubtasks(subtaskData.createdSubtasks);
+            const newSubTask = subtasks.filter((subtask) => subtask.id === null);
+            const updatedSubtasks = subtasks.filter((subtask) => subtask.id !== null);
+            if(newSubTask.length > 0) {
+                const subtaskData = await createSubtasks(id ?? response.id, newSubTask);
+                setSubtasks(subtaskData.createdSubtasks);
+            }
 
             // File upload logic
             if (selectedFiles && selectedFiles.length > 0) {
@@ -184,7 +188,7 @@ const TaskComponent: React.FC = () => {
                         <Container maxWidth="md" style={{  paddingBottom: '16px' }}>
                             <Box mt={4}>
                                 {error && <Typography color="error">{error}</Typography>}
-                                <form onSubmit={handleSubmit}>
+                                <form>
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} sm={3}>
                                             <FormControl fullWidth margin="normal">

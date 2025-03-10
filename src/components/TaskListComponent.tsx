@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Typography, Box, Select, MenuItem, FormControl, InputLabel,
+    Typography, Box,
     IconButton,
     Checkbox,
 } from '@mui/material';
@@ -19,14 +19,23 @@ import { CuztomizedHeaderBox, DeleteButtonBadge } from '../layouts/DashboardStyl
 import DeleteInactiveIcon from './../assets/Icons/Delete_inactive.svg';
 import { Task } from '../types/TaskInterface';
 import DeleteConfirmationModal from './DeleteConfirmationModalComponent';
+import FilterComponent from './FilterComponent';
+import ChipCancelled from '../assets/Chips/Chip_Cancelled.svg';
+import ChipComplete from '../assets/Chips/Chip_Complete.svg';
+import ChipInProgress from '../assets/Chips/Chip_In progress.svg';
+import ChipNotStarted from '../assets/Chips/Chip_Not started.svg';
+import ChipLow from '../assets/Chips/Chip_Low.svg';
+import ChipHigh from '../assets/Chips/Chip_High.svg';
+import ChipCritical from '../assets/Chips/Chip_Critical.svg';
+import { FilterContainerBox, FilterIconImg, TableContainer } from '../layouts/TaskListStyles';
 
 const TaskListComponent: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const navigate = useNavigate();
-    const [priorityFilter, setPriorityFilter] = useState('All');
-    const [statusFilter, setStatusFilter] = useState('All');
     const [selectedRows, setSelectedRows] = useState<string[]>([])
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+    const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
 
     const isAuthenticated = !!localStorage.getItem('token');
 
@@ -51,10 +60,19 @@ const TaskListComponent: React.FC = () => {
     const handleEdit = (taskId: string) => {
         navigate(`/edit-task/${taskId}`);
     };
-
+    
     const filteredTasks = tasks.filter((task) => {
-        const priorityMatch = priorityFilter === 'All' || task.priority === priorityFilter;
-        const statusMatch = statusFilter === 'All' || task.status === statusFilter;
+        let priorityMatch = true;
+        let statusMatch = true;
+
+        if (selectedPriorities.length > 0) {
+            priorityMatch = selectedPriorities.includes(task.priority);
+        }
+
+        if (selectedStatuses.length > 0) {
+            statusMatch = selectedStatuses.includes(task.status);
+        } 
+
         return priorityMatch && statusMatch;
     });
 
@@ -173,6 +191,73 @@ const TaskListComponent: React.FC = () => {
         },
     ];
 
+    const menuItems = [
+        {
+          label: 'Priority',
+          subMenu: [
+            { label: 'All' },
+            { label: 'Low' },
+            { label: 'High' },
+            { label: 'Critical' },
+          ],
+        },
+        {
+          label: 'Status',
+          subMenu: [
+            { label: 'All'},
+            { label: 'Not Started' },
+            { label: 'In Progress'},
+            { label: 'Complete'},
+            { label: 'Cancelled'},
+          ],
+        },
+      ];
+
+    const handleFilter = (mainMenu: string | null, subMenu: string | null) => {
+        if (mainMenu === 'Priority' && subMenu) {
+            if (subMenu === 'All') {
+                setSelectedPriorities([]);
+                return;
+            }
+            const priority = [...selectedPriorities, subMenu]
+            setSelectedPriorities(priority);
+        } else if (mainMenu === 'Status' && subMenu) {
+            if(subMenu === 'All') {
+                setSelectedStatuses([]);
+                return;
+            }
+            const status = [...selectedStatuses, subMenu]
+            setSelectedStatuses(status);
+        }
+    }
+
+    const getChipIcon = (label: string) => {
+        switch (label) {
+            case 'Cancelled':
+                return ChipCancelled;
+            case 'Complete':
+                return ChipComplete;
+            case 'In Progress':
+                return ChipInProgress;
+            case 'Not Started':
+                return ChipNotStarted;
+            case 'Low':
+                return ChipLow;
+            case 'High':
+                return ChipHigh;
+            case 'Critical':
+                return ChipCritical;
+        }
+    };
+
+    const removeFilter = (label: string, type: 'status' | 'priority') => {
+        if (type === 'status') {
+            setSelectedStatuses(selectedStatuses.filter((status) => status !== label));
+        } else {
+            setSelectedPriorities(selectedPriorities.filter((priority) => priority !== label));
+        }
+    };
+
     if (!isAuthenticated) {
         return null;
     }
@@ -182,33 +267,38 @@ const TaskListComponent: React.FC = () => {
             <Typography variant="h4" gutterBottom>
                 To-do
             </Typography>
-            <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
-                <Box display="flex" gap={2}>
-                    <FormControl>
-                        <InputLabel>Priority</InputLabel>
-                        <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
-                            <MenuItem value="All">All</MenuItem>
-                            <MenuItem value="Low">Low</MenuItem>
-                            <MenuItem value="High">High</MenuItem>
-                            <MenuItem value="Critical">Critical</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <FormControl>
-                        <InputLabel>Status</InputLabel>
-                        <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                            <MenuItem value="All">All</MenuItem>
-                            <MenuItem value="Not Started">Not Started</MenuItem>
-                            <MenuItem value="In Progress">In Progress</MenuItem>
-                            <MenuItem value="Complete">Complete</MenuItem>
-                            <MenuItem value="Cancelled">Cancelled</MenuItem>
-                        </Select>
-                    </FormControl>
+            <FilterContainerBox>
+
+                <Box display="flex" alignItems="center">
+                    <FilterComponent
+                        menuItems={menuItems}
+                        buttonLabel="Filter"
+                        onSubMenuItemClick={(mainMenu, subMenu) => handleFilter(mainMenu, subMenu)}
+                    />
+                    <Box display="flex" ml={1}>
+                     { selectedStatuses &&  (selectedStatuses.map((status) => (
+                            <FilterIconImg
+                                key={status}
+                                src={getChipIcon(status)}
+                                alt={status}
+                                onClick={() => removeFilter(status, 'status')}
+                            />
+                        ))) }
+                        { selectedPriorities && (selectedPriorities.map((priority) => (
+                            <FilterIconImg
+                                key={priority}
+                                src={getChipIcon(priority)}
+                                alt={priority}
+                                onClick={() => removeFilter(priority, 'priority')}
+                            />
+                        )))}
+                    </Box>
                 </Box>
-                <IconButton onClick={() => navigate('/create-task')}>
-                    <img src={NewTaskButtonIcon} alt="New Task" style={{ height: '40px' }} />
+                <IconButton onClick={() => navigate('/create-task')} style={{ padding: '0px'}}>
+                    <img src={NewTaskButtonIcon} alt="New Task" style={{ height: '45px' }} />
                 </IconButton>
-            </Box>
-            <div style={{ height: '85%', width: '100%', marginTop: '20px', backgroundColor: 'white' }}>
+            </FilterContainerBox>
+            <TableContainer>
                 <DataGrid
                     rows={filteredTasks}
                     columns={columns}
@@ -219,7 +309,7 @@ const TaskListComponent: React.FC = () => {
                     // checkboxSelection
                     // disableSelectionOnClick
                 />
-            </div>
+            </TableContainer>
             <DeleteConfirmationModal
                 open={isModalOpen}
                 onClose={handleCloseModal}
