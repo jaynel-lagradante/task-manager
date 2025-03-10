@@ -303,11 +303,7 @@ const TaskListComponent: React.FC = () => {
                     rows={filteredTasks}
                     columns={columns}
                     getRowId={(row) => row.id}
-                    // pagination={false} // Disable pagination
-                    hideFooterSelectedRowCount // Hide "row selected" label
-                    hideFooterPagination // Hide pagination controls
-                    // checkboxSelection
-                    // disableSelectionOnClick
+                    hideFooter
                 />
             </TableContainer>
             <DeleteConfirmationModal

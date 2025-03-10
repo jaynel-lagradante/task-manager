@@ -2,10 +2,14 @@ import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 
 export const TableContainer = styled('div')(({ theme }) => ({
-     height: '85%', 
+    //  height: '85%', 
      width: '100%', 
      marginTop: '20px', 
-     backgroundColor: 'white'
+     borderRadius: '16px', 
+     backgroundColor: 'white',
+     '& .MuiDataGrid-root': {
+        borderRadius: '16px', 
+     }
 }));
 
 export const FilterIconImg = styled('img')(({ theme }) => ({
