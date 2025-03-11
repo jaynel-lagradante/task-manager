@@ -19,7 +19,7 @@ export const DeleteButtonBadge = styled(Badge)(({ theme }) => ({
 }));
 
 export const CuztomizedHeaderBox = styled(Box)(({ theme }) => ({
-    width: 60,
+    width: 53,
     border: '1px solid #E0E0E0',
     borderRadius: 10,
 }));

@@ -10,6 +10,7 @@ export const RenderedContainer = styled('div')(({ theme }) => ({
 
     },
     '& .status': {
+        width: '8%',
         margin: '20px 10%',
     }
 }));

@@ -26,7 +26,7 @@ import NewSubtaskIcon from './../assets/Buttons/Button_New Subtask_selected.svg'
 import { FormContainer } from '../layouts/TaskStyles';
 import SaveButton from './../assets/Buttons/Button_Save.svg'; 
 import CancelButton from './../assets/Buttons/Button_Cancel.svg'; 
-import { createSubtasks, deleteSubtask, getSubtasks } from '../services/SubtaskService';
+import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../services/SubtaskService';
 import { Subtask } from '../types/SubTaskInterface';
 // import Attachment from './Attachment';
 
@@ -117,11 +117,14 @@ const TaskComponent: React.FC = () => {
                 response = await CreateTask(taskData);
             }
 
-            const newSubTask = subtasks.filter((subtask) => subtask.id === null);
-            const updatedSubtasks = subtasks.filter((subtask) => subtask.id !== null);
+            const newSubTask = subtasks.filter((subtask) => !subtask.hasOwnProperty('id'));
+            const updatedSubtasks = subtasks.filter((subtask) => subtask.hasOwnProperty('id'));
             if(newSubTask.length > 0) {
                 const subtaskData = await createSubtasks(id ?? response.id, newSubTask);
                 setSubtasks(subtaskData.createdSubtasks);
+            }
+            if(updatedSubtasks.length > 0) {
+                await updateSubtasks(updatedSubtasks);
             }
 
             // File upload logic
