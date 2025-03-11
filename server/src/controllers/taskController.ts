@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Task from '../models/Task';
 import { v4 as uuidv4 } from 'uuid';
+import Subtask from '../models/Subtask';
 
 export const createTask = async (req: Request, res: Response) => {
     try {
@@ -18,13 +19,19 @@ export const createTask = async (req: Request, res: Response) => {
 };
 
 export const getTasks = async (req: Request, res: Response) => {
-    console.log(req)
     try {
         const userId = (req.user as any).id;
-        const tasks = await Task.findAll({ where: { user_id: userId } });
+        const tasks = await Task.findAll({
+            where: { user_id: userId },
+            include: [{
+                model: Subtask,
+                as: 'subtasks'
+            }]
+        });
+
         res.json(tasks);
     } catch (error) {
-        console.error(error);
+        console.error("Error fetching tasks:", error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
