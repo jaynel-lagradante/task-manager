@@ -176,12 +176,70 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
         {
             accessorFn: (row) => (row.due_date ? moment(row.due_date).format('YYYY-MM-DD') : 'N/A'),
             id: 'due_date',
-            cell: (info) => info.getValue(),
+            cell: ({ getValue }) => {
+                const dueDate = getValue<string>();
+                const today = moment().format('YYYY-MM-DD');
+                const isToday = dueDate === today;
+                const isOverdue = dueDate !== 'N/A' && moment(dueDate).isBefore(today, 'day');
+                let color = '';
+                let statusText = '';
+
+                if (isToday) {
+                    color = '#009292';
+                    statusText = 'Today';
+                } else if (isOverdue) {
+                    color = '#CA0061';
+                    statusText = 'Overdue';
+                }
+
+                return (
+                    <div>
+                        <div style={{ color: color }}>{dueDate}</div>
+                        {statusText && <div style={{ color: color, fontSize: '12px' }}>{statusText}</div>}
+                    </div>
+                );
+            },
             header: () => <span>Due Date</span>,
         },
         {
             accessorKey: 'priority',
             header: () => 'Priority',
+            cell: ({ getValue }) => {
+                const priority = getValue<string>();
+                let bgColor = '';
+                let borderColor = '';
+
+                switch (priority) {
+                    case 'Low':
+                        bgColor = '#dff0d8';
+                        borderColor = '#2FBD00';
+                        break;
+                    case 'High':
+                        bgColor = '#fcf8e3';
+                        borderColor = '#FAC300';
+                        break;
+                    case 'Critical':
+                        bgColor = '#f2dede';
+                        borderColor = '#EB0000';
+                        break;
+                    default:
+                        bgColor = '#ffffff';
+                        borderColor = '#ccc';
+                }
+
+                return (
+                    <div
+                        style={{
+                            backgroundColor: bgColor,
+                            padding: '2px 8px',
+                            display: 'inline-block',
+                            border: `2px solid ${borderColor}`,
+                        }}
+                    >
+                        {priority}
+                    </div>
+                );
+            },
         },
         {
             accessorKey: 'status',
