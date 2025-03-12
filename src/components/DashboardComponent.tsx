@@ -26,8 +26,9 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
         setIsModalOpen(true);
     };
 
-    const handleCloseModal = () => {
+    const handleCloseModal = (newValue: number) => {
         setIsModalOpen(false);
+        setValue(newValue);
     };
 
     const handleSignOutConfirm = async () => {
@@ -86,7 +87,7 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
             <Grid item xs={12} sm={10} style={{ padding: '16px' }}>
                 <CuztomzedContainer>{children}</CuztomzedContainer>
             </Grid>
-            <Modal open={isModalOpen} onClose={handleCloseModal}>
+            <Modal open={isModalOpen} onClose={() => handleCloseModal(value)}>
                 <Box
                     sx={{
                         position: 'absolute',
@@ -115,7 +116,7 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
-                            onClick={handleCloseModal}
+                            onClick={() => handleCloseModal(0)}
                             sx={{ mr: 2, minWidth: 0, textTransform: 'none', color: 'black' }}
                         >
                             Cancel

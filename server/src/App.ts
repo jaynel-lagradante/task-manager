@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use(passport.initialize());
 const corsOptions = {
-    origin: 'http://localhost:3000', // Allow requests from this origin
+    origin: 'http://localhost:5173', // Allow requests from this origin
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed methods
     credentials: true, // Allow cookies and authorization headers
 };
