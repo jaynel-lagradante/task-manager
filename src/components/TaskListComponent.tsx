@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Typography, Box,
-    IconButton,
-} from '@mui/material';
+import { Typography, Box, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { GetTasks } from '../services/TaskService';
 import DashboardComponent from './DashboardComponent';
@@ -29,7 +26,7 @@ const TaskListComponent: React.FC = () => {
 
     useEffect(() => {
         if (!isAuthenticated) {
-            navigate('/login'); 
+            navigate('/login');
             return;
         }
 
@@ -48,7 +45,7 @@ const TaskListComponent: React.FC = () => {
     const handleEdit = (taskId: string) => {
         navigate(`/edit-task/${taskId}`);
     };
-    
+
     const filteredTasks = tasks.filter((task) => {
         let priorityMatch = true;
         let statusMatch = true;
@@ -59,32 +56,27 @@ const TaskListComponent: React.FC = () => {
 
         if (selectedStatuses.length > 0) {
             statusMatch = selectedStatuses.includes(task.status);
-        } 
+        }
 
         return priorityMatch && statusMatch;
     });
 
     const menuItems = [
         {
-          label: 'Priority',
-          subMenu: [
-            { label: 'All' },
-            { label: 'Low' },
-            { label: 'High' },
-            { label: 'Critical' },
-          ],
+            label: 'Priority',
+            subMenu: [{ label: 'All' }, { label: 'Low' }, { label: 'High' }, { label: 'Critical' }],
         },
         {
-          label: 'Status',
-          subMenu: [
-            { label: 'All'},
-            { label: 'Not Started' },
-            { label: 'In Progress'},
-            { label: 'Complete'},
-            { label: 'Cancelled'},
-          ],
+            label: 'Status',
+            subMenu: [
+                { label: 'All' },
+                { label: 'Not Started' },
+                { label: 'In Progress' },
+                { label: 'Complete' },
+                { label: 'Cancelled' },
+            ],
         },
-      ];
+    ];
 
     const handleFilter = (mainMenu: string | null, subMenu: string | null) => {
         if (mainMenu === 'Priority' && subMenu) {
@@ -92,17 +84,17 @@ const TaskListComponent: React.FC = () => {
                 setSelectedPriorities([]);
                 return;
             }
-            const priority = [...selectedPriorities, subMenu]
+            const priority = [...selectedPriorities, subMenu];
             setSelectedPriorities(priority);
         } else if (mainMenu === 'Status' && subMenu) {
-            if(subMenu === 'All') {
+            if (subMenu === 'All') {
                 setSelectedStatuses([]);
                 return;
             }
-            const status = [...selectedStatuses, subMenu]
+            const status = [...selectedStatuses, subMenu];
             setSelectedStatuses(status);
         }
-    }
+    };
 
     const getChipIcon = (label: string) => {
         switch (label) {
@@ -141,7 +133,6 @@ const TaskListComponent: React.FC = () => {
                 To-do
             </Typography>
             <FilterContainerBox>
-
                 <Box display="flex" alignItems="center">
                     <FilterComponent
                         menuItems={menuItems}
@@ -149,25 +140,27 @@ const TaskListComponent: React.FC = () => {
                         onSubMenuItemClick={(mainMenu, subMenu) => handleFilter(mainMenu, subMenu)}
                     />
                     <Box display="flex" ml={1}>
-                     { selectedStatuses &&  (selectedStatuses.map((status) => (
-                            <FilterIconImg
-                                key={status}
-                                src={getChipIcon(status)}
-                                alt={status}
-                                onClick={() => removeFilter(status, 'status')}
-                            />
-                        ))) }
-                        { selectedPriorities && (selectedPriorities.map((priority) => (
-                            <FilterIconImg
-                                key={priority}
-                                src={getChipIcon(priority)}
-                                alt={priority}
-                                onClick={() => removeFilter(priority, 'priority')}
-                            />
-                        )))}
+                        {selectedStatuses &&
+                            selectedStatuses.map((status) => (
+                                <FilterIconImg
+                                    key={status}
+                                    src={getChipIcon(status)}
+                                    alt={status}
+                                    onClick={() => removeFilter(status, 'status')}
+                                />
+                            ))}
+                        {selectedPriorities &&
+                            selectedPriorities.map((priority) => (
+                                <FilterIconImg
+                                    key={priority}
+                                    src={getChipIcon(priority)}
+                                    alt={priority}
+                                    onClick={() => removeFilter(priority, 'priority')}
+                                />
+                            ))}
                     </Box>
                 </Box>
-                <IconButton onClick={() => navigate('/create-task')} style={{ padding: '0px'}}>
+                <IconButton onClick={() => navigate('/create-task')} style={{ padding: '0px' }}>
                     <img src={NewTaskButtonIcon} alt="New Task" style={{ height: '45px' }} />
                 </IconButton>
             </FilterContainerBox>

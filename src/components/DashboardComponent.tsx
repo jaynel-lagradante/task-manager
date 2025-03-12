@@ -10,7 +10,7 @@ interface DashboardComponentProps {
     children: ReactNode;
 }
 
-const DashboardComponent: React.FC<DashboardComponentProps> = ({children}) => {
+const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => {
     const [value, setValue] = useState(0);
     const navigate = useNavigate();
     const username = localStorage.getItem('username');
@@ -36,21 +36,14 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({children}) => {
                         <Avatar src={AvatarIcon} alt="Avatar" style={{ marginBottom: '8px' }} />
                         <Typography variant="body1">{username}</Typography>
                     </Box>
-                    <MenuTabs
-                        value={value}
-                        onChange={handleChange}
-                        orientation="vertical"
-                        aria-label="dashboard tabs"
-                    >
+                    <MenuTabs value={value} onChange={handleChange} orientation="vertical" aria-label="dashboard tabs">
                         <Tab label="Home" />
                         <Tab label="Sign out" onClick={handleSignOut} />
                     </MenuTabs>
                 </Box>
             </Grid>
-            <Grid item xs={12} sm={10} style={{ padding: '16px'}}>
-                <CuztomzedContainer>
-                    {children}
-                </CuztomzedContainer>
+            <Grid item xs={12} sm={10} style={{ padding: '16px' }}>
+                <CuztomzedContainer>{children}</CuztomzedContainer>
             </Grid>
         </Grid>
     );

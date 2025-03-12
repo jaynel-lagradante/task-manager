@@ -22,7 +22,7 @@ File.init(
         sequelize,
         tableName: 'files',
         timestamps: false,
-        underscored: true
+        underscored: true,
     }
 );
 

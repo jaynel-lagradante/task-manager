@@ -3,7 +3,15 @@ import Wallpaper from './../assets/Wallpaper.svg';
 import BrandAndLogo from './../assets/Brand and logo.svg';
 import Facebook from './../assets/Icons/Facebook.svg';
 // import Google from './../assets/Icons/Google.svg'
-import { GridContainer, ImageGridItem, FormGridItem, ImageLogoItem, OrDivider, SigninOptionButton, IconWrapper } from '../layouts/CoverPageStyles';
+import {
+    GridContainer,
+    ImageGridItem,
+    FormGridItem,
+    ImageLogoItem,
+    OrDivider,
+    SigninOptionButton,
+    IconWrapper,
+} from '../layouts/CoverPageStyles';
 import GoogleLoginComponent from './GoogleLoginComponent';
 
 interface CoverPageComponentProps {
@@ -11,7 +19,6 @@ interface CoverPageComponentProps {
 }
 
 const CoverPageComponent: React.FC<CoverPageComponentProps> = ({ children }) => {
-
     return (
         <GridContainer container>
             <ImageGridItem

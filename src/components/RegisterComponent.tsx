@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Typography, InputAdornment, IconButton, List, ListItemIcon, ListItemText } from '@mui/material';
 import { Register } from '../services/AuthService';
-import { PasswordChecklist, PasswordListIconImg, SignupLink, SignupMessageItem, SubmitButton } from '../layouts/CoverPageStyles';
+import {
+    PasswordChecklist,
+    PasswordListIconImg,
+    SignupLink,
+    SignupMessageItem,
+    SubmitButton,
+} from '../layouts/CoverPageStyles';
 import ShowPasswordIcon from './../assets/Icons/Show.svg';
 import HidePasswordIcon from './../assets/Icons/Hide.svg';
 import Bullet from './../assets/Icons/Bullet.svg';
@@ -26,10 +32,10 @@ const RegisterComponent: React.FC = () => {
         const username = e.target.value;
         setUsername(username);
         setUsernameError('');
-        if(password) {
+        if (password) {
             checkPasswordStrength(password);
         }
-    }
+    };
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const password = e.target.value;
@@ -46,7 +52,7 @@ const RegisterComponent: React.FC = () => {
     };
 
     const checkPasswordStrength = (password: string) => {
-        if(!password || !username) {
+        if (!password || !username) {
             setNameEmailCheck(false);
         } else {
             setNameEmailCheck(!password.toLowerCase().includes(username.toLowerCase()));
@@ -59,11 +65,11 @@ const RegisterComponent: React.FC = () => {
         const checks = [nameEmailCheck, lengthCheck, numberSymbolCheck].filter(Boolean).length;
         setPasswordCheck(checks);
         if (checks === 3) {
-            setPasswordError('Password strength: Strong'); 
+            setPasswordError('Password strength: Strong');
         } else if (password || checks >= 1) {
-            setPasswordError('Password strength: Weak'); 
+            setPasswordError('Password strength: Weak');
         } else {
-            setPasswordError(''); 
+            setPasswordError('');
         }
     }, [nameEmailCheck, lengthCheck, numberSymbolCheck, password]);
 
@@ -76,7 +82,7 @@ const RegisterComponent: React.FC = () => {
             setPasswordError('Password is required');
         }
 
-        if(!username || !password || passwordCheck !== 3) {
+        if (!username || !password || passwordCheck !== 3) {
             return;
         }
 
@@ -85,10 +91,10 @@ const RegisterComponent: React.FC = () => {
         setRegisterError('');
 
         try {
-            await Register({ username, password }); 
+            await Register({ username, password });
             navigate('/login', { state: { registrationMessage: 'Account successfully created' } });
         } catch (err: any) {
-            if(err.response?.data?.message === 'Username already exist') {
+            if (err.response?.data?.message === 'Username already exist') {
                 setUsernameError('Username already exist');
             } else {
                 setRegisterError(err.response?.data?.message || 'Registration failed');
@@ -120,12 +126,12 @@ const RegisterComponent: React.FC = () => {
                 margin="normal"
                 value={password}
                 onChange={handlePasswordChange}
-                color='primary'
+                color="primary"
                 error={!!passwordError && passwordCheck !== 3}
                 helperText={passwordError}
                 FormHelperTextProps={{
                     sx: {
-                        color: passwordCheck ===  3 ? '#027CEC' : 'red', 
+                        color: passwordCheck === 3 ? '#027CEC' : 'red',
                     },
                 }}
                 InputProps={{
@@ -150,19 +156,31 @@ const RegisterComponent: React.FC = () => {
             <List>
                 <PasswordChecklist>
                     <ListItemIcon>
-                        {nameEmailCheck ? <PasswordListIconImg src={Check} alt="Check"/> : <PasswordListIconImg src={Bullet} alt="Bullet"/>}
+                        {nameEmailCheck ? (
+                            <PasswordListIconImg src={Check} alt="Check" />
+                        ) : (
+                            <PasswordListIconImg src={Bullet} alt="Bullet" />
+                        )}
                     </ListItemIcon>
                     <ListItemText primary="Password cannot contain your username" />
                 </PasswordChecklist>
                 <PasswordChecklist>
                     <ListItemIcon>
-                        {lengthCheck ? <PasswordListIconImg src={Check} alt="Check"/> : <PasswordListIconImg src={Bullet} alt="Bullet"/>}
+                        {lengthCheck ? (
+                            <PasswordListIconImg src={Check} alt="Check" />
+                        ) : (
+                            <PasswordListIconImg src={Bullet} alt="Bullet" />
+                        )}
                     </ListItemIcon>
                     <ListItemText primary="At least 8 characters" />
                 </PasswordChecklist>
                 <PasswordChecklist>
                     <ListItemIcon>
-                        {numberSymbolCheck ? <PasswordListIconImg src={Check} alt="Check"/> : <PasswordListIconImg src={Bullet} alt="Bullet"/>}
+                        {numberSymbolCheck ? (
+                            <PasswordListIconImg src={Check} alt="Check" />
+                        ) : (
+                            <PasswordListIconImg src={Bullet} alt="Bullet" />
+                        )}
                     </ListItemIcon>
                     <ListItemText primary="Contains a number or symbol" />
                 </PasswordChecklist>
@@ -171,13 +189,9 @@ const RegisterComponent: React.FC = () => {
                 Register
             </SubmitButton>
             <SignupMessageItem>
-                <Typography>
-                    Already have an account?
-                </Typography>
+                <Typography>Already have an account?</Typography>
 
-                <SignupLink onClick={() => navigate('/login')}>
-                    Sign in
-                </SignupLink>
+                <SignupLink onClick={() => navigate('/login')}>Sign in</SignupLink>
             </SignupMessageItem>
         </CoverPageComponent>
     );

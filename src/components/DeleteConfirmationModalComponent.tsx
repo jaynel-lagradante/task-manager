@@ -1,9 +1,8 @@
 import React from 'react';
 import { Modal, Box, Typography, IconButton } from '@mui/material';
-import AlertIcon from './../assets/Icons/Alert.svg'; 
+import AlertIcon from './../assets/Icons/Alert.svg';
 import DeleteIcon from './../assets/Buttons/Button_Delete.svg';
 import CancelIcon from './../assets/Buttons/Button_Cancel.svg';
-
 
 interface DeleteConfirmationModalProps {
     open: boolean;
@@ -13,7 +12,13 @@ interface DeleteConfirmationModalProps {
     secondLabel: string | null;
 }
 
-const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ open, onClose, onConfirm, firstLabel, secondLabel }) => {
+const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
+    open,
+    onClose,
+    onConfirm,
+    firstLabel,
+    secondLabel,
+}) => {
     return (
         <Modal open={open} onClose={onClose}>
             <Box
@@ -35,14 +40,12 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ open,
                 <Typography variant="h6" component="h2" gutterBottom>
                     {firstLabel}
                 </Typography>
-                {
-                    secondLabel && (
-                        <Typography variant="h6" component="h2" gutterBottom style={{ textDecoration: 'underline' }}>
-                            {secondLabel}
-                        </Typography>
-                    )
-                }
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center'}}>
+                {secondLabel && (
+                    <Typography variant="h6" component="h2" gutterBottom style={{ textDecoration: 'underline' }}>
+                        {secondLabel}
+                    </Typography>
+                )}
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
                     <IconButton onClick={onClose}>
                         <img src={CancelIcon} alt="Cancel" style={{ height: '40px' }} />
                     </IconButton>

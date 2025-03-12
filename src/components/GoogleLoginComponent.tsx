@@ -1,5 +1,5 @@
 import React from 'react';
-import Google from './../assets/Icons/Google.svg'
+import Google from './../assets/Icons/Google.svg';
 import { SigninOptionButton, IconWrapper } from '../layouts/CoverPageStyles';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
@@ -10,18 +10,18 @@ const GoogleLoginComponent: React.FC = () => {
 
     const GoogleLoginButton = () => {
         const handleGoogleAuth = useGoogleLogin({
-          onSuccess: async (credentialResponse: any) => {
-            if (credentialResponse && credentialResponse.code) {
-                await GoogleAuth(credentialResponse.code); 
-                navigate('/');
-            } else {
-                console.error('Credential not found in response');
-            }
+            onSuccess: async (credentialResponse: any) => {
+                if (credentialResponse && credentialResponse.code) {
+                    await GoogleAuth(credentialResponse.code);
+                    navigate('/');
+                } else {
+                    console.error('Credential not found in response');
+                }
             },
-            onError: () => console.log("Login Failed"),
+            onError: () => console.log('Login Failed'),
             flow: 'auth-code',
         });
-    
+
         return (
             <SigninOptionButton
                 onClick={() => handleGoogleAuth()}
@@ -31,11 +31,11 @@ const GoogleLoginComponent: React.FC = () => {
                         <img src={Google} alt="Google Icon" />
                     </IconWrapper>
                 }
-                >
+            >
                 Continue with Google
             </SigninOptionButton>
         );
-      };
+    };
 
     return (
         <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>

@@ -1,23 +1,23 @@
 import { Fragment, JSX, useState } from 'react';
 import {
-  useReactTable,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getSortedRowModel,
-  ColumnDef,
-  flexRender,
-  Row,
+    useReactTable,
+    getCoreRowModel,
+    getExpandedRowModel,
+    getSortedRowModel,
+    ColumnDef,
+    flexRender,
+    Row,
 } from '@tanstack/react-table';
 import {
-  Table as MuiTable,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
-  Box,
-  Checkbox,
+    Table as MuiTable,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    IconButton,
+    Box,
+    Checkbox,
 } from '@mui/material';
 import moment from 'moment';
 import { Task } from '../types/TaskInterface';
@@ -46,40 +46,43 @@ type TableProps<TData> = {
 };
 
 const renderSubComponent = ({ row }: { row: Row<Task> }) => {
-    const subtasks = row.original.subtasks
+    const subtasks = row.original.subtasks;
     if (!row.original.subtasks || row.original.subtasks.length === 0) {
-      return null;
+        return null;
     }
-  
+
     return (
         <>
-          {subtasks && subtasks.map((subtask) => {
-            let statusIcon = null;
-            if (subtask.status === 'Done') {
-              statusIcon = DoneIcon;
-            } else if (subtask.status === 'Not Done') {
-              statusIcon = NotDoneIcon;
-            }
-    
-            return (
-              <RenderedContainer key={subtask.id}>
-                <div className='title'>{subtask.title}</div>
-                <div className='status' style={{ display: 'flex', alignItems: 'center' }}>
-                  {statusIcon && <img src={statusIcon} alt={subtask.status} style={{ height: '10px', marginRight: '8px' }} />}
-                  <span>{subtask.status}</span>
-                </div>
-              </RenderedContainer>
-            );
-          })}
+            {subtasks &&
+                subtasks.map((subtask) => {
+                    let statusIcon = null;
+                    if (subtask.status === 'Done') {
+                        statusIcon = DoneIcon;
+                    } else if (subtask.status === 'Not Done') {
+                        statusIcon = NotDoneIcon;
+                    }
+
+                    return (
+                        <RenderedContainer key={subtask.id}>
+                            <div className="title">{subtask.title}</div>
+                            <div className="status" style={{ display: 'flex', alignItems: 'center' }}>
+                                {statusIcon && (
+                                    <img
+                                        src={statusIcon}
+                                        alt={subtask.status}
+                                        style={{ height: '10px', marginRight: '8px' }}
+                                    />
+                                )}
+                                <span>{subtask.status}</span>
+                            </div>
+                        </RenderedContainer>
+                    );
+                })}
         </>
     );
 };
 
-function TableComponent({
-  data,
-  getRowCanExpand,
-  setTasksValue
-}: TableProps<Task>): JSX.Element {
+function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Task>): JSX.Element {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
@@ -118,25 +121,24 @@ function TableComponent({
     const tableColumns: ColumnDef<Task>[] = [
         {
             id: 'selection',
-            header: ({ table }) => (
-              selectedRows.length > 0 ? (
-                <CuztomizedHeaderBox>
-                  <DeleteButtonBadge badgeContent={selectedRows.length} color="primary">
-                    <IconButton onClick={handleDeleteSelected}>
-                      <img src={DeleteActiveIcon} alt="Delete" style={{ height: '20px' }} />
-                    </IconButton>
-                  </DeleteButtonBadge>
-                </CuztomizedHeaderBox>
-              ) : (
-                <Box>
-                  <IconButton disabled>
-                    <img src={DeleteInactiveIcon} alt="Delete" style={{ height: '20px' }} />
-                  </IconButton>
-                </Box>
-              )
-            ),
+            header: ({ table }) =>
+                selectedRows.length > 0 ? (
+                    <CuztomizedHeaderBox>
+                        <DeleteButtonBadge badgeContent={selectedRows.length} color="primary">
+                            <IconButton onClick={handleDeleteSelected}>
+                                <img src={DeleteActiveIcon} alt="Delete" style={{ height: '20px' }} />
+                            </IconButton>
+                        </DeleteButtonBadge>
+                    </CuztomizedHeaderBox>
+                ) : (
+                    <Box>
+                        <IconButton disabled>
+                            <img src={DeleteInactiveIcon} alt="Delete" style={{ height: '20px' }} />
+                        </IconButton>
+                    </Box>
+                ),
             cell: ({ row }) => (
-              <Checkbox 
+                <Checkbox
                     checked={selectedRows.includes(row.original.id ?? '')}
                     onChange={(e) => {
                         if (e.target.checked) {
@@ -151,86 +153,83 @@ function TableComponent({
         {
             id: 'expand',
             header: '',
-            cell: ({ row }) => (
-              row.getCanExpand() && (
-                <IconButton onClick={row.getToggleExpandedHandler()} size="small">
-                  {row.getIsExpanded() ? (
-                    <img src={AccordionExpandIcon} alt="Expand" style={{ height: '6px' }} />
-                  ) : (
-                    <img src={AccordionSuppressIcon} alt="Suppress" style={{ height: '10px' }} />
-                  )}
-                </IconButton>
-              )
-            ),
-          },
-          {
+            cell: ({ row }) =>
+                row.getCanExpand() && (
+                    <IconButton onClick={row.getToggleExpandedHandler()} size="small">
+                        {row.getIsExpanded() ? (
+                            <img src={AccordionExpandIcon} alt="Expand" style={{ height: '6px' }} />
+                        ) : (
+                            <img src={AccordionSuppressIcon} alt="Suppress" style={{ height: '10px' }} />
+                        )}
+                    </IconButton>
+                ),
+        },
+        {
             accessorKey: 'title',
             header: 'Title',
             cell: ({ row, getValue }) => (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ paddingLeft: `${row.depth * 2}rem`, fontWeight: 'bold' }}>
-                  {getValue<string>()}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ paddingLeft: `${row.depth * 2}rem`, fontWeight: 'bold' }}>{getValue<string>()}</div>
                 </div>
-              </div>
             ),
         },
         {
-          accessorFn: (row) => row.due_date ? moment(row.due_date).format('YYYY-MM-DD') : 'N/A',
-          id: 'due_date',
-          cell: (info) => info.getValue(),
-          header: () => <span>Due Date</span>,
+            accessorFn: (row) => (row.due_date ? moment(row.due_date).format('YYYY-MM-DD') : 'N/A'),
+            id: 'due_date',
+            cell: (info) => info.getValue(),
+            header: () => <span>Due Date</span>,
         },
         {
-          accessorKey: 'priority',
-          header: () => 'Priority',
+            accessorKey: 'priority',
+            header: () => 'Priority',
         },
         {
             accessorKey: 'status',
             header: 'Status',
             cell: ({ getValue }) => {
-              const status = getValue<string>();
-              let icon;
-        
-              switch (status) {
-                case 'Not Started':
-                  icon = NotStartedIcon;
-                  break;
-                case 'In Progress':
-                  icon = InProgressIcon;
-                  break;
-                case 'Complete':
-                  icon = CompleteIcon;
-                  break;
-                case 'Cancelled':
-                  icon = CancelledIcon;
-                  break;
-                default:
-                  icon = null;
-              }
-        
-              return (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  {icon && <img src={icon} alt={status} style={{ height: '20px', marginRight: '8px' }} />}
-                  <span>{status}</span>
-                </div>
-              );
+                const status = getValue<string>();
+                let icon;
+
+                switch (status) {
+                    case 'Not Started':
+                        icon = NotStartedIcon;
+                        break;
+                    case 'In Progress':
+                        icon = InProgressIcon;
+                        break;
+                    case 'Complete':
+                        icon = CompleteIcon;
+                        break;
+                    case 'Cancelled':
+                        icon = CancelledIcon;
+                        break;
+                    default:
+                        icon = null;
+                }
+
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        {icon && <img src={icon} alt={status} style={{ height: '20px', marginRight: '8px' }} />}
+                        <span>{status}</span>
+                    </div>
+                );
             },
         },
         {
             id: 'edit',
             header: '',
             cell: ({ row }) => (
-              <img
-                src={EditIcon}
-                alt="Edit"
-                style={{ height: '20px', cursor: 'pointer' }}
-                onClick={() => handleEdit(row.original.id ?? '')}
-              />
+                <img
+                    src={EditIcon}
+                    alt="Edit"
+                    style={{ height: '20px', cursor: 'pointer' }}
+                    onClick={() => handleEdit(row.original.id ?? '')}
+                />
             ),
         },
     ];
 
-    const columns = tableColumns;   
+    const columns = tableColumns;
     const table = useReactTable<Task>({
         data,
         columns,
@@ -243,63 +242,57 @@ function TableComponent({
     return (
         <TableContainer>
             <MuiTable>
-            <TableHead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
+                <TableHead>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => {
+                                return (
+                                    <TableCell key={header.id} colSpan={header.colSpan}>
+                                        {header.isPlaceholder ? null : (
+                                            <div
+                                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                                                onClick={header.column.getToggleSortingHandler()}
+                                            >
+                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                                {header.column.getIsSorted() && (
+                                                    <img
+                                                        src={SortDesktopIcon}
+                                                        alt="Sort"
+                                                        style={{ height: '15px', marginLeft: '5px' }}
+                                                    />
+                                                )}
+                                            </div>
+                                        )}
+                                    </TableCell>
+                                );
+                            })}
+                        </TableRow>
+                    ))}
+                </TableHead>
+                <TableBody>
+                    {table.getRowModel().rows.map((row) => {
                         return (
-                        <TableCell key={header.id} colSpan={header.colSpan}>
-                            {header.isPlaceholder ? null : (
-                            <div
-                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                                onClick={header.column.getToggleSortingHandler()}
-                            >
-                                {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
+                            <Fragment key={row.id}>
+                                <TableRow>
+                                    {row.getVisibleCells().map((cell) => {
+                                        return (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        );
+                                    })}
+                                </TableRow>
+                                {row.getIsExpanded() && (
+                                    <TableRow>
+                                        <TableCell colSpan={row.getVisibleCells().length} style={{ padding: 0 }}>
+                                            {renderSubComponent({ row })}
+                                        </TableCell>
+                                    </TableRow>
                                 )}
-                                {header.column.getIsSorted() && (
-                                <img
-                                    src={SortDesktopIcon}
-                                    alt="Sort"
-                                    style={{ height: '15px', marginLeft: '5px' }}
-                                />
-                                )}
-                            </div>
-                            )}
-                        </TableCell>
+                            </Fragment>
                         );
                     })}
-                    </TableRow>
-                ))}
-            </TableHead>
-            <TableBody>
-                {table.getRowModel().rows.map((row) => {
-                return (
-                    <Fragment key={row.id}>
-                    <TableRow>
-                        {row.getVisibleCells().map((cell) => {
-                        return (
-                            <TableCell key={cell.id}>
-                            {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                            )}
-                            </TableCell>
-                        );
-                        })}
-                    </TableRow>
-                    {row.getIsExpanded() && (
-                        <TableRow>
-                        <TableCell colSpan={row.getVisibleCells().length} style={{ padding: 0 }}>
-                            {renderSubComponent({ row })}
-                        </TableCell>
-                        </TableRow>
-                    )}
-                    </Fragment>
-                );
-                })}
-            </TableBody>
+                </TableBody>
             </MuiTable>
 
             <DeleteConfirmationModal

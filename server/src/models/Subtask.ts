@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database';
 
 class Subtask extends Model {
@@ -19,7 +19,7 @@ Subtask.init(
         created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
         updated_at: { type: DataTypes.DATE },
     },
-    { sequelize, tableName: "subtask", modelName: "Subtask", underscored: true }
+    { sequelize, tableName: 'subtask', modelName: 'Subtask', underscored: true }
 );
 
 export default Subtask;

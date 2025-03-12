@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database';
 import Subtask from './Subtask';
 
@@ -27,7 +27,7 @@ Task.init(
         updated_at: { type: DataTypes.DATE },
         date_completed: { type: DataTypes.DATE },
     },
-    { sequelize, tableName: "task", modelName: "Task", underscored: true }
+    { sequelize, tableName: 'task', modelName: 'Task', underscored: true }
 );
 
 Task.hasMany(Subtask, { foreignKey: 'task_id', as: 'subtasks' });

@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database';
 
 class Account extends Model {
@@ -23,13 +23,13 @@ Account.init(
         active_sign_in: { type: DataTypes.STRING(50) },
         created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
         updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-        google_id: { 
+        google_id: {
             type: DataTypes.STRING,
             allowNull: true,
             unique: true,
         },
     },
-    { sequelize, tableName: "account", modelName: "Account", underscored: true }
+    { sequelize, tableName: 'account', modelName: 'Account', underscored: true }
 );
 
 export default Account;

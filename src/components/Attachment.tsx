@@ -18,7 +18,7 @@ const Attachment: React.FC<AttachmentProps> = ({ taskId }) => {
                 const files = await GetFiles(taskId);
                 setUploadedFiles(files.map((file: any) => file.file_name));
             } catch (error) {
-                console.error("Error fetching files", error);
+                console.error('Error fetching files', error);
             }
         };
         fetchFiles();
@@ -28,7 +28,9 @@ const Attachment: React.FC<AttachmentProps> = ({ taskId }) => {
         <div>
             {uploadedFiles.length > 0 && (
                 <div>
-                    <Typography variant="subtitle1" style={{ marginTop: '16px' }}>Uploaded Files:</Typography>
+                    <Typography variant="subtitle1" style={{ marginTop: '16px' }}>
+                        Uploaded Files:
+                    </Typography>
                     <List>
                         {uploadedFiles.map((fileName, index) => (
                             <ListItem key={index}>

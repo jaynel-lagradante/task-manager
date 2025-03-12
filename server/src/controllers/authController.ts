@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
-import { OAuth2Client } from 'google-auth-library'; 
+import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
 
 dotenv.config();
@@ -13,16 +13,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     try {
         const { username, password } = req.body;
         if (!username || !password) {
-            res.status(400).json({ message: "Username and password are required" });
+            res.status(400).json({ message: 'Username and password are required' });
             return;
         }
-        
+
         const account = await Account.findOne({ where: { username } });
         if (!account) {
             res.status(401).json({ message: 'Invalid credentials' });
             return;
         }
-        if(account.password) {
+        if (account.password) {
             const passwordMatch = await bcrypt.compare(password, account.password);
             if (!passwordMatch) {
                 res.status(401).json({ message: 'Invalid credentials' });
@@ -42,7 +42,7 @@ export const register = async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body;
         if (!username || !password) {
-            res.status(400).json({ message: "Username and password are required" });
+            res.status(400).json({ message: 'Username and password are required' });
             return;
         }
         // Check if username already exists
@@ -64,7 +64,7 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const signInUsingGoogle = async (req: Request, res: Response) => {
-    try { 
+    try {
         const { code } = req.body;
         const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -76,7 +76,7 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
             redirect_uri: 'http://localhost:3000', // Must match Google console settings
         });
 
-        const {id_token} = userInfo.data;
+        const { id_token } = userInfo.data;
 
         const ticket = await client.verifyIdToken({
             idToken: id_token,

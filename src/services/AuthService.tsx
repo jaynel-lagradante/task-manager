@@ -31,7 +31,7 @@ export const GoogleAuth = async (code: string) => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 export const Logout = () => {
     localStorage.removeItem('token');

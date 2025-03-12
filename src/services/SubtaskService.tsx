@@ -22,9 +22,13 @@ export const getSubtasks = async (taskId: string) => {
 
 export const createSubtasks = async (taskId: string, subtasks: Subtask[]) => {
     try {
-        const response = await axios.post(`${API_URL}`, { taskId, subtasks }, {
-            headers: getAuthHeaders(),
-        });
+        const response = await axios.post(
+            `${API_URL}`,
+            { taskId, subtasks },
+            {
+                headers: getAuthHeaders(),
+            }
+        );
         return response.data;
     } catch (error) {
         console.error('Error creating subtasks:', error);
@@ -34,9 +38,13 @@ export const createSubtasks = async (taskId: string, subtasks: Subtask[]) => {
 
 export const updateSubtasks = async (subtasks: Subtask[]) => {
     try {
-        const response = await axios.put(`${API_URL}`, { subtasks }, {
-            headers: getAuthHeaders(),
-        });
+        const response = await axios.put(
+            `${API_URL}`,
+            { subtasks },
+            {
+                headers: getAuthHeaders(),
+            }
+        );
         return response.data;
     } catch (error) {
         console.error('Error updating subtasks:', error);

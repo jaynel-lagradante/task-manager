@@ -18,7 +18,7 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({ index, subtask, onTitleChang
     const handleDeleteSelected = () => {
         setIsModalOpen(true);
     };
-    
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
@@ -30,14 +30,11 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({ index, subtask, onTitleChang
                 value={subtask.title}
                 onChange={(e) => onTitleChange(index, e.target.value)}
                 size="small"
-                fullWidth 
-                sx={{ flex: 1 }} 
+                fullWidth
+                sx={{ flex: 1 }}
             />
-            <FormControl size="small" sx={{ flex: 1 }}> 
-                <Select
-                    value={subtask.status}
-                    onChange={(e) => onStatusChange(index, e.target.value)}
-                >
+            <FormControl size="small" sx={{ flex: 1 }}>
+                <Select value={subtask.status} onChange={(e) => onStatusChange(index, e.target.value)}>
                     <MenuItem value="Not Done">Not Done</MenuItem>
                     <MenuItem value="Done">Done</MenuItem>
                 </Select>

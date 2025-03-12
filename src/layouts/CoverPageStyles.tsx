@@ -20,15 +20,15 @@ export const ImageGridItem = styled(Grid)(({ theme }) => ({
 }));
 
 export const ImageLogoItem = styled('img')(({ theme }) => ({
-    maxWidth: '100%', 
-    height: 'auto'
-}))
+    maxWidth: '100%',
+    height: 'auto',
+}));
 
 export const FormGridItem = styled(Grid)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    padding: theme.spacing(10)
+    padding: theme.spacing(10),
 }));
 
 export const SubmitButton = styled(Button)(({ theme }) => ({

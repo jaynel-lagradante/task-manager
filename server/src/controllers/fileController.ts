@@ -8,7 +8,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 export const uploadFiles = async (req: Request, res: Response): Promise<any> => {
-    upload.array('files', 10)(req, res, async (err) => { // Apply multer middleware here
+    upload.array('files', 10)(req, res, async (err) => {
+        // Apply multer middleware here
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'File upload error' });

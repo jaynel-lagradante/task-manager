@@ -13,14 +13,14 @@ export const createSubtasks = async (req: Request, res: Response) => {
         const createdSubtasks = await Promise.all(
             subtasks.map(async (subtaskData: { title: string; status: string }) => {
                 if (!subtaskData.title || subtaskData.title.trim() === '') {
-                    return null; 
+                    return null;
                 }
                 const id = uuidv4();
                 return Subtask.create({ id, title: subtaskData.title, status: subtaskData.status, task_id: taskId });
             })
         );
 
-        const filteredSubtasks = createdSubtasks.filter(subtask => subtask !== null); // Remove null values
+        const filteredSubtasks = createdSubtasks.filter((subtask) => subtask !== null); // Remove null values
 
         if (filteredSubtasks.length === 0) {
             res.status(400).json({ message: 'No valid subtasks provided' });
@@ -56,7 +56,7 @@ export const updateSubtasks = async (req: Request, res: Response) => {
             subtasks.map(async (subtaskData: { id: string; title: string; status: string }) => {
                 const { id, title, status } = subtaskData;
                 if (!id) {
-                    return null; 
+                    return null;
                 }
                 const subtask = await Subtask.findByPk(id);
                 if (!subtask) {
@@ -67,7 +67,7 @@ export const updateSubtasks = async (req: Request, res: Response) => {
             })
         );
 
-        const filteredSubtasks = updatedSubtasks.filter(subtask => subtask !== null); // Remove null values
+        const filteredSubtasks = updatedSubtasks.filter((subtask) => subtask !== null); // Remove null values
 
         if (filteredSubtasks.length === 0) {
             res.status(400).json({ message: 'No valid subtasks provided for update' });

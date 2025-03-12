@@ -22,10 +22,10 @@ import { Task } from '../types/TaskInterface';
 import { CreateTask, GetTaskById, UpdateTask, UploadFiles } from '../services/TaskService';
 import DashboardComponent from './DashboardComponent';
 import SubtaskComponent from './SubTaskComponent';
-import NewSubtaskIcon from './../assets/Buttons/Button_New Subtask_selected.svg'; 
+import NewSubtaskIcon from './../assets/Buttons/Button_New Subtask_selected.svg';
 import { FormContainer } from '../layouts/TaskStyles';
-import SaveButton from './../assets/Buttons/Button_Save.svg'; 
-import CancelButton from './../assets/Buttons/Button_Cancel.svg'; 
+import SaveButton from './../assets/Buttons/Button_Save.svg';
+import CancelButton from './../assets/Buttons/Button_Cancel.svg';
 import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../services/SubtaskService';
 import { Subtask } from '../types/SubTaskInterface';
 // import Attachment from './Attachment';
@@ -63,7 +63,7 @@ const TaskComponent: React.FC = () => {
                         ...data,
                         due_date: data.due_date ? moment(data.due_date) : null,
                     });
-                    if(subtasksData) {
+                    if (subtasksData) {
                         setSubtasks(subtasksData || []);
                     }
                 } catch (err: any) {
@@ -119,11 +119,11 @@ const TaskComponent: React.FC = () => {
 
             const newSubTask = subtasks.filter((subtask) => !subtask.hasOwnProperty('id'));
             const updatedSubtasks = subtasks.filter((subtask) => subtask.hasOwnProperty('id'));
-            if(newSubTask.length > 0) {
+            if (newSubTask.length > 0) {
                 const subtaskData = await createSubtasks(id ?? response.id, newSubTask);
                 setSubtasks(subtaskData.createdSubtasks);
             }
-            if(updatedSubtasks.length > 0) {
+            if (updatedSubtasks.length > 0) {
                 await updateSubtasks(updatedSubtasks);
             }
 
@@ -159,11 +159,11 @@ const TaskComponent: React.FC = () => {
     };
 
     const handleSubtaskTitleChange = (index: number, title: string) => {
-        setSubtasks(subtasks.map((subtask, i) => i === index ? { ...subtask, title } : subtask));
+        setSubtasks(subtasks.map((subtask, i) => (i === index ? { ...subtask, title } : subtask)));
     };
 
     const handleSubtaskStatusChange = (index: number, status: string) => {
-        setSubtasks(subtasks.map((subtask, i) => i === index ? { ...subtask, status } : subtask));
+        setSubtasks(subtasks.map((subtask, i) => (i === index ? { ...subtask, status } : subtask)));
     };
 
     const handleDeleteSubtask = async (index: number, subtaskId: string | null) => {
@@ -172,7 +172,7 @@ const TaskComponent: React.FC = () => {
                 await deleteSubtask(subtaskId); // Use the API delete function
                 setSubtasks(subtasks.filter((subtask) => subtask?.id !== subtaskId)); // Update state
             } catch (error) {
-                console.error("Error deleting subtask:", error);
+                console.error('Error deleting subtask:', error);
                 // Handle error (e.g., show a message to the user)
             }
         } else {
@@ -188,7 +188,7 @@ const TaskComponent: React.FC = () => {
                 </Typography>
                 <Paper style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', height: '100%' }}>
                     <LocalizationProvider dateAdapter={AdapterMoment}>
-                        <Container maxWidth="md" style={{  paddingBottom: '16px' }}>
+                        <Container maxWidth="md" style={{ paddingBottom: '16px' }}>
                             <Box mt={4}>
                                 {error && <Typography color="error">{error}</Typography>}
                                 <form>
@@ -272,8 +272,16 @@ const TaskComponent: React.FC = () => {
 
                                 <Divider style={{ width: '100%', marginTop: '32px' }} />
 
-                                <Box mt={2} display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: '16px', marginTop: '4px' }}>
-                                    <Typography variant="h6" gutterBottom>Subtask</Typography>
+                                <Box
+                                    mt={2}
+                                    display="flex"
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                    style={{ marginBottom: '16px', marginTop: '4px' }}
+                                >
+                                    <Typography variant="h6" gutterBottom>
+                                        Subtask
+                                    </Typography>
                                     <IconButton onClick={handleAddSubtask}>
                                         <img src={NewSubtaskIcon} alt="Add Subtask" style={{ height: '40px' }} />
                                     </IconButton>
