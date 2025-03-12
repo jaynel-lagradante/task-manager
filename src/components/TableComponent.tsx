@@ -108,7 +108,7 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
             });
             setTasksValue(updatedTasks);
             setSelectedRows([]);
-            setIsModalOpen(false); // Close modal after delete
+            setIsModalOpen(false);
         } catch (error) {
             console.error('Error deleting selected tasks:', error);
         }
@@ -121,7 +121,7 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
     const tableColumns: ColumnDef<Task>[] = [
         {
             id: 'selection',
-            header: ({ table }) =>
+            header: () =>
                 selectedRows.length > 0 ? (
                     <CuztomizedHeaderBox>
                         <DeleteButtonBadge badgeContent={selectedRows.length} color="primary">

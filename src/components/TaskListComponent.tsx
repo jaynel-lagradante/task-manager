@@ -42,10 +42,6 @@ const TaskListComponent: React.FC = () => {
         fetchTasks();
     }, [navigate, isAuthenticated]);
 
-    const handleEdit = (taskId: string) => {
-        navigate(`/edit-task/${taskId}`);
-    };
-
     const filteredTasks = tasks.filter((task) => {
         let priorityMatch = true;
         let statusMatch = true;

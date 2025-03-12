@@ -2,8 +2,20 @@ import { styled } from '@mui/material/styles';
 import { Badge, Box, Container, Tabs } from '@mui/material';
 
 export const MenuTabs = styled(Tabs)(({ theme }) => ({
+    '& .MuiTabs-indicator': {
+        display: 'none',
+    },
     '& .MuiTabs-flexContainer button': {
         textTransform: 'none',
+    },
+    '& .MuiTab-root': {
+        justifyContent: 'flex-start',
+        padding: '12px 16px',
+        '&.Mui-selected': {
+            backgroundColor: '#F2F8FD',
+            color: theme.palette.text.primary,
+            borderRadius: 10,
+        },
     },
 }));
 
