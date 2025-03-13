@@ -36,7 +36,7 @@ const TaskComponent: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
     const [task, setTask] = useState<Task>({
-        title: '',
+        title: 'Task 01',
         due_date: null,
         priority: 'Low',
         status: 'Not Started',
@@ -53,6 +53,7 @@ const TaskComponent: React.FC = () => {
     const [dueDateError, setDueDateError] = useState('');
     const [completionDate, setCompletionDate] = useState<Moment | null>(null);
     const [isAddSubtaskHovered, setIsAddSubtaskHovered] = useState(false);
+    const [subtaskTitleErrors, setSubtaskTitleErrors] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -103,8 +104,14 @@ const TaskComponent: React.FC = () => {
     };
 
     const handleDateChange = (date: Moment | null) => {
-        if (date && dueDateError) {
-            setDueDateError('');
+        if (date) {
+            if (date.isBefore(dateCreated, 'day')) {
+                setDueDateError('Must be later than Date Created');
+            } else {
+                setDueDateError('');
+            }
+        } else {
+            setDueDateError('Due Date is required');
         }
         setTask({ ...task, due_date: date });
     };
@@ -118,16 +125,27 @@ const TaskComponent: React.FC = () => {
 
         setTitleError('');
         setDueDateError('');
+        setSubtaskTitleErrors([]);
 
         let hasError = false;
 
         if (!task.title.trim()) {
-            setTitleError('Title is required');
+            setTitleError('Must not be empty');
             hasError = true;
         }
 
         if (!task.due_date) {
             setDueDateError('Due Date is required');
+            hasError = true;
+        } else if (task.due_date.isBefore(dateCreated, 'day')) {
+            setDueDateError('Must be later than Date Created');
+            hasError = true;
+        }
+
+        const newSubtaskTitleErrors = subtasks.map((subtask) => (!subtask.title.trim() ? 'Must not be empty' : ''));
+        setSubtaskTitleErrors(newSubtaskTitleErrors);
+
+        if (newSubtaskTitleErrors.some((error) => error)) {
             hasError = true;
         }
 
@@ -199,6 +217,14 @@ const TaskComponent: React.FC = () => {
 
     const handleSubtaskTitleChange = (index: number, title: string) => {
         setSubtasks(subtasks.map((subtask, i) => (i === index ? { ...subtask, title } : subtask)));
+
+        const newErrors = [...subtaskTitleErrors];
+        if (!title.trim()) {
+            newErrors[index] = 'Must not be empty';
+        } else {
+            newErrors[index] = '';
+        }
+        setSubtaskTitleErrors(newErrors);
     };
 
     const handleSubtaskStatusChange = (index: number, status: string) => {
@@ -386,6 +412,7 @@ const TaskComponent: React.FC = () => {
                                         onTitleChange={handleSubtaskTitleChange}
                                         onStatusChange={handleSubtaskStatusChange}
                                         onDelete={() => handleDeleteSubtask(index, subtask.id ?? null)}
+                                        titleError={subtaskTitleErrors[index]}
                                     />
                                 ))}
                             </Box>

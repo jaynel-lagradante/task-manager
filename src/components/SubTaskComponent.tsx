@@ -10,9 +10,17 @@ interface SubtaskProps {
     onTitleChange: (index: number, title: string) => void;
     onStatusChange: (index: number, status: string) => void;
     onDelete: (index: number) => void;
+    titleError?: string;
 }
 
-const SubtaskComponent: React.FC<SubtaskProps> = ({ index, subtask, onTitleChange, onStatusChange, onDelete }) => {
+const SubtaskComponent: React.FC<SubtaskProps> = ({
+    index,
+    subtask,
+    onTitleChange,
+    onStatusChange,
+    onDelete,
+    titleError,
+}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleDeleteSelected = () => {
@@ -24,7 +32,7 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({ index, subtask, onTitleChang
     };
 
     return (
-        <Box display="flex" alignItems="center" gap={2} marginBottom={2}>
+        <Box display="flex" alignItems="flex-start" gap={2} marginBottom={2}>
             <TextField
                 label="Subtask Title"
                 value={subtask.title}
@@ -32,6 +40,8 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({ index, subtask, onTitleChang
                 size="small"
                 fullWidth
                 sx={{ flex: 1 }}
+                error={!!titleError}
+                helperText={titleError}
             />
             <FormControl size="small" sx={{ flex: 1 }}>
                 <Select value={subtask.status} onChange={(e) => onStatusChange(index, e.target.value)}>
