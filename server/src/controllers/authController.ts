@@ -30,7 +30,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             }
         }
 
-        const token = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        const token = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, { expiresIn: '2h' });
         res.json({ token });
     } catch (error) {
         console.error(error);
@@ -101,7 +101,7 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
             });
         }
 
-        const jwtToken = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        const jwtToken = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, { expiresIn: '2h' });
         res.json({ token: jwtToken });
     } catch (error) {
         console.error('Error verifying Google token:', error);

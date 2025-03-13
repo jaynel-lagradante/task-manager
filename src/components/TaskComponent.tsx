@@ -31,7 +31,7 @@ import CancelButton from './../assets/Buttons/Button_Cancel.svg';
 import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../services/SubtaskService';
 import { Subtask } from '../types/SubTaskInterface';
 import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.svg';
-// import Attachment from './Attachment';
+import AttachmentComponent from './AttachmentComponent';
 
 const TaskComponent: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -375,6 +375,8 @@ const TaskComponent: React.FC = () => {
                                         </Grid>
                                     </Grid>
                                 </form>
+
+                                <AttachmentComponent></AttachmentComponent>
 
                                 <Divider style={{ width: '100%', marginTop: '32px' }} />
 

@@ -39,7 +39,7 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
                 onChange={(e) => onTitleChange(index, e.target.value)}
                 size="small"
                 fullWidth
-                sx={{ flex: 1 }}
+                sx={{ flex: 2 }}
                 error={!!titleError}
                 helperText={titleError}
             />
