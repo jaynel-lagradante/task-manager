@@ -38,6 +38,9 @@ import SortDesktopIcon from './../assets/Icons/Sort_desktop.svg';
 import { RenderedContainer } from '../layouts/TableStyle';
 import DoneIcon from './../assets/Icons/Done.svg';
 import NotDoneIcon from './../assets/Icons/Not Done.svg';
+import LowPriorityIcon from './../assets/Icons/Low_table.svg';
+import HighPriorityIcon from './../assets/Icons/High_table.svg';
+import CriticalPriorityIcon from './../assets/Icons/Critical_table.svg';
 
 type TableProps<TData> = {
     data: TData[];
@@ -210,39 +213,21 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
             header: () => 'Priority',
             cell: ({ getValue }) => {
                 const priority = getValue<string>();
-                let bgColor = '';
-                let borderColor = '';
+                let icon = null;
 
                 switch (priority) {
                     case 'Low':
-                        bgColor = '#dff0d8';
-                        borderColor = '#2FBD00';
+                        icon = LowPriorityIcon;
                         break;
                     case 'High':
-                        bgColor = '#fcf8e3';
-                        borderColor = '#FAC300';
+                        icon = HighPriorityIcon;
                         break;
                     case 'Critical':
-                        bgColor = '#f2dede';
-                        borderColor = '#EB0000';
+                        icon = CriticalPriorityIcon;
                         break;
-                    default:
-                        bgColor = '#ffffff';
-                        borderColor = '#ccc';
                 }
 
-                return (
-                    <div
-                        style={{
-                            backgroundColor: bgColor,
-                            padding: '2px 8px',
-                            display: 'inline-block',
-                            border: `2px solid ${borderColor}`,
-                        }}
-                    >
-                        {priority}
-                    </div>
-                );
+                return <div>{icon && <img src={icon} alt={priority} style={{ height: '20px' }} />}</div>;
             },
         },
         {
