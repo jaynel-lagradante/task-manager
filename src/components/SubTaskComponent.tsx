@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, FormControl, Select, MenuItem, IconButton, Box } from '@mui/material';
+import { TextField, FormControl, Select, MenuItem, IconButton, Box, InputLabel } from '@mui/material';
 import DeleteIcon from './../assets/Icons/Delete_active.svg';
 import { Subtask } from '../types/SubTaskInterface';
 import DeleteConfirmationModal from './DeleteConfirmationModalComponent';
@@ -34,7 +34,7 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
     return (
         <Box display="flex" alignItems="flex-start" gap={2} marginBottom={2}>
             <TextField
-                label="Subtask Title"
+                label="Title"
                 value={subtask.title}
                 onChange={(e) => onTitleChange(index, e.target.value)}
                 size="small"
@@ -44,7 +44,13 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
                 helperText={titleError}
             />
             <FormControl size="small" sx={{ flex: 1 }}>
-                <Select value={subtask.status} onChange={(e) => onStatusChange(index, e.target.value)}>
+                <InputLabel id="status-label">Status</InputLabel>
+                <Select
+                    labelId="status-label"
+                    value={subtask.status}
+                    label="Status"
+                    onChange={(e) => onStatusChange(index, e.target.value)}
+                >
                     <MenuItem value="Not Done">Not Done</MenuItem>
                     <MenuItem value="Done">Done</MenuItem>
                 </Select>

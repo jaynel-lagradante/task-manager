@@ -30,6 +30,7 @@ import SaveButton from './../assets/Buttons/Button_Save.svg';
 import CancelButton from './../assets/Buttons/Button_Cancel.svg';
 import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../services/SubtaskService';
 import { Subtask } from '../types/SubTaskInterface';
+import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.svg';
 // import Attachment from './Attachment';
 
 const TaskComponent: React.FC = () => {
@@ -54,6 +55,7 @@ const TaskComponent: React.FC = () => {
     const [completionDate, setCompletionDate] = useState<Moment | null>(null);
     const [isAddSubtaskHovered, setIsAddSubtaskHovered] = useState(false);
     const [subtaskTitleErrors, setSubtaskTitleErrors] = useState<string[]>([]);
+    const [isMarkAsComplete, setIsMarkAsComplete] = useState(false);
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -163,7 +165,7 @@ const TaskComponent: React.FC = () => {
                 title: task.title,
                 due_date: task.due_date,
                 priority: task.priority,
-                status: task.status,
+                status: isMarkAsComplete ? 'Complete' : task.status,
                 description: task.description,
                 date_completed: completionDate,
             };
@@ -248,6 +250,15 @@ const TaskComponent: React.FC = () => {
         return (subtasks.length > 0 && subtasks.every((subtask) => subtask.status === 'Done')) || subtasks.length === 0;
     };
 
+    const handleMarkAsComplete = () => {
+        setIsMarkAsComplete(true);
+        setCompletionDate(moment());
+        setTask({ ...task, status: 'Complete' });
+    };
+
+    const showMarkAsComplete =
+        subtasks.length > 0 && subtasks.every((subtask) => subtask.status === 'Done') && task.status !== 'Complete';
+
     return (
         <DashboardComponent>
             <FormContainer>
@@ -287,6 +298,7 @@ const TaskComponent: React.FC = () => {
                                                     value={task.status}
                                                     onChange={handleSelectChange}
                                                     label="Status"
+                                                    disabled={isMarkAsComplete}
                                                 >
                                                     <MenuItem value="Not Started">Not Started</MenuItem>
                                                     <MenuItem value="In Progress">In Progress</MenuItem>
@@ -318,7 +330,7 @@ const TaskComponent: React.FC = () => {
                                                 fullWidth
                                                 margin="normal"
                                                 multiline
-                                                rows={3}
+                                                rows={4}
                                                 disabled={!!id}
                                                 error={!!titleError}
                                                 helperText={titleError}
@@ -358,7 +370,7 @@ const TaskComponent: React.FC = () => {
                                                 fullWidth
                                                 margin="normal"
                                                 multiline
-                                                rows={3}
+                                                rows={6}
                                             />
                                         </Grid>
                                     </Grid>
@@ -424,10 +436,15 @@ const TaskComponent: React.FC = () => {
                     <IconButton onClick={() => navigate('/')}>
                         <img src={CancelButton} alt="Add Subtask" style={{ height: '40px' }} />
                     </IconButton>
-
-                    <IconButton onClick={handleSubmit}>
-                        <img src={SaveButton} alt="Add Subtask" style={{ height: '40px' }} />
-                    </IconButton>
+                    {showMarkAsComplete && !isMarkAsComplete ? (
+                        <IconButton onClick={handleMarkAsComplete}>
+                            <img src={MarkAsCompleteButton} alt="Mark as Complete" style={{ height: '40px' }} />
+                        </IconButton>
+                    ) : (
+                        <IconButton onClick={handleSubmit}>
+                            <img src={SaveButton} alt="Add Subtask" style={{ height: '40px' }} />
+                        </IconButton>
+                    )}
                 </Box>
             </FormContainer>
         </DashboardComponent>
