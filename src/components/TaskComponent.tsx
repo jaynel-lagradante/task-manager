@@ -49,7 +49,6 @@ const TaskComponent: React.FC = () => {
 
     useEffect(() => {
         const fetchTask = async () => {
-            // debugger;
             const token = localStorage.getItem('token');
             if (!token) {
                 navigate('/login');
@@ -101,7 +100,6 @@ const TaskComponent: React.FC = () => {
                 navigate('/login');
                 return;
             }
-
             const taskData: Task = {
                 title: task.title,
                 due_date: task.due_date,
@@ -169,14 +167,13 @@ const TaskComponent: React.FC = () => {
     const handleDeleteSubtask = async (index: number, subtaskId: string | null) => {
         if (subtaskId) {
             try {
-                await deleteSubtask(subtaskId); // Use the API delete function
-                setSubtasks(subtasks.filter((subtask) => subtask?.id !== subtaskId)); // Update state
+                await deleteSubtask(subtaskId);
+                setSubtasks(subtasks.filter((subtask) => subtask?.id !== subtaskId));
             } catch (error) {
                 console.error('Error deleting subtask:', error);
-                // Handle error (e.g., show a message to the user)
             }
         } else {
-            setSubtasks(subtasks.filter((_, i) => i !== index)); // Remove by index if no ID
+            setSubtasks(subtasks.filter((_, i) => i !== index));
         }
     };
 
@@ -241,7 +238,7 @@ const TaskComponent: React.FC = () => {
                                         <Grid item xs={12} sm={6}>
                                             <TextField
                                                 label="Date Created"
-                                                value={dateCreated.format('YYYY-MM-DD')}
+                                                value={dateCreated.format('MM/DD/YYYY')}
                                                 fullWidth
                                                 margin="normal"
                                                 disabled
@@ -252,6 +249,7 @@ const TaskComponent: React.FC = () => {
                                                 label="Due Date"
                                                 value={task.due_date}
                                                 onChange={(date) => handleDateChange(date)}
+                                                format="MM/DD/YYYY"
                                                 slotProps={{ textField: { fullWidth: true, margin: 'normal' } }}
                                             />
                                         </Grid>

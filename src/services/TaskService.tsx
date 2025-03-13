@@ -10,7 +10,8 @@ const getAuthHeaders = () => {
 
 export const CreateTask = async (taskData: Task) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/tasks`, taskData, {
+        const formData = { ...taskData, due_date: taskData.due_date?.format('YYYY-MM-DD') };
+        const response = await axios.post(`${API_BASE_URL}/tasks`, formData, {
             headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         });
         return response.data;
@@ -43,7 +44,8 @@ export const GetTaskById = async (taskId: string) => {
 
 export const UpdateTask = async (taskId: string, taskData: Task) => {
     try {
-        const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}`, taskData, {
+        const formData = { ...taskData, due_date: taskData.due_date?.format('YYYY-MM-DD') };
+        const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}`, formData, {
             headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         });
         return response.data;
