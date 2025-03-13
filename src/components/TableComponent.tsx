@@ -169,7 +169,11 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
             header: 'Title',
             cell: ({ row, getValue }) => (
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div style={{ paddingLeft: `${row.depth * 2}rem`, fontWeight: 'bold' }}>{getValue<string>()}</div>
+                    <div
+                        style={{ paddingLeft: `${row.depth * 2}rem`, fontWeight: 'bold', textDecoration: 'underline' }}
+                    >
+                        {getValue<string>()}
+                    </div>
                 </div>
             ),
         },

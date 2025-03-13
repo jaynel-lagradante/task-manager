@@ -22,7 +22,9 @@ import { Task } from '../types/TaskInterface';
 import { CreateTask, GetTaskById, UpdateTask, UploadFiles } from '../services/TaskService';
 import DashboardComponent from './DashboardComponent';
 import SubtaskComponent from './SubTaskComponent';
-import NewSubtaskIcon from './../assets/Buttons/Button_New Subtask_selected.svg';
+import NewSubtaskIconSelected from './../assets/Buttons/Button_New Subtask_selected.svg';
+import NewSubtaskIconActive from './../assets/Buttons/Button_New Subtask_active.svg';
+import NewSubtaskIconInactive from './../assets/Buttons/Button_New Subtask_inactive.svg';
 import { FormContainer } from '../layouts/TaskStyles';
 import SaveButton from './../assets/Buttons/Button_Save.svg';
 import CancelButton from './../assets/Buttons/Button_Cancel.svg';
@@ -40,12 +42,17 @@ const TaskComponent: React.FC = () => {
         status: 'Not Started',
         description: '',
         subtasks: [],
+        date_completed: null,
         // attachments: null,
     });
     const [error, setError] = useState('');
     const [dateCreated] = useState(moment());
     const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
     const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+    const [titleError, setTitleError] = useState('');
+    const [dueDateError, setDueDateError] = useState('');
+    const [completionDate, setCompletionDate] = useState<Moment | null>(null);
+    const [isAddSubtaskHovered, setIsAddSubtaskHovered] = useState(false);
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -65,6 +72,9 @@ const TaskComponent: React.FC = () => {
                     if (subtasksData) {
                         setSubtasks(subtasksData || []);
                     }
+                    if (data.status === 'Complete') {
+                        setCompletionDate(moment(data.completion_date));
+                    }
                 } catch (err: any) {
                     setError(err.response?.data?.message || 'Failed to fetch task');
                     navigate('/login');
@@ -76,15 +86,26 @@ const TaskComponent: React.FC = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
+        if (name === 'title' && titleError) {
+            setTitleError('');
+        }
         setTask({ ...task, [name]: value });
     };
 
     const handleSelectChange = (e: any) => {
         const { name, value } = e.target;
+        if (value === 'Complete') {
+            setCompletionDate(moment());
+        } else if (task.status === 'Complete') {
+            setCompletionDate(null);
+        }
         setTask({ ...task, [name]: value });
     };
 
-    const handleDateChange = (date: Moment | null | undefined) => {
+    const handleDateChange = (date: Moment | null) => {
+        if (date && dueDateError) {
+            setDueDateError('');
+        }
         setTask({ ...task, due_date: date });
     };
 
@@ -94,6 +115,26 @@ const TaskComponent: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        setTitleError('');
+        setDueDateError('');
+
+        let hasError = false;
+
+        if (!task.title.trim()) {
+            setTitleError('Title is required');
+            hasError = true;
+        }
+
+        if (!task.due_date) {
+            setDueDateError('Due Date is required');
+            hasError = true;
+        }
+
+        if (hasError) {
+            return;
+        }
+
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -106,6 +147,7 @@ const TaskComponent: React.FC = () => {
                 priority: task.priority,
                 status: task.status,
                 description: task.description,
+                date_completed: completionDate,
             };
 
             let response;
@@ -130,7 +172,6 @@ const TaskComponent: React.FC = () => {
                 await UploadFiles(response.id || id || '', selectedFiles);
                 setSelectedFiles(null);
             }
-
             // // File upload logic
             // if (selectedFiles && selectedFiles.length > 0) {
             //     const formData = new FormData();
@@ -177,6 +218,10 @@ const TaskComponent: React.FC = () => {
         }
     };
 
+    const disableCompleteStatus = () => {
+        return (subtasks.length > 0 && subtasks.every((subtask) => subtask.status === 'Done')) || subtasks.length === 0;
+    };
+
     return (
         <DashboardComponent>
             <FormContainer>
@@ -199,6 +244,7 @@ const TaskComponent: React.FC = () => {
                                                     value={task.priority}
                                                     onChange={handleSelectChange}
                                                     label="Priority"
+                                                    disabled={!!id}
                                                 >
                                                     <MenuItem value="Low">Low</MenuItem>
                                                     <MenuItem value="High">High</MenuItem>
@@ -218,11 +264,25 @@ const TaskComponent: React.FC = () => {
                                                 >
                                                     <MenuItem value="Not Started">Not Started</MenuItem>
                                                     <MenuItem value="In Progress">In Progress</MenuItem>
-                                                    <MenuItem value="Complete">Complete</MenuItem>
+                                                    <MenuItem value="Complete" disabled={!disableCompleteStatus()}>
+                                                        Complete
+                                                    </MenuItem>
                                                     <MenuItem value="Cancelled">Cancelled</MenuItem>
                                                 </Select>
                                             </FormControl>
                                         </Grid>
+
+                                        {task.status === 'Complete' && (
+                                            <Grid item xs={12} sm={3}>
+                                                <TextField
+                                                    label="Completion Date"
+                                                    value={completionDate ? completionDate.format('MM/DD/YYYY') : ''}
+                                                    fullWidth
+                                                    margin="normal"
+                                                    disabled
+                                                />
+                                            </Grid>
+                                        )}
                                         <Grid item xs={12}>
                                             <TextField
                                                 label="Title"
@@ -233,6 +293,9 @@ const TaskComponent: React.FC = () => {
                                                 margin="normal"
                                                 multiline
                                                 rows={3}
+                                                disabled={!!id}
+                                                error={!!titleError}
+                                                helperText={titleError}
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
@@ -250,7 +313,14 @@ const TaskComponent: React.FC = () => {
                                                 value={task.due_date}
                                                 onChange={(date) => handleDateChange(date)}
                                                 format="MM/DD/YYYY"
-                                                slotProps={{ textField: { fullWidth: true, margin: 'normal' } }}
+                                                slotProps={{
+                                                    textField: {
+                                                        fullWidth: true,
+                                                        margin: 'normal',
+                                                        error: !!dueDateError,
+                                                        helperText: dueDateError,
+                                                    },
+                                                }}
                                             />
                                         </Grid>
                                         <Grid item xs={12}>
@@ -280,8 +350,31 @@ const TaskComponent: React.FC = () => {
                                     <Typography variant="h6" gutterBottom>
                                         Subtask
                                     </Typography>
-                                    <IconButton onClick={handleAddSubtask}>
-                                        <img src={NewSubtaskIcon} alt="Add Subtask" style={{ height: '40px' }} />
+                                    <IconButton
+                                        onClick={handleAddSubtask}
+                                        disabled={task.status === 'Complete'}
+                                        onMouseEnter={() => setIsAddSubtaskHovered(true)}
+                                        onMouseLeave={() => setIsAddSubtaskHovered(false)}
+                                    >
+                                        {task.status === 'Complete' ? (
+                                            <img
+                                                src={NewSubtaskIconInactive}
+                                                alt="Add Subtask"
+                                                style={{ height: '40px' }}
+                                            />
+                                        ) : isAddSubtaskHovered ? (
+                                            <img
+                                                src={NewSubtaskIconSelected}
+                                                alt="Add Subtask"
+                                                style={{ height: '40px' }}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={NewSubtaskIconActive}
+                                                alt="Add Subtask"
+                                                style={{ height: '40px' }}
+                                            />
+                                        )}
                                     </IconButton>
                                 </Box>
 
