@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
     TextField,
     Container,
@@ -33,6 +33,7 @@ import { Subtask } from '../types/SubTaskInterface';
 import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.svg';
 import AttachmentComponent from './AttachmentComponent';
 import { Attachment } from '../types/AttachmentInterface';
+import BackIcon from '../assets/Icons/Back.svg';
 
 const TaskComponent: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -257,8 +258,13 @@ const TaskComponent: React.FC = () => {
         <DashboardComponent>
             <FormContainer>
                 <Typography variant="h6" gutterBottom>
-                    Back | View Task / Edit
+                    <Link to="/" style={{ textDecoration: 'none', color: '#027CEC' }}>
+                        <img src={BackIcon} alt="Back" style={{ height: '12px', marginRight: '8px' }} />
+                        Home
+                    </Link>{' '}
+                    | {id ? 'View Task / Edit' : 'New Task'}
                 </Typography>
+
                 <Paper style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', height: '100%' }}>
                     <LocalizationProvider dateAdapter={AdapterMoment}>
                         <Container maxWidth="md" style={{ paddingBottom: '16px' }}>

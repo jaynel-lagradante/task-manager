@@ -5,6 +5,7 @@ import TaskListComponent from './components/TaskListComponent';
 import TaskComponent from './components/TaskComponent';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import ViewTaskComponent from './components/ViewTaskComponent';
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/" element={<TaskListComponent />} />
                     <Route path="/create-task" element={<TaskComponent />} />
                     <Route path="/edit-task/:id" element={<TaskComponent />} />
+                    <Route path="/view-task/:id" element={<ViewTaskComponent />} />
                 </Routes>
             </Router>
         </LocalizationProvider>

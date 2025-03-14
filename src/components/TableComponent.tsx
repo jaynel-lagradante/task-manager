@@ -119,7 +119,7 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
     };
 
     const handleEdit = (taskId: string) => {
-        navigate(`/edit-task/${taskId}`);
+        navigate(`/view-task/${taskId}`);
     };
 
     const tableColumns: ColumnDef<Task>[] = [
