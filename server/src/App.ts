@@ -31,7 +31,7 @@ sequelize.sync().then(() => {
 app.use('/auth', authRoutes);
 app.use('/tasks', passport.authenticate('jwt', { session: false }), taskRoutes); // Protected routes
 app.use('/subtasks', passport.authenticate('jwt', { session: false }), subtaskRoutes); // Protected routes
-app.use('/upload', passport.authenticate('jwt', { session: false }), fileRoutes); // Protected routes
+app.use('/files', passport.authenticate('jwt', { session: false }), fileRoutes); // Protected routes
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

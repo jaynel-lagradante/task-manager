@@ -64,7 +64,7 @@ export const DeleteTask = async (taskId: string) => {
     }
 };
 
-export const UploadFiles = async (taskId: string, files: FileList) => {
+export const UploadFiles = async (taskId: string, files: File[]) => {
     try {
         const formData = new FormData();
         for (let i = 0; i < files.length; i++) {
@@ -84,6 +84,16 @@ export const GetFiles = async (taskId: string) => {
             headers: getAuthHeaders(),
         });
         return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const DeleteFile = async (fileId: string) => {
+    try {
+        await axios.delete(`${API_BASE_URL}/files/${fileId}`, {
+            headers: getAuthHeaders(),
+        });
     } catch (error) {
         throw error;
     }

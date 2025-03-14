@@ -1,8 +1,12 @@
 import express from 'express';
-import { uploadFiles } from '../controllers/fileController';
+import multer from 'multer';
+import { uploadFiles, getFilesByTaskId, deleteFileById } from '../controllers/fileController';
 
 const router = express.Router();
+const upload = multer();
 
-router.post('/:taskId', uploadFiles); // Remove multer from here
+router.post('/:taskId', upload.array('files', 10), uploadFiles);
+router.get('/:taskId', getFilesByTaskId);
+router.delete('/:fileId', deleteFileById);
 
 export default router;

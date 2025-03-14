@@ -19,7 +19,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import moment, { Moment } from 'moment';
 import { Task } from '../types/TaskInterface';
-import { CreateTask, GetTaskById, UpdateTask, UploadFiles } from '../services/TaskService';
+import { CreateTask, GetFiles, GetTaskById, UpdateTask, UploadFiles } from '../services/TaskService';
 import DashboardComponent from './DashboardComponent';
 import SubtaskComponent from './SubTaskComponent';
 import NewSubtaskIconSelected from './../assets/Buttons/Button_New Subtask_selected.svg';
@@ -32,6 +32,7 @@ import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../s
 import { Subtask } from '../types/SubTaskInterface';
 import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.svg';
 import AttachmentComponent from './AttachmentComponent';
+import { Attachment } from '../types/AttachmentInterface';
 
 const TaskComponent: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -44,11 +45,9 @@ const TaskComponent: React.FC = () => {
         description: '',
         subtasks: [],
         date_completed: null,
-        // attachments: null,
     });
     const [error, setError] = useState('');
     const [dateCreated] = useState(moment());
-    const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
     const [subtasks, setSubtasks] = useState<Subtask[]>([]);
     const [titleError, setTitleError] = useState('');
     const [dueDateError, setDueDateError] = useState('');
@@ -56,6 +55,8 @@ const TaskComponent: React.FC = () => {
     const [isAddSubtaskHovered, setIsAddSubtaskHovered] = useState(false);
     const [subtaskTitleErrors, setSubtaskTitleErrors] = useState<string[]>([]);
     const [isMarkAsComplete, setIsMarkAsComplete] = useState(false);
+    const [attachmentFiles, setAttachmentFiles] = useState<Attachment[]>([]);
+    const [attachmentData, setAttachmentData] = useState<Attachment[]>([]);
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -68,6 +69,12 @@ const TaskComponent: React.FC = () => {
                 try {
                     const data = await GetTaskById(id);
                     const subtasksData = await getSubtasks(id);
+                    const attachmentsData = await GetFiles(id);
+
+                    if (attachmentsData.length > 0) {
+                        setAttachmentData(attachmentsData);
+                    }
+
                     setTask({
                         ...data,
                         due_date: data.due_date ? moment(data.due_date) : null,
@@ -85,7 +92,7 @@ const TaskComponent: React.FC = () => {
             }
         };
         fetchTask();
-    }, [id, navigate]);
+    }, [id]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -117,10 +124,6 @@ const TaskComponent: React.FC = () => {
         }
         setTask({ ...task, due_date: date });
     };
-
-    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     setSelectedFiles(event.target.files);
-    // };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -187,25 +190,10 @@ const TaskComponent: React.FC = () => {
                 await updateSubtasks(updatedSubtasks);
             }
 
-            // File upload logic
-            if (selectedFiles && selectedFiles.length > 0) {
-                await UploadFiles(response.id || id || '', selectedFiles);
-                setSelectedFiles(null);
+            if (attachmentFiles && attachmentFiles.length > 0) {
+                const files = attachmentFiles.map((attachment) => attachment.file);
+                await UploadFiles(response.id || id, files);
             }
-            // // File upload logic
-            // if (selectedFiles && selectedFiles.length > 0) {
-            //     const formData = new FormData();
-            //     for (let i = 0; i < selectedFiles.length; i++) {
-            //         formData.append('files', selectedFiles[i]);
-            //     }
-            //     await axios.post(`http://localhost:5000/files/${response.data.id || id}`, formData, {
-            //         headers: {
-            //             Authorization: `Bearer ${token}`,
-            //             'Content-Type': 'multipart/form-data',
-            //         },
-            //     });
-            //     setSelectedFiles(null);
-            // }
 
             navigate('/');
         } catch (err: any) {
@@ -258,6 +246,10 @@ const TaskComponent: React.FC = () => {
 
     const showMarkAsComplete =
         subtasks.length > 0 && subtasks.every((subtask) => subtask.status === 'Done') && task.status !== 'Complete';
+
+    const handleAttachmentFilesChange = (files: Attachment[]) => {
+        setAttachmentFiles(files);
+    };
 
     return (
         <DashboardComponent>
@@ -376,7 +368,10 @@ const TaskComponent: React.FC = () => {
                                     </Grid>
                                 </form>
 
-                                <AttachmentComponent></AttachmentComponent>
+                                <AttachmentComponent
+                                    onFilesChange={handleAttachmentFilesChange}
+                                    attachments={attachmentData}
+                                />
 
                                 <Divider style={{ width: '100%', marginTop: '32px' }} />
 

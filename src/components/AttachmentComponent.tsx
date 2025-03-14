@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import { IconButton, Stack } from '@mui/material';
 import NewSubtaskIconSelected from './../assets/Icons/Upload.svg';
 import CancelIcon from './../assets/Icons/Cancel.svg';
+import { Attachment } from '../types/AttachmentInterface';
+import { DeleteFile } from '../services/TaskService';
 
 const AttachmentBox = styled(Box)(({ theme }) => ({
     position: 'relative',
@@ -22,10 +24,33 @@ const LegendTypography = styled(Typography)(({ theme }) => ({
     padding: theme.spacing(0, 1),
 }));
 
-const AttachmentComponent: React.FC = () => {
+interface AttachmentComponentProps {
+    attachments: Attachment[];
+    onFilesChange?: (files: Attachment[]) => void;
+}
+
+const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, onFilesChange }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [selectedFiles, setSelectedFiles] = useState<File[]>();
+    const [selectedFiles, setSelectedFiles] = useState<Attachment[]>();
     const [objectURLs, setObjectURLs] = useState<string[]>();
+
+    useEffect(() => {
+        if (attachments && attachments.length > 0) {
+            const newFiles: Attachment[] = attachments.map((attachment: any) => {
+                const buffer = attachment.file_data.data;
+                const fileName = attachment.file_name;
+                const file = bufferToFile(buffer, fileName);
+                return { id: attachment.id, file };
+            });
+
+            setSelectedFiles(newFiles);
+            const urls = newFiles.map((file) =>
+                file.file.type.startsWith('image/') ? URL.createObjectURL(file.file) : ''
+            );
+            setObjectURLs(urls);
+        }
+    }, [attachments]);
+
     const handleBrowseClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
@@ -36,30 +61,37 @@ const AttachmentComponent: React.FC = () => {
         const files = event.target.files;
         if (files) {
             const newURLs: string[] = [];
-            const newFiles: File[] = [];
+            const newFiles: Attachment[] = [];
 
             Array.from(files).forEach((file) => {
-                newFiles.push(file);
+                newFiles.push({ file });
                 if (file.type.startsWith('image/')) {
                     const url = URL.createObjectURL(file);
                     newURLs.push(url);
                 } else {
-                    newURLs.push(''); // Placeholder for non-images
+                    newURLs.push('');
                 }
             });
 
             setSelectedFiles((prevFiles) => {
                 const currentFiles = prevFiles ?? [];
-                return [...currentFiles, ...newFiles];
+                const updatedFiles = [...currentFiles, ...newFiles];
+                if (onFilesChange) {
+                    onFilesChange(updatedFiles);
+                }
+                return updatedFiles;
             });
 
             setObjectURLs((prevURLs) => [...(prevURLs ?? []), ...newURLs]);
         }
     };
 
-    const handleRemoveFile = (index: number) => {
+    const handleRemoveFile = async (index: number, fileId: string | undefined) => {
         setSelectedFiles((prevFiles) => {
             const updatedFiles = prevFiles?.filter((_, i) => i !== index) ?? [];
+            if (onFilesChange) {
+                onFilesChange(updatedFiles);
+            }
             return updatedFiles;
         });
 
@@ -71,6 +103,9 @@ const AttachmentComponent: React.FC = () => {
             const updatedURLs = prevURLs?.filter((_, i) => i !== index) ?? [];
             return updatedURLs;
         });
+        if (fileId) {
+            await DeleteFile(fileId);
+        }
     };
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -78,10 +113,10 @@ const AttachmentComponent: React.FC = () => {
         const files = event.dataTransfer.files;
         if (files) {
             const newURLs: string[] = [];
-            const newFiles: File[] = [];
+            const newFiles: Attachment[] = [];
 
             Array.from(files).forEach((file) => {
-                newFiles.push(file);
+                newFiles.push({ file });
                 if (file.type.startsWith('image/')) {
                     const url = URL.createObjectURL(file);
                     newURLs.push(url);
@@ -90,11 +125,13 @@ const AttachmentComponent: React.FC = () => {
                 }
             });
 
-            console.log(files);
-
             setSelectedFiles((prevFiles) => {
                 const currentFiles = prevFiles ?? [];
-                return [...currentFiles, ...newFiles];
+                const updatedFiles = [...currentFiles, ...newFiles];
+                if (onFilesChange) {
+                    onFilesChange(updatedFiles);
+                }
+                return updatedFiles;
             });
 
             setObjectURLs((prevURLs) => [...(prevURLs ?? []), ...newURLs]);
@@ -104,17 +141,6 @@ const AttachmentComponent: React.FC = () => {
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
     };
-
-    useEffect(() => {
-        return () => {
-            if (objectURLs)
-                objectURLs.forEach((url) => {
-                    if (url) {
-                        URL.revokeObjectURL(url);
-                    }
-                });
-        };
-    }, [objectURLs]);
 
     const formatFileSize = (bytes: number, decimals = 2): string => {
         if (!bytes) return '0 Bytes';
@@ -127,6 +153,12 @@ const AttachmentComponent: React.FC = () => {
 
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     };
+
+    function bufferToFile(buffer: ArrayBuffer, fileName: string) {
+        const uint8Array = new Uint8Array(buffer);
+        const blob = new Blob([uint8Array], { type: 'image/jpeg' });
+        return new File([blob], fileName, { type: blob.type });
+    }
 
     return (
         <AttachmentBox marginTop={2} onDrop={handleDrop} onDragOver={handleDragOver}>
@@ -166,31 +198,45 @@ const AttachmentComponent: React.FC = () => {
                             padding: 1,
                             display: 'flex',
                             alignItems: 'center',
-                            position: 'relative', // Crucial for absolute positioning
+                            position: 'relative',
+                            gap: 1,
                         }}
                     >
-                        {file.type.startsWith('image/') && objectURLs && objectURLs[index] && (
+                        {file.file.type.startsWith('image/') && objectURLs && objectURLs[index] && (
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <img
                                     src={objectURLs[index]}
-                                    alt={file.name}
+                                    alt={file.file.name}
                                     style={{
-                                        height: '50px',
-                                        width: '50px',
+                                        height: '80px',
+                                        width: 'auto',
                                         objectFit: 'cover',
                                     }}
                                 />
-                                <Typography variant="body2">{file.name}</Typography>
-                                <Typography variant="body2">{formatFileSize(file.size)}</Typography>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'left',
+                                        marginTop: 10,
+                                    }}
+                                >
+                                    <Typography variant="body2" align="left">
+                                        {file.file.name}
+                                    </Typography>
+                                    <Typography variant="subtitle2" color="textSecondary" align="left" fontSize={12}>
+                                        {formatFileSize(file.file.size)}
+                                    </Typography>
+                                </div>
                             </div>
                         )}
                         <IconButton
-                            onClick={() => handleRemoveFile(index)}
+                            onClick={() => handleRemoveFile(index, file?.id)}
                             size="small"
                             sx={{
                                 position: 'absolute',
                                 top: -15,
-                                right: 0,
+                                right: 15,
                             }}
                         >
                             <img src={CancelIcon} alt="Remove" style={{ height: '15px' }} />
