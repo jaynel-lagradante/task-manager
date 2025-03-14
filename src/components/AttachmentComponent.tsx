@@ -51,6 +51,10 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, 
         }
     }, [attachments]);
 
+    useEffect(() => {
+        onFilesChange && onFilesChange(selectedFiles ?? []);
+    }, [selectedFiles]);
+
     const handleBrowseClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
@@ -76,9 +80,6 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, 
             setSelectedFiles((prevFiles) => {
                 const currentFiles = prevFiles ?? [];
                 const updatedFiles = [...currentFiles, ...newFiles];
-                if (onFilesChange) {
-                    onFilesChange(updatedFiles);
-                }
                 return updatedFiles;
             });
 
@@ -89,9 +90,6 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, 
     const handleRemoveFile = async (index: number, fileId: string | undefined) => {
         setSelectedFiles((prevFiles) => {
             const updatedFiles = prevFiles?.filter((_, i) => i !== index) ?? [];
-            if (onFilesChange) {
-                onFilesChange(updatedFiles);
-            }
             return updatedFiles;
         });
 
@@ -128,9 +126,6 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, 
             setSelectedFiles((prevFiles) => {
                 const currentFiles = prevFiles ?? [];
                 const updatedFiles = [...currentFiles, ...newFiles];
-                if (onFilesChange) {
-                    onFilesChange(updatedFiles);
-                }
                 return updatedFiles;
             });
 
