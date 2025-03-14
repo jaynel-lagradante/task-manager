@@ -45,11 +45,6 @@ export const getFilesByTaskId = async (req: Request, res: Response): Promise<voi
             attributes: ['id', 'file_name', 'created_at', 'file_data'],
         });
 
-        if (!files || files.length === 0) {
-            res.status(404).json({ message: 'No files found for this task' });
-            return;
-        }
-
         res.status(200).json(files);
     } catch (error) {
         console.error(error);

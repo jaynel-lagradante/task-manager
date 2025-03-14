@@ -8,6 +8,7 @@ export interface Task {
     priority: string;
     status: string;
     description: string;
+    hasAttachment?: boolean;
     user_id?: string;
     date_completed?: Moment | null;
     created_at?: Date;

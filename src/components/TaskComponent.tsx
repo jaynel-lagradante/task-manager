@@ -191,7 +191,9 @@ const TaskComponent: React.FC = () => {
             }
 
             if (attachmentFiles && attachmentFiles.length > 0) {
-                const files = attachmentFiles.map((attachment) => attachment.file);
+                const files = attachmentFiles
+                    .filter((attachment) => !attachment.id)
+                    .map((attachment) => attachment.file);
                 await UploadFiles(response.id || id, files);
             }
 

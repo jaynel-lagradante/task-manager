@@ -41,6 +41,7 @@ import NotDoneIcon from './../assets/Icons/Not Done.svg';
 import LowPriorityIcon from './../assets/Icons/Low_table.svg';
 import HighPriorityIcon from './../assets/Icons/High_table.svg';
 import CriticalPriorityIcon from './../assets/Icons/Critical_table.svg';
+import AttachmentIcon from './../assets/Icons/attachment.svg';
 
 type TableProps<TData> = {
     data: TData[];
@@ -177,6 +178,9 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
                     >
                         {getValue<string>()}
                     </div>
+                    {row.original.hasAttachment && (
+                        <img src={AttachmentIcon} alt="Attachment" style={{ height: '20px', marginLeft: '8px' }} />
+                    )}
                 </div>
             ),
         },

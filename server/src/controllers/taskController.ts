@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Task from '../models/Task';
 import { v4 as uuidv4 } from 'uuid';
 import Subtask from '../models/Subtask';
+import File from '../models/File';
 
 export const createTask = async (req: Request, res: Response) => {
     try {
@@ -41,7 +42,19 @@ export const getTasks = async (req: Request, res: Response) => {
             ],
         });
 
-        res.json(tasks);
+        const tasksWithAttachment = await Promise.all(
+            tasks.map(async (task) => {
+                const hasAttachment = await File.findOne({
+                    where: { task_id: task.id },
+                });
+                return {
+                    ...task.toJSON(),
+                    hasAttachment: !!hasAttachment,
+                };
+            })
+        );
+
+        res.json(tasksWithAttachment);
     } catch (error) {
         console.error('Error fetching tasks:', error);
         res.status(500).json({ message: 'Internal server error' });
