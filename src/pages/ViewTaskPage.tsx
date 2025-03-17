@@ -176,7 +176,7 @@ const ViewTaskComponent = () => {
                             <Typography variant="h5">{task.title}</Typography>
 
                             <Typography variant="body2" color="textSecondary">
-                                {moment(task.due_date).format('DD MMM YYYY')} -{' '}
+                                {moment(task.created_at).format('DD MMM YYYY')} -{' '}
                                 {moment(task.due_date).format('DD MMM YYYY')}
                             </Typography>
 

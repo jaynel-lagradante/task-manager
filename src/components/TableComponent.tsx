@@ -180,28 +180,53 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
             ),
         },
         {
-            accessorFn: (row) => (row.due_date ? moment(row.due_date).format('YYYY-MM-DD') : 'N/A'),
+            accessorFn: (row) => (row.due_date ? moment(row.due_date).format('YYYY-MM-DD HH:mm:ss') : 'N/A'),
             id: 'due_date',
-            cell: ({ getValue }) => {
+            cell: ({ row, getValue }) => {
                 const dueDate = getValue<string>();
-                const today = moment().format('YYYY-MM-DD');
-                const isToday = dueDate === today;
-                const isOverdue = dueDate !== 'N/A' && moment(dueDate).isBefore(today, 'day');
+                const today = moment();
+                const taskDueDate = dueDate !== 'N/A' ? moment(dueDate) : null;
+                const isOverdue = taskDueDate && taskDueDate.isBefore(today, 'day');
+                const isDueToday = taskDueDate && taskDueDate.isSame(today, 'day');
+                const isNearingDueDate =
+                    taskDueDate &&
+                    taskDueDate.isAfter(today) &&
+                    row.original.status !== 'Complete' &&
+                    row.original.status !== 'Cancelled' &&
+                    (row.original.priority === 'Critical'
+                        ? taskDueDate.diff(today, 'hours') <= 48
+                        : taskDueDate.diff(today, 'hours') <= 24);
+
                 let color = '';
                 let statusText = '';
+                let fontWeight = 'normal';
 
-                if (isToday) {
-                    color = '#009292';
-                    statusText = 'Today';
+                if (row.original.status === 'Complete') {
+                    color = '';
+                    statusText = '';
+                    fontWeight = 'normal';
                 } else if (isOverdue) {
                     color = '#CA0061';
                     statusText = 'Overdue';
+                    fontWeight = 'bold';
+                } else if (isDueToday) {
+                    color = '#009292';
+                    statusText = 'Today';
+                    fontWeight = 'bold';
+                } else if (isNearingDueDate) {
+                    color = '#EB0000';
+                    statusText = 'Nearing Due Date';
+                    fontWeight = 'bold';
                 }
 
                 return (
                     <div>
-                        <div style={{ color: color }}>{dueDate}</div>
-                        {statusText && <div style={{ color: color, fontSize: '12px' }}>{statusText}</div>}
+                        <div style={{ color: color, fontWeight: fontWeight }}>
+                            {dueDate !== 'N/A' ? moment(dueDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
+                        </div>
+                        {statusText && (
+                            <div style={{ color: color, fontSize: '12px', fontWeight: fontWeight }}>{statusText}</div>
+                        )}
                     </div>
                 );
             },

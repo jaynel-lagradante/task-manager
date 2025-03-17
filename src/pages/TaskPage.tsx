@@ -20,7 +20,7 @@ import moment, { Moment } from 'moment';
 import { Task } from '../types/TaskInterface';
 import { CreateTask, GetFiles, GetTaskById, UpdateTask, UploadFiles } from '../services/TaskService';
 import DashboardComponent from './../components/DashboardComponent';
-import SubtaskComponent from './SubTaskPage';
+import SubtaskComponent from './../components/SubTaskComponent';
 import NewSubtaskIconSelected from './../assets/Buttons/Button_New Subtask_selected.svg';
 import NewSubtaskIconActive from './../assets/Buttons/Button_New Subtask_active.svg';
 import NewSubtaskIconInactive from './../assets/Buttons/Button_New Subtask_inactive.svg';
@@ -51,6 +51,7 @@ const TaskPage: React.FC = () => {
     const [dateCreated] = useState(moment());
     const [subtasks, setSubtasks] = useState<Subtask[]>([]);
     const [titleError, setTitleError] = useState('');
+    const [detailsError, setDetailsError] = useState('');
     const [dueDateError, setDueDateError] = useState('');
     const [completionDate, setCompletionDate] = useState<Moment | null>(null);
     const [isAddSubtaskHovered, setIsAddSubtaskHovered] = useState(false);
@@ -58,6 +59,7 @@ const TaskPage: React.FC = () => {
     const [isMarkAsComplete, setIsMarkAsComplete] = useState(false);
     const [attachmentFiles, setAttachmentFiles] = useState<Attachment[]>([]);
     const [attachmentData, setAttachmentData] = useState<Attachment[]>([]);
+    const [subTaskError, setSubTaskError] = useState('');
     const isUserAuthenticated = isAuthenticated();
 
     useEffect(() => {
@@ -97,8 +99,16 @@ const TaskPage: React.FC = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        if (name === 'title' && titleError) {
-            setTitleError('');
+        if (name === 'title') {
+            if (titleError) setTitleError('');
+            if (value.length > 25) {
+                setTitleError('Must be at most 25 characters');
+            }
+        } else if (name === 'description') {
+            if (detailsError) setDetailsError('');
+            if (value.length > 300) {
+                setDetailsError('Must be at most 300 characters');
+            }
         }
         setTask({ ...task, [name]: value });
     };
@@ -137,6 +147,14 @@ const TaskPage: React.FC = () => {
 
         if (!task.title.trim()) {
             setTitleError('Must not be empty');
+            hasError = true;
+        } else if (task.title.length > 25) {
+            setTitleError('Must be at most 25 characters');
+            hasError = true;
+        }
+
+        if (task.description.length > 300) {
+            setDetailsError('Must be at most 300 characters');
             hasError = true;
         }
 
@@ -195,7 +213,7 @@ const TaskPage: React.FC = () => {
                 const files = attachmentFiles
                     .filter((attachment) => !attachment.id)
                     .map((attachment) => attachment.file);
-                await UploadFiles(response.id || id, files);
+                if (files.length > 0) await UploadFiles(response.id || id, files);
             }
 
             navigate('/');
@@ -205,6 +223,12 @@ const TaskPage: React.FC = () => {
     };
 
     const handleAddSubtask = () => {
+        if (subtasks.length >= 10) {
+            setSubTaskError('Maximum of 10 subtasks allowed');
+            return;
+        } else {
+            setSubTaskError('');
+        }
         setSubtasks([...subtasks, { title: '', status: 'Not Done' }]);
     };
 
@@ -234,6 +258,10 @@ const TaskPage: React.FC = () => {
             }
         } else {
             setSubtasks(subtasks.filter((_, i) => i !== index));
+        }
+
+        if (subtasks.length <= 10) {
+            setSubTaskError('');
         }
     };
 
@@ -371,6 +399,9 @@ const TaskPage: React.FC = () => {
                                                 margin="normal"
                                                 multiline
                                                 rows={6}
+                                                inputProps={{ maxLength: 300 }}
+                                                error={!!detailsError}
+                                                helperText={detailsError}
                                             />
                                         </Grid>
                                     </Grid>
@@ -379,6 +410,8 @@ const TaskPage: React.FC = () => {
                                 <AttachmentComponent
                                     onFilesChange={handleAttachmentFilesChange}
                                     attachments={attachmentData}
+                                    maxFiles={5}
+                                    maxFileSize={10 * 1024 * 1024}
                                 />
 
                                 <Divider style={{ width: '100%', marginTop: '32px' }} />
@@ -408,6 +441,7 @@ const TaskPage: React.FC = () => {
                                         )}
                                     </IconButton>
                                 </Box>
+                                {subTaskError && <Typography color="error">{subTaskError}</Typography>}
 
                                 {subtasks.map((subtask, index) => (
                                     <SubtaskComponent

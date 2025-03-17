@@ -21,10 +21,17 @@ import {
 
 interface AttachmentComponentProps {
     attachments: Attachment[];
+    maxFiles?: number;
+    maxFileSize?: number;
     onFilesChange?: (files: Attachment[]) => void;
 }
 
-const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, onFilesChange }) => {
+const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
+    attachments,
+    maxFiles,
+    maxFileSize,
+    onFilesChange,
+}) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = useState<Attachment[]>();
     const [objectURLs, setObjectURLs] = useState<string[]>();
@@ -56,31 +63,31 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, 
         }
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (files) {
-            const newURLs: string[] = [];
-            const newFiles: Attachment[] = [];
+    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const files = event.target.files;
+    //     if (files) {
+    //         const newURLs: string[] = [];
+    //         const newFiles: Attachment[] = [];
 
-            Array.from(files).forEach((file) => {
-                newFiles.push({ file });
-                if (file.type.startsWith('image/')) {
-                    const url = URL.createObjectURL(file);
-                    newURLs.push(url);
-                } else {
-                    newURLs.push('');
-                }
-            });
+    //         Array.from(files).forEach((file) => {
+    //             newFiles.push({ file });
+    //             if (file.type.startsWith('image/')) {
+    //                 const url = URL.createObjectURL(file);
+    //                 newURLs.push(url);
+    //             } else {
+    //                 newURLs.push('');
+    //             }
+    //         });
 
-            setSelectedFiles((prevFiles) => {
-                const currentFiles = prevFiles ?? [];
-                const updatedFiles = [...currentFiles, ...newFiles];
-                return updatedFiles;
-            });
+    //         setSelectedFiles((prevFiles) => {
+    //             const currentFiles = prevFiles ?? [];
+    //             const updatedFiles = [...currentFiles, ...newFiles];
+    //             return updatedFiles;
+    //         });
 
-            setObjectURLs((prevURLs) => [...(prevURLs ?? []), ...newURLs]);
-        }
-    };
+    //         setObjectURLs((prevURLs) => [...(prevURLs ?? []), ...newURLs]);
+    //     }
+    // };
 
     const handleRemoveFile = async (index: number, fileId: string | undefined) => {
         setSelectedFiles((prevFiles) => {
@@ -101,35 +108,84 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, 
         }
     };
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files) {
+            handleNewFiles(Array.from(files));
+        }
+    };
+
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const files = event.dataTransfer.files;
         if (files) {
-            const newURLs: string[] = [];
-            const newFiles: Attachment[] = [];
-
-            Array.from(files).forEach((file) => {
-                newFiles.push({ file });
-                if (file.type.startsWith('image/')) {
-                    const url = URL.createObjectURL(file);
-                    newURLs.push(url);
-                } else {
-                    newURLs.push('');
-                }
-            });
-
-            setSelectedFiles((prevFiles) => {
-                const currentFiles = prevFiles ?? [];
-                const updatedFiles = [...currentFiles, ...newFiles];
-                return updatedFiles;
-            });
-
-            setObjectURLs((prevURLs) => [...(prevURLs ?? []), ...newURLs]);
+            handleNewFiles(Array.from(files));
         }
     };
 
+    // const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    //     event.preventDefault();
+    //     const files = event.dataTransfer.files;
+    //     if (files) {
+    //         const newURLs: string[] = [];
+    //         const newFiles: Attachment[] = [];
+
+    //         Array.from(files).forEach((file) => {
+    //             newFiles.push({ file });
+    //             if (file.type.startsWith('image/')) {
+    //                 const url = URL.createObjectURL(file);
+    //                 newURLs.push(url);
+    //             } else {
+    //                 newURLs.push('');
+    //             }
+    //         });
+
+    //         setSelectedFiles((prevFiles) => {
+    //             const currentFiles = prevFiles ?? [];
+    //             const updatedFiles = [...currentFiles, ...newFiles];
+    //             return updatedFiles;
+    //         });
+
+    //         setObjectURLs((prevURLs) => [...(prevURLs ?? []), ...newURLs]);
+    //     }
+    // };
+
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
+    };
+
+    const handleNewFiles = (newFilesList: File[]) => {
+        const validFiles: Attachment[] = [];
+        const newURLs: string[] = [];
+
+        newFilesList.forEach((file) => {
+            if (maxFiles && selectedFiles && selectedFiles.length >= maxFiles) {
+                console.log(`Maximum of ${maxFiles} files allowed.`, { variant: 'warning' });
+                return;
+            }
+
+            if (maxFileSize && file.size > maxFileSize) {
+                console.log(`File "${file.name}" exceeds the maximum size of ${formatFileSize(maxFileSize)}.`, {
+                    variant: 'warning',
+                });
+                return;
+            }
+
+            validFiles.push({ file });
+            if (file.type.startsWith('image/')) {
+                newURLs.push(URL.createObjectURL(file));
+            } else {
+                newURLs.push('');
+            }
+        });
+
+        setSelectedFiles((prevFiles) => [...(prevFiles || []), ...validFiles]);
+        setObjectURLs((prevURLs) => [...(prevURLs || []), ...newURLs]);
+
+        // Clear the input value so the same file can be selected again
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     return (

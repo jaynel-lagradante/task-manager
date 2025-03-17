@@ -8,7 +8,7 @@ export const uploadFiles = async (req: Request, res: Response): Promise<any> => 
         const files = req.files as Express.Multer.File[];
 
         if (!files || files.length === 0) {
-            return res.status(400).json({ message: 'No files uploaded' });
+            return res.status(201).json({ message: 'No files uploaded' });
         }
 
         const fileUploadPromises = files.map(async (file) => {
