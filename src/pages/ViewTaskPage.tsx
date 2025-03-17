@@ -31,6 +31,7 @@ import {
     CuztomizedPaper,
     FileContainer,
 } from '../layouts/ViewTaskStyles';
+import { isAuthenticated } from '../services/AuthService';
 
 const ViewTaskComponent = () => {
     const { id } = useParams<{ id?: string }>();
@@ -41,6 +42,7 @@ const ViewTaskComponent = () => {
     const [error, setError] = useState('');
     const [objectURLs, setObjectURLs] = useState<string[]>();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const isUserAuthenticated = isAuthenticated();
 
     const handleDeleteSelected = () => {
         setIsModalOpen(true);
@@ -52,6 +54,10 @@ const ViewTaskComponent = () => {
 
     useEffect(() => {
         const fetchTaskDetails = async () => {
+            if (!isUserAuthenticated) {
+                navigate('/login');
+                return;
+            }
             if (!id) return;
             try {
                 const taskData = await GetTaskById(id);

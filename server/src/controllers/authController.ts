@@ -73,7 +73,7 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
             client_secret: process.env.GOOGLE_CLIENT_SECRET,
             code,
             grant_type: 'authorization_code',
-            redirect_uri: 'http://localhost:3000', // Must match Google console settings
+            redirect_uri: 'http://localhost:5173',
         });
 
         const { id_token } = userInfo.data;

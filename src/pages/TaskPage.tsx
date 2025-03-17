@@ -33,6 +33,7 @@ import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.sv
 import AttachmentComponent from './../components/AttachmentComponent';
 import { Attachment } from '../types/AttachmentInterface';
 import BackIcon from '../assets/Icons/Back.svg';
+import { isAuthenticated } from '../services/AuthService';
 
 const TaskPage: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -57,11 +58,11 @@ const TaskPage: React.FC = () => {
     const [isMarkAsComplete, setIsMarkAsComplete] = useState(false);
     const [attachmentFiles, setAttachmentFiles] = useState<Attachment[]>([]);
     const [attachmentData, setAttachmentData] = useState<Attachment[]>([]);
+    const isUserAuthenticated = isAuthenticated();
 
     useEffect(() => {
         const fetchTask = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
+            if (!isUserAuthenticated) {
                 navigate('/login');
                 return;
             }

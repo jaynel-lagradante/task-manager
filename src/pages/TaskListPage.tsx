@@ -15,17 +15,17 @@ import ChipHigh from '../assets/Chips/Chip_High.svg';
 import ChipCritical from '../assets/Chips/Chip_Critical.svg';
 import { FilterContainerBox, FilterIconImg, TableContainer } from '../layouts/TaskListStyles';
 import TableComponent from './../components/TableComponent';
+import { isAuthenticated } from '../services/AuthService';
 
 const TaskListPage: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const navigate = useNavigate();
     const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
     const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
-
-    const isAuthenticated = !!localStorage.getItem('token');
+    const isUserAuthenticated = isAuthenticated();
 
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (!isUserAuthenticated) {
             navigate('/login');
             return;
         }
@@ -40,7 +40,7 @@ const TaskListPage: React.FC = () => {
             }
         };
         fetchTasks();
-    }, [navigate, isAuthenticated]);
+    }, [navigate]);
 
     const filteredTasks = tasks.filter((task) => {
         let priorityMatch = true;
@@ -119,7 +119,7 @@ const TaskListPage: React.FC = () => {
         }
     };
 
-    if (!isAuthenticated) {
+    if (!isUserAuthenticated) {
         return null;
     }
 
