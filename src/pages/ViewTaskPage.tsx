@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Typography, Box, Paper, Chip, IconButton, Divider, List, ListItem, ListItemText } from '@mui/material';
+import { Typography, Box, Paper, IconButton, Divider, Grid, Container } from '@mui/material';
 import moment from 'moment';
-import { GetTaskById, GetFiles } from '../services/TaskService';
+import { GetTaskById, GetFiles, DeleteTask } from '../services/TaskService';
 import { getSubtasks } from '../services/SubtaskService';
 import { Task } from '../types/TaskInterface';
 import { Subtask } from '../types/SubTaskInterface';
@@ -10,18 +10,18 @@ import { Attachment } from '../types/AttachmentInterface';
 import { FormContainer } from '../layouts/TaskStyles';
 import DashboardComponent from './../components/DashboardComponent';
 import BackIcon from '../assets/Icons/Back.svg';
-
+import DeleteConfirmationModal from './../components/DeleteConfirmationModalComponent';
 import LowPriorityIcon from './../assets/Icons/Low_table.svg';
 import HighPriorityIcon from './../assets/Icons/High_table.svg';
 import CriticalPriorityIcon from './../assets/Icons/Critical_table.svg';
-
 import NotStartedIcon from './../assets/Icons/Not Started.svg';
 import InProgressIcon from './../assets/Icons/In Progress.svg';
 import CompleteIcon from './../assets/Icons/Complete.svg';
 import CancelledIcon from './../assets/Icons/Cancelled.svg';
-
 import DeleteIcon from './../assets/Icons/Delete_active.svg';
 import EditIcon from './../assets/Icons/Edit.svg';
+import DoneIcon from './../assets/Icons/Done.svg';
+import NotDoneIcon from './../assets/Icons/Not Done.svg';
 
 const ViewTaskComponent = () => {
     const { id } = useParams<{ id?: string }>();
@@ -31,6 +31,15 @@ const ViewTaskComponent = () => {
     const [attachments, setAttachments] = useState<Attachment[]>([]);
     const [error, setError] = useState('');
     const [objectURLs, setObjectURLs] = useState<string[]>();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleDeleteSelected = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
     useEffect(() => {
         const fetchTaskDetails = async () => {
@@ -59,6 +68,7 @@ const ViewTaskComponent = () => {
                 }
             } catch (err: any) {
                 setError(err.response?.data?.message || 'Failed to fetch task');
+                navigate('/');
             }
         };
 
@@ -115,6 +125,16 @@ const ViewTaskComponent = () => {
         }
     };
 
+    const handleConfirmDelete = async () => {
+        try {
+            task.id && (await DeleteTask(task.id));
+            setIsModalOpen(false);
+            navigate('/');
+        } catch (error) {
+            console.error('Error deleting selected tasks:', error);
+        }
+    };
+
     return (
         <DashboardComponent>
             <FormContainer>
@@ -125,123 +145,171 @@ const ViewTaskComponent = () => {
                     </Link>{' '}
                     | View Task
                 </Typography>
-                <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                        <Box display="flex" alignItems="center">
-                            {getPriorityIcon(task.priority)}
+                <Paper
+                    elevation={3}
+                    style={{
+                        overflowY: 'auto',
+                        maxHeight: 'calc(100vh - 110px)',
+                        height: '100%',
+                        boxShadow: 'none',
+                        borderRadius: '8px',
+                    }}
+                >
+                    <Container>
+                        <Box mt={4}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                <Box display="flex" alignItems="center">
+                                    {getPriorityIcon(task.priority)}
 
-                            <Box display="flex" alignItems="center" marginLeft={4}>
-                                {getStatusIcon(task.status)}
-                                <Typography variant="body2" marginLeft={1}>
-                                    {task.status}{' '}
-                                    {task.status === 'Complete'
-                                        ? `- ${moment(task.date_completed).format('DD MMM YYYY')}`
-                                        : ''}
-                                </Typography>
+                                    <Box display="flex" alignItems="center" marginLeft={4}>
+                                        {getStatusIcon(task.status)}
+                                        <Typography variant="body2" marginLeft={1}>
+                                            {task.status}{' '}
+                                            {task.status === 'Complete'
+                                                ? `- ${moment(task.date_completed).format('DD MMM YYYY')}`
+                                                : ''}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                <Box>
+                                    <IconButton aria-label="edit" onClick={() => navigate(`/edit-task/${id}`)}>
+                                        <img src={EditIcon} alt="Edit" style={{ height: '20px' }} />
+                                    </IconButton>
+                                    <IconButton aria-label="delete" onClick={() => handleDeleteSelected()}>
+                                        <img src={DeleteIcon} alt="Delete" style={{ height: '20px' }} />
+                                    </IconButton>
+                                </Box>
                             </Box>
-                        </Box>
 
-                        <Box>
-                            <IconButton aria-label="edit" onClick={() => navigate(`/edit-task/${id}`)}>
-                                <img src={EditIcon} alt="Edit" style={{ height: '20px' }} />
-                            </IconButton>
-                            <IconButton aria-label="delete">
-                                <img src={DeleteIcon} alt="Delete" style={{ height: '20px' }} />
-                            </IconButton>
-                        </Box>
-                    </Box>
+                            <Typography variant="h5" gutterBottom>
+                                {task.title}
+                            </Typography>
 
-                    <Typography variant="h5" gutterBottom>
-                        {task.title}
-                    </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                                {moment(task.due_date).format('DD MMM YYYY')} -{' '}
+                                {moment(task.due_date).format('DD MMM YYYY')}
+                            </Typography>
 
-                    <Typography variant="body2" color="textSecondary">
-                        {moment(task.due_date).format('DD MMM YYYY')} - {moment(task.due_date).format('DD MMM YYYY')}
-                    </Typography>
+                            <Typography variant="body1" paragraph>
+                                {task.description}
+                            </Typography>
 
-                    <Typography variant="body1" paragraph>
-                        {task.description}
-                    </Typography>
-
-                    {attachments?.length > 0 && (
-                        <Box
-                            mt={2}
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                flexWrap: 'wrap',
-                                gap: 2,
-                                marginTop: 2,
-                            }}
-                        >
-                            {attachments.map((file, index) => (
+                            {attachments?.length > 0 && (
                                 <Box
-                                    key={index}
+                                    mt={2}
                                     sx={{
-                                        padding: 1,
                                         display: 'flex',
-                                        alignItems: 'center',
-                                        position: 'relative',
-                                        gap: 1,
+                                        flexDirection: 'row',
+                                        flexWrap: 'wrap',
+                                        gap: 2,
+                                        marginTop: 2,
                                     }}
                                 >
-                                    {file.file?.type?.startsWith('image/') && objectURLs && objectURLs[index] && (
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                            <img
-                                                src={objectURLs[index]}
-                                                alt={file.file?.name}
-                                                style={{
-                                                    height: '80px',
-                                                    width: 'auto',
-                                                    objectFit: 'cover',
-                                                }}
-                                            />
-                                            <div
-                                                style={{
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'left',
-                                                    marginTop: 10,
-                                                }}
-                                            >
-                                                <Typography variant="body2" align="left">
-                                                    {file.file?.name}
-                                                </Typography>
-                                                <Typography
-                                                    variant="subtitle2"
-                                                    color="textSecondary"
-                                                    align="left"
-                                                    fontSize={12}
-                                                >
-                                                    {formatFileSize(file.file?.size)}
-                                                </Typography>
-                                            </div>
-                                        </div>
-                                    )}
+                                    {attachments.map((file, index) => (
+                                        <Box
+                                            key={index}
+                                            sx={{
+                                                padding: 1,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                position: 'relative',
+                                                gap: 1,
+                                            }}
+                                        >
+                                            {file.file?.type?.startsWith('image/') &&
+                                                objectURLs &&
+                                                objectURLs[index] && (
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'center',
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={objectURLs[index]}
+                                                            alt={file.file?.name}
+                                                            style={{
+                                                                height: '80px',
+                                                                width: 'auto',
+                                                                objectFit: 'cover',
+                                                            }}
+                                                        />
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                alignItems: 'left',
+                                                                marginTop: 10,
+                                                            }}
+                                                        >
+                                                            <Typography variant="body2" align="left">
+                                                                {file.file?.name}
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="subtitle2"
+                                                                color="textSecondary"
+                                                                align="left"
+                                                                fontSize={12}
+                                                            >
+                                                                {formatFileSize(file.file?.size)}
+                                                            </Typography>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                        </Box>
+                                    ))}
                                 </Box>
-                            ))}
+                            )}
+
+                            <Divider style={{ margin: '20px 0' }} />
+
+                            <Typography variant="h6" gutterBottom>
+                                Subtask
+                            </Typography>
+
+                            {subtasks.map((subtask) => {
+                                let statusIcon = null;
+                                if (subtask.status === 'Done') {
+                                    statusIcon = DoneIcon;
+                                } else if (subtask.status === 'Not Done') {
+                                    statusIcon = NotDoneIcon;
+                                }
+                                return (
+                                    <Grid container marginTop={1} key={`${subtask.id}`}>
+                                        <Grid sm={3} xs={6}>
+                                            <Typography variant="body1" color="textPrimary">
+                                                {subtask.title}
+                                            </Typography>
+                                        </Grid>
+                                        <Grid sm={3} xs={6}>
+                                            <Typography variant="body1" color="textSecondary">
+                                                {statusIcon && (
+                                                    <img
+                                                        src={statusIcon}
+                                                        alt={subtask.status}
+                                                        style={{ height: '10px', marginRight: '8px' }}
+                                                    />
+                                                )}
+                                                {subtask.status}
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
+                                );
+                            })}
                         </Box>
-                    )}
-
-                    <Divider style={{ margin: '20px 0' }} />
-
-                    <Typography variant="h6" gutterBottom>
-                        Subtask
-                    </Typography>
-
-                    <List>
-                        {subtasks.map((subtask) => (
-                            <ListItem key={subtask.id} disableGutters>
-                                <ListItemText primary={subtask.title} />
-                                <Chip
-                                    label={subtask.status}
-                                    color={subtask.status === 'Done' ? 'primary' : 'default'}
-                                />
-                            </ListItem>
-                        ))}
-                    </List>
+                    </Container>
                 </Paper>
             </FormContainer>
+
+            <DeleteConfirmationModal
+                open={isModalOpen}
+                onClose={handleCloseModal}
+                onConfirm={() => handleConfirmDelete()}
+                firstLabel={'Delete this Task?'}
+                secondLabel={task.title}
+            />
         </DashboardComponent>
     );
 };

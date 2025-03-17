@@ -30,7 +30,6 @@ import DeleteInactiveIcon from './../assets/Icons/Delete_inactive.svg';
 import { CuztomizedHeaderBox, DeleteButtonBadge } from '../layouts/DashboardStyles';
 import DeleteConfirmationModal from './DeleteConfirmationModalComponent';
 import { DeleteTask } from '../services/TaskService';
-import { useNavigate } from 'react-router-dom';
 import EditIcon from './../assets/Icons/Edit.svg';
 import AccordionExpandIcon from './../assets/Icons/Accordion_expand.svg';
 import AccordionSuppressIcon from './../assets/Icons/Accordion_supress.svg';

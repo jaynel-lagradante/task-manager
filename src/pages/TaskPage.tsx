@@ -265,7 +265,9 @@ const TaskPage: React.FC = () => {
                     | {id ? 'View Task / Edit' : 'New Task'}
                 </Typography>
 
-                <Paper style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', height: '100%' }}>
+                <Paper
+                    style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', height: '100%', boxShadow: 'none' }}
+                >
                     <LocalizationProvider dateAdapter={AdapterMoment}>
                         <Container maxWidth="md" style={{ paddingBottom: '16px' }}>
                             <Box mt={4}>
