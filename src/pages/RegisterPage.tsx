@@ -26,12 +26,16 @@ const RegisterPage: React.FC = () => {
     const [lengthCheck, setLengthCheck] = useState(false);
     const [numberSymbolCheck, setNumberSymbolCheck] = useState(false);
     const [passwordCheck, setPasswordCheck] = useState(0);
+    const allowedUsernameSymbols = /^[a-zA-Z0-9\s!#()_-]*$/;
     const navigate = useNavigate();
 
     const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const username = e.target.value;
         setUsername(username);
         setUsernameError('');
+        if (!allowedUsernameSymbols.test(username)) {
+            setUsernameError('Username can only contain letters, numbers, spaces, and !#()_-');
+        }
         if (password) {
             checkPasswordStrength(password);
         }
@@ -74,15 +78,23 @@ const RegisterPage: React.FC = () => {
     }, [nameEmailCheck, lengthCheck, numberSymbolCheck, password]);
 
     const handleRegister = async () => {
+        let hasError = false;
         if (!username) {
             setUsernameError('Username is required');
+            hasError = true;
+        }
+
+        if (!allowedUsernameSymbols.test(username)) {
+            setUsernameError('Username can only contain letters, numbers, spaces, and !#()_-');
+            hasError = true;
         }
 
         if (!password) {
             setPasswordError('Password is required');
+            hasError = true;
         }
 
-        if (!username || !password || passwordCheck !== 3) {
+        if (hasError || passwordCheck !== 3) {
             return;
         }
 

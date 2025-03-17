@@ -28,16 +28,19 @@ const LoginPage: React.FC = () => {
         setUsernameError('');
         setPasswordError('');
         setLoginError('');
+        let hasError = false;
 
         if (!username) {
             setUsernameError('Username is required');
+            hasError = true;
         }
 
         if (!password) {
             setPasswordError('Password is required');
+            hasError = true;
         }
 
-        if (!username || !password) {
+        if (hasError) {
             return;
         }
 

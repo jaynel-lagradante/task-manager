@@ -39,12 +39,19 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const register = async (req: Request, res: Response) => {
+    const allowedUsernameSymbols = /^[a-zA-Z0-9\s!#()_-]*$/;
     try {
         const { username, password } = req.body;
         if (!username || !password) {
             res.status(400).json({ message: 'Username and password are required' });
             return;
         }
+
+        // Validate username against allowed symbols
+        if (!allowedUsernameSymbols.test(username)) {
+            return res.status(400).json({ message: 'Username can only contain letters, numbers, spaces, and !#()_-' });
+        }
+
         // Check if username already exists
         const existingUser = await Account.findOne({ where: { username } });
         if (existingUser) {
