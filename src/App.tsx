@@ -1,23 +1,23 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import RegisterComponent from './components/RegisterComponent';
-import LoginComponent from './components/LoginComponent';
-import TaskListComponent from './components/TaskListComponent';
-import TaskComponent from './components/TaskComponent';
+import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import TaskListPage from './pages/TaskListPage';
+import TaskPage from './pages/TaskPage';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import ViewTaskComponent from './components/ViewTaskComponent';
+import ViewTaskPage from './pages/ViewTaskPage';
 
 function App() {
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <Router>
                 <Routes>
-                    <Route path="/login" element={<LoginComponent />} />
-                    <Route path="/register" element={<RegisterComponent />} />
-                    <Route path="/" element={<TaskListComponent />} />
-                    <Route path="/create-task" element={<TaskComponent />} />
-                    <Route path="/edit-task/:id" element={<TaskComponent />} />
-                    <Route path="/view-task/:id" element={<ViewTaskComponent />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/" element={<TaskListPage />} />
+                    <Route path="/create-task" element={<TaskPage />} />
+                    <Route path="/edit-task/:id" element={<TaskPage />} />
+                    <Route path="/view-task/:id" element={<ViewTaskPage />} />
                 </Routes>
             </Router>
         </LocalizationProvider>

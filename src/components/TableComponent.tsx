@@ -47,6 +47,7 @@ type TableProps<TData> = {
     data: TData[];
     getRowCanExpand: (row: Row<TData>) => boolean;
     setTasksValue: (tasks: Task[]) => void;
+    handleEdit?: (taskId: string) => void;
 };
 
 const renderSubComponent = ({ row }: { row: Row<Task> }) => {
@@ -86,10 +87,9 @@ const renderSubComponent = ({ row }: { row: Row<Task> }) => {
     );
 };
 
-function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Task>): JSX.Element {
+const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: TableProps<Task>): JSX.Element => {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const navigate = useNavigate();
 
     const handleDeleteSelected = () => {
         setIsModalOpen(true);
@@ -116,10 +116,6 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
         } catch (error) {
             console.error('Error deleting selected tasks:', error);
         }
-    };
-
-    const handleEdit = (taskId: string) => {
-        navigate(`/view-task/${taskId}`);
     };
 
     const tableColumns: ColumnDef<Task>[] = [
@@ -274,7 +270,7 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
                     src={EditIcon}
                     alt="Edit"
                     style={{ height: '20px', cursor: 'pointer' }}
-                    onClick={() => handleEdit(row.original.id ?? '')}
+                    onClick={() => handleEdit && handleEdit(row.original.id ?? '')}
                 />
             ),
         },
@@ -355,6 +351,6 @@ function TableComponent({ data, getRowCanExpand, setTasksValue }: TableProps<Tas
             />
         </TableContainer>
     );
-}
+};
 
 export default TableComponent;

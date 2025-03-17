@@ -8,7 +8,7 @@ import { Task } from '../types/TaskInterface';
 import { Subtask } from '../types/SubTaskInterface';
 import { Attachment } from '../types/AttachmentInterface';
 import { FormContainer } from '../layouts/TaskStyles';
-import DashboardComponent from './DashboardComponent';
+import DashboardComponent from './../components/DashboardComponent';
 import BackIcon from '../assets/Icons/Back.svg';
 
 import LowPriorityIcon from './../assets/Icons/Low_table.svg';

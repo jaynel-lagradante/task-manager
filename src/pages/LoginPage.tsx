@@ -5,9 +5,9 @@ import { Login } from './../services/AuthService';
 import ShowPasswordIcon from './../assets/Icons/Show.svg';
 import HidePasswordIcon from './../assets/Icons/Hide.svg';
 import { SignupLink, SignupMessageItem, SubmitButton } from '../layouts/CoverPageStyles';
-import CoverPageComponent from './CoverPageComponent';
+import CoverPageComponent from './../components/CoverPageComponent';
 
-const LoginComponent: React.FC = () => {
+const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [usernameError, setUsernameError] = useState('');
@@ -115,4 +115,4 @@ const LoginComponent: React.FC = () => {
     );
 };
 
-export default LoginComponent;
+export default LoginPage;

@@ -20,8 +20,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import moment, { Moment } from 'moment';
 import { Task } from '../types/TaskInterface';
 import { CreateTask, GetFiles, GetTaskById, UpdateTask, UploadFiles } from '../services/TaskService';
-import DashboardComponent from './DashboardComponent';
-import SubtaskComponent from './SubTaskComponent';
+import DashboardComponent from './../components/DashboardComponent';
+import SubtaskComponent from './SubTaskPage';
 import NewSubtaskIconSelected from './../assets/Buttons/Button_New Subtask_selected.svg';
 import NewSubtaskIconActive from './../assets/Buttons/Button_New Subtask_active.svg';
 import NewSubtaskIconInactive from './../assets/Buttons/Button_New Subtask_inactive.svg';
@@ -31,11 +31,11 @@ import CancelButton from './../assets/Buttons/Button_Cancel.svg';
 import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../services/SubtaskService';
 import { Subtask } from '../types/SubTaskInterface';
 import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.svg';
-import AttachmentComponent from './AttachmentComponent';
+import AttachmentComponent from './../components/AttachmentComponent';
 import { Attachment } from '../types/AttachmentInterface';
 import BackIcon from '../assets/Icons/Back.svg';
 
-const TaskComponent: React.FC = () => {
+const TaskPage: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
     const [task, setTask] = useState<Task>({
@@ -456,4 +456,4 @@ const TaskComponent: React.FC = () => {
     );
 };
 
-export default TaskComponent;
+export default TaskPage;

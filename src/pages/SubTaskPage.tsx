@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextField, FormControl, Select, MenuItem, IconButton, Box, InputLabel } from '@mui/material';
 import DeleteIcon from './../assets/Icons/Delete_active.svg';
 import { Subtask } from '../types/SubTaskInterface';
-import DeleteConfirmationModal from './DeleteConfirmationModalComponent';
+import DeleteConfirmationModal from './../components/DeleteConfirmationModalComponent';
 
 interface SubtaskProps {
     index: number;
@@ -13,7 +13,7 @@ interface SubtaskProps {
     titleError?: string;
 }
 
-const SubtaskComponent: React.FC<SubtaskProps> = ({
+const SubtaskPage: React.FC<SubtaskProps> = ({
     index,
     subtask,
     onTitleChange,
@@ -70,4 +70,4 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
     );
 };
 
-export default SubtaskComponent;
+export default SubtaskPage;

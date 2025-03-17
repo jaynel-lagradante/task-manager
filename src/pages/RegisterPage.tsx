@@ -13,9 +13,9 @@ import ShowPasswordIcon from './../assets/Icons/Show.svg';
 import HidePasswordIcon from './../assets/Icons/Hide.svg';
 import Bullet from './../assets/Icons/Bullet.svg';
 import Check from './../assets/Icons/Check.svg';
-import CoverPageComponent from './CoverPageComponent';
+import CoverPageComponent from './../components/CoverPageComponent';
 
-const RegisterComponent: React.FC = () => {
+const RegisterPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [usernameError, setUsernameError] = useState('');
@@ -197,4 +197,4 @@ const RegisterComponent: React.FC = () => {
     );
 };
 
-export default RegisterComponent;
+export default RegisterPage;
