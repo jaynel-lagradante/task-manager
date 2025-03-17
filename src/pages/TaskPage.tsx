@@ -11,7 +11,6 @@ import {
     MenuItem,
     Divider,
     IconButton,
-    Paper,
     Grid,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -25,7 +24,7 @@ import SubtaskComponent from './SubTaskPage';
 import NewSubtaskIconSelected from './../assets/Buttons/Button_New Subtask_selected.svg';
 import NewSubtaskIconActive from './../assets/Buttons/Button_New Subtask_active.svg';
 import NewSubtaskIconInactive from './../assets/Buttons/Button_New Subtask_inactive.svg';
-import { FormContainer } from '../layouts/TaskStyles';
+import { CuztomizedImg, CuztomizedPaper, FormContainer } from '../layouts/TaskStyles';
 import SaveButton from './../assets/Buttons/Button_Save.svg';
 import CancelButton from './../assets/Buttons/Button_Cancel.svg';
 import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../services/SubtaskService';
@@ -265,9 +264,7 @@ const TaskPage: React.FC = () => {
                     | {id ? 'View Task / Edit' : 'New Task'}
                 </Typography>
 
-                <Paper
-                    style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', height: '100%', boxShadow: 'none' }}
-                >
+                <CuztomizedPaper>
                     <LocalizationProvider dateAdapter={AdapterMoment}>
                         <Container maxWidth="md" style={{ paddingBottom: '16px' }}>
                             <Box mt={4}>
@@ -402,23 +399,11 @@ const TaskPage: React.FC = () => {
                                         onMouseLeave={() => setIsAddSubtaskHovered(false)}
                                     >
                                         {task.status === 'Complete' ? (
-                                            <img
-                                                src={NewSubtaskIconInactive}
-                                                alt="Add Subtask"
-                                                style={{ height: '40px' }}
-                                            />
+                                            <CuztomizedImg src={NewSubtaskIconInactive} alt="Add Subtask" />
                                         ) : isAddSubtaskHovered ? (
-                                            <img
-                                                src={NewSubtaskIconSelected}
-                                                alt="Add Subtask"
-                                                style={{ height: '40px' }}
-                                            />
+                                            <CuztomizedImg src={NewSubtaskIconSelected} alt="Add Subtask" />
                                         ) : (
-                                            <img
-                                                src={NewSubtaskIconActive}
-                                                alt="Add Subtask"
-                                                style={{ height: '40px' }}
-                                            />
+                                            <CuztomizedImg src={NewSubtaskIconActive} alt="Add Subtask" />
                                         )}
                                     </IconButton>
                                 </Box>
@@ -437,19 +422,19 @@ const TaskPage: React.FC = () => {
                             </Box>
                         </Container>
                     </LocalizationProvider>
-                </Paper>
+                </CuztomizedPaper>
 
                 <Box display="flex" justifyContent="flex-end" marginTop="32px" marginRight="16px">
                     <IconButton onClick={() => navigate('/')}>
-                        <img src={CancelButton} alt="Add Subtask" style={{ height: '40px' }} />
+                        <CuztomizedImg src={CancelButton} alt="Add Subtask" />
                     </IconButton>
                     {showMarkAsComplete && !isMarkAsComplete ? (
                         <IconButton onClick={handleMarkAsComplete}>
-                            <img src={MarkAsCompleteButton} alt="Mark as Complete" style={{ height: '40px' }} />
+                            <CuztomizedImg src={MarkAsCompleteButton} alt="Mark as Complete" />
                         </IconButton>
                     ) : (
                         <IconButton onClick={handleSubmit}>
-                            <img src={SaveButton} alt="Add Subtask" style={{ height: '40px' }} />
+                            <CuztomizedImg src={SaveButton} alt="Add Subtask" />
                         </IconButton>
                     )}
                 </Box>

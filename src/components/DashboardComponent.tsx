@@ -4,7 +4,14 @@ import { Grid, Tab, Box, Divider, Avatar, Typography, Modal, Button } from '@mui
 import { Logout } from './../services/AuthService';
 import LogoHeader from './../assets/Logo Header.svg';
 import AvatarIcon from './../assets/Icons/Avatar.svg';
-import { CuztomzedContainer, MenuTabs } from '../layouts/DashboardStyles';
+import {
+    CuztomizedDivider,
+    CuztomzedContainer,
+    MainGridContainer,
+    MenuDivContainer,
+    MenuGridContainer,
+    MenuTabs,
+} from '../layouts/DashboardStyles';
 import HomeIcon from './../assets/Icons/Home.svg';
 import SignoutIcon from './../assets/Icons/Signout.svg';
 
@@ -38,13 +45,13 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
     };
 
     return (
-        <Grid container style={{ height: '100vh' }}>
-            <Grid item xs={12} sm={2} style={{ backgroundColor: '#fffff', padding: '16px' }}>
+        <MainGridContainer container>
+            <MenuGridContainer item xs={12} sm={2}>
                 <Box display="flex" flexDirection="column">
                     <Box display="flex" justifyContent="flex-start" width="100%" marginBottom="16px">
                         <img src={LogoHeader} alt="Logo" style={{ height: '60px' }} />
                     </Box>
-                    <Divider style={{ width: '100%', marginBottom: '16px' }} />
+                    <CuztomizedDivider />
                     <Box display="flex" flexDirection="column" alignItems="center" width="100%" marginBottom="16px">
                         <Avatar src={AvatarIcon} alt="Avatar" style={{ marginBottom: '8px' }} />
                         <Typography variant="body1">{username}</Typography>
@@ -52,38 +59,24 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
                     <MenuTabs value={value} onChange={handleChange} orientation="vertical" aria-label="dashboard tabs">
                         <Tab
                             label={
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        width: '100%',
-                                    }}
-                                >
-                                    <img src={HomeIcon} alt="Home" style={{ height: '20px' }} />
-                                    <span style={{ textAlign: 'center', flex: 1 }}>Home</span>
-                                </div>
+                                <MenuDivContainer>
+                                    <img src={HomeIcon} alt="Home" />
+                                    <span>Home</span>
+                                </MenuDivContainer>
                             }
                         />
                         <Tab
                             label={
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        width: '100%',
-                                    }}
-                                >
-                                    <img src={SignoutIcon} alt="Sign out" style={{ height: '20px' }} />
-                                    <span style={{ textAlign: 'center', flex: 1 }}>Sign out</span>
-                                </div>
+                                <MenuDivContainer>
+                                    <img src={SignoutIcon} alt="Sign out" />
+                                    <span>Sign out</span>
+                                </MenuDivContainer>
                             }
                             onClick={handleOpenModal}
                         />
                     </MenuTabs>
                 </Box>
-            </Grid>
+            </MenuGridContainer>
             <Grid item xs={12} sm={10} style={{ padding: '16px' }}>
                 <CuztomzedContainer>{children}</CuztomzedContainer>
             </Grid>
@@ -130,7 +123,7 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
                     </Box>
                 </Box>
             </Modal>
-        </Grid>
+        </MainGridContainer>
     );
 };
 

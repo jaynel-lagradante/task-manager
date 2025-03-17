@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Typography, Box, Paper, IconButton, Divider, Grid, Container } from '@mui/material';
+import { Typography, Box, IconButton, Grid, Container } from '@mui/material';
 import moment from 'moment';
 import { GetTaskById, GetFiles, DeleteTask } from '../services/TaskService';
 import { getSubtasks } from '../services/SubtaskService';
@@ -22,6 +22,15 @@ import DeleteIcon from './../assets/Icons/Delete_active.svg';
 import EditIcon from './../assets/Icons/Edit.svg';
 import DoneIcon from './../assets/Icons/Done.svg';
 import NotDoneIcon from './../assets/Icons/Not Done.svg';
+import { formatFileSize } from '../utils/TextHelper';
+import { bufferToFile } from '../utils/FileHelper';
+import {
+    AttachmentBoxContainer,
+    AttachmentBoxContent,
+    CuztomizedDivider,
+    CuztomizedPaper,
+    FileContainer,
+} from '../layouts/ViewTaskStyles';
 
 const ViewTaskComponent = () => {
     const { id } = useParams<{ id?: string }>();
@@ -79,49 +88,27 @@ const ViewTaskComponent = () => {
         return error ? <Typography color="error">{error}</Typography> : <Typography>Loading...</Typography>;
     }
 
-    const formatFileSize = (bytes: number, decimals = 2): string => {
-        if (!bytes) return '0 Bytes';
-
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    };
-
-    function bufferToFile(buffer: ArrayBuffer, fileName: string) {
-        const uint8Array = new Uint8Array(buffer);
-        const blob = new Blob([uint8Array], { type: 'image/jpeg' });
-        return new File([blob], fileName, { type: blob.type });
-    }
-
     const getPriorityIcon = (priority: string) => {
         switch (priority) {
             case 'Low':
-                return <img src={LowPriorityIcon} alt="Low Priority" style={{ height: '20px' }} />;
+                return LowPriorityIcon;
             case 'High':
-                return <img src={HighPriorityIcon} alt="High Priority" style={{ height: '20px' }} />;
+                return HighPriorityIcon;
             case 'Critical':
-                return <img src={CriticalPriorityIcon} alt="Critical Priority" style={{ height: '20px' }} />;
-            default:
-                return null;
+                return CriticalPriorityIcon;
         }
     };
 
     const getStatusIcon = (status: string) => {
         switch (status) {
             case 'Not Started':
-                return <img src={NotStartedIcon} alt="Not Started" style={{ height: '20px' }} />;
+                return NotStartedIcon;
             case 'In Progress':
-                return <img src={InProgressIcon} alt="In Progress" style={{ height: '20px' }} />;
+                return InProgressIcon;
             case 'Complete':
-                return <img src={CompleteIcon} alt="Complete" style={{ height: '20px' }} />;
+                return CompleteIcon;
             case 'Cancelled':
-                return <img src={CancelledIcon} alt="Cancelled" style={{ height: '20px' }} />;
-            default:
-                return null;
+                return CancelledIcon;
         }
     };
 
@@ -145,24 +132,22 @@ const ViewTaskComponent = () => {
                     </Link>{' '}
                     | View Task
                 </Typography>
-                <Paper
-                    elevation={3}
-                    style={{
-                        overflowY: 'auto',
-                        maxHeight: 'calc(100vh - 110px)',
-                        height: '100%',
-                        boxShadow: 'none',
-                        borderRadius: '8px',
-                    }}
-                >
+                <CuztomizedPaper elevation={3}>
                     <Container>
                         <Box mt={4}>
                             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                                 <Box display="flex" alignItems="center">
-                                    {getPriorityIcon(task.priority)}
-
+                                    <img
+                                        src={getPriorityIcon(task.priority)}
+                                        alt={task.priority}
+                                        style={{ height: '20px' }}
+                                    />
                                     <Box display="flex" alignItems="center" marginLeft={4}>
-                                        {getStatusIcon(task.status)}
+                                        <img
+                                            src={getStatusIcon(task.status)}
+                                            alt={task.status}
+                                            style={{ height: '20px' }}
+                                        />
                                         <Typography variant="body2" marginLeft={1}>
                                             {task.status}{' '}
                                             {task.status === 'Complete'
@@ -182,68 +167,27 @@ const ViewTaskComponent = () => {
                                 </Box>
                             </Box>
 
-                            <Typography variant="h5" gutterBottom>
-                                {task.title}
-                            </Typography>
+                            <Typography variant="h5">{task.title}</Typography>
 
                             <Typography variant="body2" color="textSecondary">
                                 {moment(task.due_date).format('DD MMM YYYY')} -{' '}
                                 {moment(task.due_date).format('DD MMM YYYY')}
                             </Typography>
 
-                            <Typography variant="body1" paragraph>
+                            <Typography variant="body1" paragraph mt={2}>
                                 {task.description}
                             </Typography>
 
                             {attachments?.length > 0 && (
-                                <Box
-                                    mt={2}
-                                    sx={{
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        flexWrap: 'wrap',
-                                        gap: 2,
-                                        marginTop: 2,
-                                    }}
-                                >
+                                <AttachmentBoxContainer mt={2}>
                                     {attachments.map((file, index) => (
-                                        <Box
-                                            key={index}
-                                            sx={{
-                                                padding: 1,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                position: 'relative',
-                                                gap: 1,
-                                            }}
-                                        >
+                                        <AttachmentBoxContent key={index}>
                                             {file.file?.type?.startsWith('image/') &&
                                                 objectURLs &&
                                                 objectURLs[index] && (
-                                                    <div
-                                                        style={{
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            alignItems: 'center',
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={objectURLs[index]}
-                                                            alt={file.file?.name}
-                                                            style={{
-                                                                height: '80px',
-                                                                width: 'auto',
-                                                                objectFit: 'cover',
-                                                            }}
-                                                        />
-                                                        <div
-                                                            style={{
-                                                                display: 'flex',
-                                                                flexDirection: 'column',
-                                                                alignItems: 'left',
-                                                                marginTop: 10,
-                                                            }}
-                                                        >
+                                                    <FileContainer>
+                                                        <img src={objectURLs[index]} alt={file.file?.name} />
+                                                        <div>
                                                             <Typography variant="body2" align="left">
                                                                 {file.file?.name}
                                                             </Typography>
@@ -256,14 +200,14 @@ const ViewTaskComponent = () => {
                                                                 {formatFileSize(file.file?.size)}
                                                             </Typography>
                                                         </div>
-                                                    </div>
+                                                    </FileContainer>
                                                 )}
-                                        </Box>
+                                        </AttachmentBoxContent>
                                     ))}
-                                </Box>
+                                </AttachmentBoxContainer>
                             )}
 
-                            <Divider style={{ margin: '20px 0' }} />
+                            <CuztomizedDivider />
 
                             <Typography variant="h6" gutterBottom>
                                 Subtask
@@ -278,12 +222,12 @@ const ViewTaskComponent = () => {
                                 }
                                 return (
                                     <Grid container marginTop={1} key={`${subtask.id}`}>
-                                        <Grid sm={3} xs={6}>
+                                        <Grid sm={3} xs={7}>
                                             <Typography variant="body1" color="textPrimary">
                                                 {subtask.title}
                                             </Typography>
                                         </Grid>
-                                        <Grid sm={3} xs={6}>
+                                        <Grid sm={3} xs={5}>
                                             <Typography variant="body1" color="textSecondary">
                                                 {statusIcon && (
                                                     <img
@@ -300,7 +244,7 @@ const ViewTaskComponent = () => {
                             })}
                         </Box>
                     </Container>
-                </Paper>
+                </CuztomizedPaper>
             </FormContainer>
 
             <DeleteConfirmationModal

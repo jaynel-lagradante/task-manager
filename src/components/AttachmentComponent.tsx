@@ -1,28 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { IconButton, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import NewSubtaskIconSelected from './../assets/Icons/Upload.svg';
 import CancelIcon from './../assets/Icons/Cancel.svg';
 import { Attachment } from '../types/AttachmentInterface';
 import { DeleteFile } from '../services/TaskService';
-
-const AttachmentBox = styled(Box)(({ theme }) => ({
-    position: 'relative',
-    border: `1px dashed ${theme.palette.divider}`,
-    borderRadius: theme.shape.borderRadius,
-    padding: theme.spacing(3),
-    textAlign: 'center',
-}));
-
-const LegendTypography = styled(Typography)(({ theme }) => ({
-    position: 'absolute',
-    top: theme.spacing(-1),
-    left: theme.spacing(1),
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(0, 1),
-}));
+import { formatFileSize } from '../utils/TextHelper';
+import { bufferToFile } from '../utils/FileHelper';
+import {
+    AttachmentBox,
+    AttachmentBoxContent,
+    LegendTypography,
+    ImageBoxContainer,
+    CuztomizedImg,
+    CuztomizedImgDiv,
+    CuztomizedIconButton,
+    FileDivContainer,
+} from '../layouts/AttachmentStyles';
 
 interface AttachmentComponentProps {
     attachments: Attachment[];
@@ -137,24 +132,6 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, 
         event.preventDefault();
     };
 
-    const formatFileSize = (bytes: number, decimals = 2): string => {
-        if (!bytes) return '0 Bytes';
-
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    };
-
-    function bufferToFile(buffer: ArrayBuffer, fileName: string) {
-        const uint8Array = new Uint8Array(buffer);
-        const blob = new Blob([uint8Array], { type: 'image/jpeg' });
-        return new File([blob], fileName, { type: blob.type });
-    }
-
     return (
         <AttachmentBox marginTop={2} onDrop={handleDrop} onDragOver={handleDragOver}>
             <LegendTypography variant="subtitle2" color="textSecondary">
@@ -177,68 +154,28 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({ attachments, 
                 </Stack>
             </Box>
 
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    gap: 2,
-                    marginTop: 2,
-                }}
-            >
+            <AttachmentBoxContent>
                 {selectedFiles?.map((file, index) => (
-                    <Box
-                        key={index}
-                        sx={{
-                            padding: 1,
-                            display: 'flex',
-                            alignItems: 'center',
-                            position: 'relative',
-                            gap: 1,
-                        }}
-                    >
+                    <ImageBoxContainer key={index}>
                         {file.file.type.startsWith('image/') && objectURLs && objectURLs[index] && (
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <img
-                                    src={objectURLs[index]}
-                                    alt={file.file.name}
-                                    style={{
-                                        height: '80px',
-                                        width: 'auto',
-                                        objectFit: 'cover',
-                                    }}
-                                />
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'left',
-                                        marginTop: 10,
-                                    }}
-                                >
+                            <FileDivContainer>
+                                <CuztomizedImg src={objectURLs[index]} alt={file.file.name} />
+                                <CuztomizedImgDiv>
                                     <Typography variant="body2" align="left">
                                         {file.file.name}
                                     </Typography>
                                     <Typography variant="subtitle2" color="textSecondary" align="left" fontSize={12}>
                                         {formatFileSize(file.file.size)}
                                     </Typography>
-                                </div>
-                            </div>
+                                </CuztomizedImgDiv>
+                            </FileDivContainer>
                         )}
-                        <IconButton
-                            onClick={() => handleRemoveFile(index, file?.id)}
-                            size="small"
-                            sx={{
-                                position: 'absolute',
-                                top: -15,
-                                right: 15,
-                            }}
-                        >
+                        <CuztomizedIconButton onClick={() => handleRemoveFile(index, file?.id)} size="small">
                             <img src={CancelIcon} alt="Remove" style={{ height: '15px' }} />
-                        </IconButton>
-                    </Box>
+                        </CuztomizedIconButton>
+                    </ImageBoxContainer>
                 ))}
-            </Box>
+            </AttachmentBoxContent>
 
             <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} multiple />
         </AttachmentBox>

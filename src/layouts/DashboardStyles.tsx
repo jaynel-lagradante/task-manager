@@ -1,5 +1,33 @@
 import { styled } from '@mui/material/styles';
-import { Badge, Box, Container, Tabs } from '@mui/material';
+import { Badge, Box, Container, Grid, Tabs } from '@mui/material';
+
+export const MainGridContainer = styled(Grid)(() => ({
+    height: '100vh',
+}));
+
+export const MenuGridContainer = styled(Grid)(() => ({
+    backgroundColor: '#fffff',
+    padding: '16px',
+}));
+
+export const CuztomizedDivider = styled('div')(() => ({
+    width: '100%',
+    marginBottom: '16px',
+}));
+
+export const MenuDivContainer = styled('div')(() => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    '& img': {
+        height: '20px',
+    },
+    '& span': {
+        textAlign: 'center',
+        flex: 1,
+    },
+}));
 
 export const MenuTabs = styled(Tabs)(({ theme }) => ({
     '& .MuiTabs-indicator': {
@@ -19,7 +47,7 @@ export const MenuTabs = styled(Tabs)(({ theme }) => ({
     },
 }));
 
-export const DeleteButtonBadge = styled(Badge)(({ theme }) => ({
+export const DeleteButtonBadge = styled(Badge)(() => ({
     '& .MuiBadge-badge': {
         right: -3,
         top: 18,
@@ -29,13 +57,13 @@ export const DeleteButtonBadge = styled(Badge)(({ theme }) => ({
     },
 }));
 
-export const CuztomizedHeaderBox = styled(Box)(({ theme }) => ({
+export const CuztomizedHeaderBox = styled(Box)(() => ({
     width: 53,
     border: '1px solid #E0E0E0',
     borderRadius: 10,
 }));
 
-export const CuztomzedContainer = styled(Container)(({ theme }) => ({
+export const CuztomzedContainer = styled(Container)(() => ({
     padding: '16px',
     backgroundColor: '#F2F8FD',
     borderRadius: '16px',

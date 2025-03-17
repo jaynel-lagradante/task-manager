@@ -34,7 +34,7 @@ import EditIcon from './../assets/Icons/Edit.svg';
 import AccordionExpandIcon from './../assets/Icons/Accordion_expand.svg';
 import AccordionSuppressIcon from './../assets/Icons/Accordion_supress.svg';
 import SortDesktopIcon from './../assets/Icons/Sort_desktop.svg';
-import { RenderedContainer } from '../layouts/TableStyle';
+import { CuztomizedImg, RenderedContainer } from '../layouts/TableStyle';
 import DoneIcon from './../assets/Icons/Done.svg';
 import NotDoneIcon from './../assets/Icons/Not Done.svg';
 import LowPriorityIcon from './../assets/Icons/Low_table.svg';
@@ -125,14 +125,14 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                     <CuztomizedHeaderBox>
                         <DeleteButtonBadge badgeContent={selectedRows.length} color="primary">
                             <IconButton onClick={handleDeleteSelected}>
-                                <img src={DeleteActiveIcon} alt="Delete" style={{ height: '20px' }} />
+                                <CuztomizedImg src={DeleteActiveIcon} alt="Delete" />
                             </IconButton>
                         </DeleteButtonBadge>
                     </CuztomizedHeaderBox>
                 ) : (
                     <Box>
                         <IconButton disabled>
-                            <img src={DeleteInactiveIcon} alt="Delete" style={{ height: '20px' }} />
+                            <CuztomizedImg src={DeleteInactiveIcon} alt="Delete" />
                         </IconButton>
                     </Box>
                 ),
