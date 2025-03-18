@@ -18,23 +18,35 @@ import {
     CuztomizedIconButton,
     FileDivContainer,
 } from '../layouts/AttachmentStyles';
+import ModalComponent from './ModalComponent';
 
 interface AttachmentComponentProps {
     attachments: Attachment[];
     maxFiles?: number;
     maxFileSize?: number;
+    allowedFileTypes?: string[];
     onFilesChange?: (files: Attachment[]) => void;
 }
 
 const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
     attachments,
-    maxFiles,
-    maxFileSize,
+    maxFiles = 5,
+    maxFileSize = 10 * 1024 * 1024, // 10 MB
+    allowedFileTypes,
     onFilesChange,
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = useState<Attachment[]>();
     const [objectURLs, setObjectURLs] = useState<string[]>();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalProp, setModalProp] = useState({
+        firstLabel: '',
+        secondLabel: '',
+        onCloseLabel: '',
+        onConfirmLabel: '',
+        onClose: () => {},
+        onConfirm: () => {},
+    });
 
     useEffect(() => {
         if (attachments && attachments.length > 0) {
@@ -63,31 +75,19 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
         }
     };
 
-    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const files = event.target.files;
-    //     if (files) {
-    //         const newURLs: string[] = [];
-    //         const newFiles: Attachment[] = [];
-
-    //         Array.from(files).forEach((file) => {
-    //             newFiles.push({ file });
-    //             if (file.type.startsWith('image/')) {
-    //                 const url = URL.createObjectURL(file);
-    //                 newURLs.push(url);
-    //             } else {
-    //                 newURLs.push('');
-    //             }
-    //         });
-
-    //         setSelectedFiles((prevFiles) => {
-    //             const currentFiles = prevFiles ?? [];
-    //             const updatedFiles = [...currentFiles, ...newFiles];
-    //             return updatedFiles;
-    //         });
-
-    //         setObjectURLs((prevURLs) => [...(prevURLs ?? []), ...newURLs]);
-    //     }
-    // };
+    const handleModalRemoveFile = (index: number, file: Attachment) => {
+        setModalProp({
+            firstLabel: `Remove file?`,
+            secondLabel: `${file.file.name}`,
+            onCloseLabel: 'Cancel',
+            onConfirmLabel: 'Delete',
+            onClose: () => setIsModalOpen(false),
+            onConfirm: () => {
+                handleRemoveFile(index, file?.id), setIsModalOpen(false);
+            },
+        });
+        setIsModalOpen(true);
+    };
 
     const handleRemoveFile = async (index: number, fileId: string | undefined) => {
         setSelectedFiles((prevFiles) => {
@@ -123,33 +123,6 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
         }
     };
 
-    // const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    //     event.preventDefault();
-    //     const files = event.dataTransfer.files;
-    //     if (files) {
-    //         const newURLs: string[] = [];
-    //         const newFiles: Attachment[] = [];
-
-    //         Array.from(files).forEach((file) => {
-    //             newFiles.push({ file });
-    //             if (file.type.startsWith('image/')) {
-    //                 const url = URL.createObjectURL(file);
-    //                 newURLs.push(url);
-    //             } else {
-    //                 newURLs.push('');
-    //             }
-    //         });
-
-    //         setSelectedFiles((prevFiles) => {
-    //             const currentFiles = prevFiles ?? [];
-    //             const updatedFiles = [...currentFiles, ...newFiles];
-    //             return updatedFiles;
-    //         });
-
-    //         setObjectURLs((prevURLs) => [...(prevURLs ?? []), ...newURLs]);
-    //     }
-    // };
-
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
     };
@@ -157,17 +130,31 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
     const handleNewFiles = (newFilesList: File[]) => {
         const validFiles: Attachment[] = [];
         const newURLs: string[] = [];
+        const totalFiles = newFilesList.length + (selectedFiles?.length || 0);
+        let largeFilesLabel = '';
+        let invalidTypeFilesLabel = '';
+
+        if (totalFiles > maxFiles) {
+            setModalProp({
+                firstLabel: `Maximum of ${maxFiles} files allowed.`,
+                secondLabel: ``,
+                onCloseLabel: 'Close',
+                onConfirmLabel: '',
+                onClose: () => setIsModalOpen(false),
+                onConfirm: () => {},
+            });
+            setIsModalOpen(true);
+            return;
+        }
 
         newFilesList.forEach((file) => {
-            if (maxFiles && selectedFiles && selectedFiles.length >= maxFiles) {
-                console.log(`Maximum of ${maxFiles} files allowed.`, { variant: 'warning' });
+            if (maxFileSize && file.size > maxFileSize) {
+                largeFilesLabel += `${file.name} `;
                 return;
             }
 
-            if (maxFileSize && file.size > maxFileSize) {
-                console.log(`File "${file.name}" exceeds the maximum size of ${formatFileSize(maxFileSize)}.`, {
-                    variant: 'warning',
-                });
+            if (allowedFileTypes && allowedFileTypes.length > 0 && !allowedFileTypes.includes(file.type)) {
+                invalidTypeFilesLabel += `${file.name} `;
                 return;
             }
 
@@ -179,10 +166,33 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
             }
         });
 
+        if (largeFilesLabel) {
+            setModalProp({
+                firstLabel: `${largeFilesLabel}`,
+                secondLabel: `Exceeds the maximum size of ${formatFileSize(maxFileSize)}.`,
+                onCloseLabel: 'Close',
+                onConfirmLabel: '',
+                onClose: () => setIsModalOpen(false),
+                onConfirm: () => {},
+            });
+            setIsModalOpen(true);
+        }
+
+        if (invalidTypeFilesLabel) {
+            setModalProp({
+                firstLabel: `${invalidTypeFilesLabel}`,
+                secondLabel: `Has an invalid file type. Allowed types are: ${allowedFileTypes?.join(', ')}.`,
+                onCloseLabel: 'Close',
+                onConfirmLabel: '',
+                onClose: () => setIsModalOpen(false),
+                onConfirm: () => {},
+            });
+            setIsModalOpen(true);
+        }
+
         setSelectedFiles((prevFiles) => [...(prevFiles || []), ...validFiles]);
         setObjectURLs((prevURLs) => [...(prevURLs || []), ...newURLs]);
 
-        // Clear the input value so the same file can be selected again
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -226,7 +236,7 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
                                 </CuztomizedImgDiv>
                             </FileDivContainer>
                         )}
-                        <CuztomizedIconButton onClick={() => handleRemoveFile(index, file?.id)} size="small">
+                        <CuztomizedIconButton onClick={() => handleModalRemoveFile(index, file)} size="small">
                             <img src={CancelIcon} alt="Remove" style={{ height: '15px' }} />
                         </CuztomizedIconButton>
                     </ImageBoxContainer>
@@ -234,6 +244,8 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
             </AttachmentBoxContent>
 
             <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} multiple />
+
+            <ModalComponent open={isModalOpen} {...modalProp} />
         </AttachmentBox>
     );
 };

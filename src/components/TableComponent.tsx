@@ -28,7 +28,7 @@ import CancelledIcon from './../assets/Icons/Cancelled.svg';
 import DeleteActiveIcon from './../assets/Icons/Delete_active.svg';
 import DeleteInactiveIcon from './../assets/Icons/Delete_inactive.svg';
 import { CuztomizedHeaderBox, DeleteButtonBadge } from '../layouts/DashboardStyles';
-import DeleteConfirmationModal from './DeleteConfirmationModalComponent';
+import ModalComponent from './ModalComponent';
 import { DeleteTask } from '../services/TaskService';
 import EditIcon from './../assets/Icons/Edit.svg';
 import AccordionExpandIcon from './../assets/Icons/Accordion_expand.svg';
@@ -366,8 +366,10 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                 </TableBody>
             </MuiTable>
 
-            <DeleteConfirmationModal
+            <ModalComponent
                 open={isModalOpen}
+                onCloseLabel={'Cancel'}
+                onConfirmLabel={'Delete'}
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
                 firstLabel={`${selectedRows.length} Task${selectedRows.length !== 1 ? 's' : ''} will be deleted.`}

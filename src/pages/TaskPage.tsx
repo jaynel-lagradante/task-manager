@@ -219,6 +219,7 @@ const TaskPage: React.FC = () => {
             navigate('/');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to save task');
+            navigate('/');
         }
     };
 
@@ -412,6 +413,7 @@ const TaskPage: React.FC = () => {
                                     attachments={attachmentData}
                                     maxFiles={5}
                                     maxFileSize={10 * 1024 * 1024}
+                                    allowedFileTypes={['image/png', 'image/jpeg']}
                                 />
 
                                 <Divider style={{ width: '100%', marginTop: '32px' }} />

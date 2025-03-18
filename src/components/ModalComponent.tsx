@@ -1,24 +1,38 @@
 import React from 'react';
 import { Modal, Box, Typography, IconButton } from '@mui/material';
 import AlertIcon from './../assets/Icons/Alert.svg';
-import DeleteIcon from './../assets/Buttons/Button_Delete.svg';
-import CancelIcon from './../assets/Buttons/Button_Cancel.svg';
+import DeleteButton from './../assets/Buttons/Button_Delete.svg';
+import CancelButton from './../assets/Buttons/Button_Cancel.svg';
+import CancelIcon from './../assets/Icons/Cancel.svg';
 
-interface DeleteConfirmationModalProps {
+interface ModalComponentProps {
     open: boolean;
+    onCloseLabel?: string | null;
+    onConfirmLabel?: string | null;
     onClose: () => void;
     onConfirm: () => void;
     firstLabel: string | null;
     secondLabel: string | null;
 }
 
-const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
+const ModalComponent: React.FC<ModalComponentProps> = ({
     open,
+    onCloseLabel,
+    onConfirmLabel,
     onClose,
     onConfirm,
     firstLabel,
     secondLabel,
 }) => {
+    let closeIcon = null;
+    switch (onCloseLabel) {
+        case 'Cancel':
+            closeIcon = CancelButton;
+            break;
+        case 'Close':
+            closeIcon = CancelIcon;
+            break;
+    }
     return (
         <Modal open={open} onClose={onClose}>
             <Box
@@ -46,16 +60,20 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
                     </Typography>
                 )}
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                    <IconButton onClick={onClose}>
-                        <img src={CancelIcon} alt="Cancel" style={{ height: '40px' }} />
-                    </IconButton>
-                    <IconButton onClick={onConfirm}>
-                        <img src={DeleteIcon} alt="Delete" style={{ height: '40px' }} />
-                    </IconButton>
+                    {closeIcon && (
+                        <IconButton onClick={onClose}>
+                            <img src={closeIcon} alt="Cancel" style={{ height: '40px' }} />
+                        </IconButton>
+                    )}
+                    {onConfirmLabel && (
+                        <IconButton onClick={onConfirm}>
+                            <img src={DeleteButton} alt="Delete" style={{ height: '40px' }} />
+                        </IconButton>
+                    )}
                 </Box>
             </Box>
         </Modal>
     );
 };
 
-export default DeleteConfirmationModal;
+export default ModalComponent;

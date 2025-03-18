@@ -10,7 +10,7 @@ import { Attachment } from '../types/AttachmentInterface';
 import { FormContainer } from '../layouts/TaskStyles';
 import DashboardComponent from './../components/DashboardComponent';
 import BackIcon from '../assets/Icons/Back.svg';
-import DeleteConfirmationModal from './../components/DeleteConfirmationModalComponent';
+import ModalComponent from '../components/ModalComponent';
 import LowPriorityIcon from './../assets/Icons/Low_table.svg';
 import HighPriorityIcon from './../assets/Icons/High_table.svg';
 import CriticalPriorityIcon from './../assets/Icons/Critical_table.svg';
@@ -253,8 +253,10 @@ const ViewTaskComponent = () => {
                 </CuztomizedPaper>
             </FormContainer>
 
-            <DeleteConfirmationModal
+            <ModalComponent
                 open={isModalOpen}
+                onCloseLabel={'Cancel'}
+                onConfirmLabel={'Delete'}
                 onClose={handleCloseModal}
                 onConfirm={() => handleConfirmDelete()}
                 firstLabel={'Delete this Task?'}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextField, FormControl, Select, MenuItem, IconButton, Box, InputLabel } from '@mui/material';
 import DeleteIcon from './../assets/Icons/Delete_active.svg';
 import { Subtask } from '../types/SubTaskInterface';
-import DeleteConfirmationModal from '../components/DeleteConfirmationModalComponent';
+import ModalComponent from './ModalComponent';
 
 interface SubtaskProps {
     index: number;
@@ -59,8 +59,10 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
                 <img src={DeleteIcon} alt="Delete" style={{ height: '20px' }} />
             </IconButton>
 
-            <DeleteConfirmationModal
+            <ModalComponent
                 open={isModalOpen}
+                onCloseLabel={'Cancel'}
+                onConfirmLabel={'Delete'}
                 onClose={handleCloseModal}
                 onConfirm={() => {
                     onDelete(index), handleCloseModal();
