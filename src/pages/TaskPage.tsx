@@ -361,6 +361,7 @@ const TaskPage: React.FC = () => {
                                                 multiline
                                                 rows={4}
                                                 disabled={!!id}
+                                                inputProps={{ maxLength: 25 }}
                                                 error={!!titleError}
                                                 helperText={titleError}
                                             />
