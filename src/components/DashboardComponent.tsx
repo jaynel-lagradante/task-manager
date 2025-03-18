@@ -7,10 +7,12 @@ import AvatarIcon from './../assets/Icons/Avatar.svg';
 import {
     CuztomizedDivider,
     CuztomzedContainer,
+    DesktopMenu,
     MainGridContainer,
     MenuDivContainer,
     MenuGridContainer,
     MenuTabs,
+    MobileMenu,
 } from '../layouts/DashboardStyles';
 import HomeIcon from './../assets/Icons/Home.svg';
 import SignoutIcon from './../assets/Icons/Signout.svg';
@@ -46,8 +48,8 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
 
     return (
         <MainGridContainer container>
-            <MenuGridContainer item xs={12} sm={2}>
-                <Box display="flex" flexDirection="column">
+            <MenuGridContainer item xs={12} sm={12} md={2}>
+                <DesktopMenu display="flex" flexDirection="column">
                     <Box display="flex" justifyContent="flex-start" width="100%" marginBottom="16px">
                         <img src={LogoHeader} alt="Logo" style={{ height: '60px' }} />
                     </Box>
@@ -75,9 +77,39 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
                             onClick={handleOpenModal}
                         />
                     </MenuTabs>
-                </Box>
+                </DesktopMenu>
+
+                <MobileMenu display="flex" justifyContent={'space-between'}>
+                    <Box>
+                        <img src={LogoHeader} alt="Logo" style={{ height: '60px' }} />
+                    </Box>
+                    <Box display="flex" flexDirection="row">
+                        <MenuTabs
+                            value={value}
+                            onChange={handleChange}
+                            orientation="horizontal"
+                            aria-label="dashboard tabs"
+                        >
+                            <Tab
+                                label={
+                                    <div>
+                                        <img src={HomeIcon} alt="Home" />
+                                    </div>
+                                }
+                            />
+                            <Tab
+                                label={
+                                    <div>
+                                        <img src={SignoutIcon} alt="Sign out" />
+                                    </div>
+                                }
+                                onClick={handleOpenModal}
+                            />
+                        </MenuTabs>
+                    </Box>
+                </MobileMenu>
             </MenuGridContainer>
-            <Grid item xs={12} sm={10} style={{ padding: '16px' }}>
+            <Grid item xs={12} sm={12} md={10} style={{ padding: '16px' }}>
                 <CuztomzedContainer>{children}</CuztomzedContainer>
             </Grid>
             <Modal open={isModalOpen} onClose={() => handleCloseModal(value)}>

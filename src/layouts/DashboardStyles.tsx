@@ -1,6 +1,19 @@
 import { styled } from '@mui/material/styles';
 import { Badge, Box, Container, Grid, Tabs } from '@mui/material';
 
+export const DesktopMenu = styled(Grid)(() => ({
+    '@media (max-width: 899px)': {
+        display: 'none',
+    },
+    height: '100vh',
+}));
+
+export const MobileMenu = styled(Grid)(() => ({
+    '@media (min-width: 900px)': {
+        display: 'none',
+    },
+}));
+
 export const MainGridContainer = styled(Grid)(() => ({
     height: '100vh',
 }));
