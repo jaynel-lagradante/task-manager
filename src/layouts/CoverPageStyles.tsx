@@ -2,8 +2,12 @@ import { styled } from '@mui/material/styles';
 import { Grid, Button, Typography, Divider, ListItem } from '@mui/material';
 
 export const GridContainer = styled(Grid)(({ theme }) => ({
-    minHeight: '100vh',
-    width: '100vw',
+    '@media (min-width: 900px)': {
+        minHeight: '100vh',
+        width: '100vw',
+    },
+    minHeight: 'auto',
+    width: 'auto',
     margin: 0,
 }));
 
@@ -17,18 +21,37 @@ export const ImageGridItem = styled(Grid)(({ theme }) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    '@media (max-width: 899px)': {
+        display: 'none',
+    },
+    '& img': {
+        maxWidth: '100%',
+        height: 'auto',
+    },
 }));
 
-export const ImageLogoItem = styled('img')(({ theme }) => ({
-    maxWidth: '100%',
-    height: 'auto',
+export const ImageGridMobile = styled(Grid)(({ theme }) => ({
+    '@media (min-width: 900px)': {
+        display: 'none',
+    },
+    backgroundColor: '#027CEC',
+    width: '100%',
+    height: 70,
+    padding: 5,
+    '& img': {
+        height: 60,
+    },
 }));
 
 export const FormGridItem = styled(Grid)(({ theme }) => ({
+    '@media (min-width: 900px)': {
+        padding: theme.spacing(10),
+        maxWidth: '800px',
+    },
+    padding: theme.spacing(4),
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    padding: theme.spacing(10),
 }));
 
 export const SubmitButton = styled(Button)(({ theme }) => ({

@@ -222,7 +222,7 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                 return (
                     <div>
                         <div style={{ color: color, fontWeight: fontWeight }}>
-                            {dueDate !== 'N/A' ? moment(dueDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
+                            {dueDate !== 'N/A' ? moment(dueDate).format('MM/DD/YYYY') : 'N/A'}
                         </div>
                         {statusText && (
                             <div style={{ color: color, fontSize: '12px', fontWeight: fontWeight }}>{statusText}</div>

@@ -7,10 +7,10 @@ import {
     GridContainer,
     ImageGridItem,
     FormGridItem,
-    ImageLogoItem,
     OrDivider,
     SigninOptionButton,
     IconWrapper,
+    ImageGridMobile,
 } from '../layouts/CoverPageStyles';
 import GoogleLoginComponent from './GoogleLoginComponent';
 
@@ -29,8 +29,11 @@ const CoverPageComponent: React.FC<CoverPageComponentProps> = ({ children }) => 
                     backgroundImage: `url(${Wallpaper})`,
                 }}
             >
-                <ImageLogoItem src={BrandAndLogo} alt="Brand Logo" />
+                <img src={BrandAndLogo} alt="Brand Logo" />
             </ImageGridItem>
+            <ImageGridMobile>
+                <img src={BrandAndLogo} alt="Brand Logo" />
+            </ImageGridMobile>
             <FormGridItem item xs={12} md={6}>
                 {children}
                 <OrDivider>OR</OrDivider>
