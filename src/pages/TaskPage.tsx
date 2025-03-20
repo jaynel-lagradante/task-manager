@@ -341,7 +341,7 @@ const TaskPage: React.FC = () => {
                                         )}
                                         <Grid item xs={12}>
                                             <TextField
-                                                label="Title"
+                                                label={<Typography variant="h6">Title</Typography>}
                                                 name="title"
                                                 value={task.title}
                                                 onChange={handleInputChange}
@@ -353,6 +353,12 @@ const TaskPage: React.FC = () => {
                                                 inputProps={{ maxLength: 25 }}
                                                 error={!!titleError}
                                                 helperText={titleError}
+                                                InputProps={{
+                                                    style: {
+                                                        fontSize: '1.25rem',
+                                                        fontWeight: 500,
+                                                    },
+                                                }}
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>

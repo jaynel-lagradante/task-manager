@@ -7,10 +7,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import ViewTaskPage from './pages/ViewTaskPage';
 import Authentication from './hooks/Authentication';
+import LoadingScreen from './components/LoadingScreen';
+import { selectIsLoading, useLoadingState } from './state/LoadingState';
 
 function App() {
+    const isLoading = useLoadingState(selectIsLoading);
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
+            <LoadingScreen open={isLoading} />
             <Router>
                 <Routes>
                     <Route path="/login" element={<LoginPage />} />
