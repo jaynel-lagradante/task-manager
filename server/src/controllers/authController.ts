@@ -49,7 +49,8 @@ export const register = async (req: Request, res: Response) => {
 
         // Validate username against allowed symbols
         if (!allowedUsernameSymbols.test(username)) {
-            return res.status(400).json({ message: 'Username can only contain letters, numbers, spaces, and !#()_-' });
+            res.status(400).json({ message: 'Username can only contain letters, numbers, spaces, and !#()_-' });
+            return;
         }
 
         // Check if username already exists

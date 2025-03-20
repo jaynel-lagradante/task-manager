@@ -5,7 +5,7 @@ import { Stack } from '@mui/material';
 import NewSubtaskIconSelected from './../assets/Icons/Upload.svg';
 import CancelIcon from './../assets/Icons/Cancel.svg';
 import { Attachment } from '../types/AttachmentInterface';
-import { DeleteFile } from '../services/TaskService';
+import { DeleteFile } from '../services/FileService';
 import { formatFileSize } from '../utils/TextHelper';
 import { bufferToFile } from '../utils/FileHelper';
 import {

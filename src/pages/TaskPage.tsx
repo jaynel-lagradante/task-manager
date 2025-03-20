@@ -18,7 +18,8 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import moment, { Moment } from 'moment';
 import { Task } from '../types/TaskInterface';
-import { CreateTask, GetFiles, GetTaskById, UpdateTask, UploadFiles } from '../services/TaskService';
+import { CreateTask, GetTaskById, UpdateTask } from '../services/TaskService';
+import { GetFiles, UploadFiles } from '../services/FileService';
 import DashboardComponent from './../components/DashboardComponent';
 import SubtaskComponent from './../components/SubTaskComponent';
 import NewSubtaskIconSelected from './../assets/Buttons/Button_New Subtask_selected.svg';
@@ -33,7 +34,6 @@ import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.sv
 import AttachmentComponent from './../components/AttachmentComponent';
 import { Attachment } from '../types/AttachmentInterface';
 import BackIcon from '../assets/Icons/Back.svg';
-import { isAuthenticated } from '../services/AuthService';
 
 const TaskPage: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -60,14 +60,9 @@ const TaskPage: React.FC = () => {
     const [attachmentFiles, setAttachmentFiles] = useState<Attachment[]>([]);
     const [attachmentData, setAttachmentData] = useState<Attachment[]>([]);
     const [subTaskError, setSubTaskError] = useState('');
-    const isUserAuthenticated = isAuthenticated();
 
     useEffect(() => {
         const fetchTask = async () => {
-            if (!isUserAuthenticated) {
-                navigate('/login');
-                return;
-            }
             if (id) {
                 try {
                     const data = await GetTaskById(id);
@@ -90,7 +85,6 @@ const TaskPage: React.FC = () => {
                     }
                 } catch (err: any) {
                     setError(err.response?.data?.message || 'Failed to fetch task');
-                    navigate('/login');
                 }
             }
         };
@@ -178,11 +172,6 @@ const TaskPage: React.FC = () => {
         }
 
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                navigate('/login');
-                return;
-            }
             const taskData: Task = {
                 title: task.title,
                 due_date: task.due_date,

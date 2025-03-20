@@ -15,32 +15,24 @@ import ChipHigh from '../assets/Chips/Chip_High.svg';
 import ChipCritical from '../assets/Chips/Chip_Critical.svg';
 import { FilterContainerBox, FilterIconImg, TableContainer } from '../layouts/TaskListStyles';
 import TableComponent from './../components/TableComponent';
-import { isAuthenticated } from '../services/AuthService';
 
 const TaskListPage: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const navigate = useNavigate();
     const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
     const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
-    const isUserAuthenticated = isAuthenticated();
 
     useEffect(() => {
-        if (!isUserAuthenticated) {
-            navigate('/login');
-            return;
-        }
-
         const fetchTasks = async () => {
             try {
                 const fetchedTasks = await GetTasks();
                 setTasks(fetchedTasks);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
-                navigate('/login');
             }
         };
         fetchTasks();
-    }, [navigate]);
+    }, []);
 
     const filteredTasks = tasks.filter((task) => {
         let priorityMatch = true;
@@ -118,10 +110,6 @@ const TaskListPage: React.FC = () => {
             setSelectedPriorities(selectedPriorities.filter((priority) => priority !== label));
         }
     };
-
-    if (!isUserAuthenticated) {
-        return null;
-    }
 
     return (
         <DashboardComponent>

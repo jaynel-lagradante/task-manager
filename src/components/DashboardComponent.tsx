@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, Tab, Box, Divider, Avatar, Typography, Modal, Button } from '@mui/material';
+import { Grid, Tab, Box, Avatar, Typography, Modal, Button } from '@mui/material';
 import { Logout } from './../services/AuthService';
 import LogoHeader from './../assets/Logo Header.svg';
 import AvatarIcon from './../assets/Icons/Avatar.svg';

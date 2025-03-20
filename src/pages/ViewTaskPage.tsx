@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Typography, Box, IconButton, Grid, Container } from '@mui/material';
 import moment from 'moment';
-import { GetTaskById, GetFiles, DeleteTask } from '../services/TaskService';
+import { GetTaskById, DeleteTask } from '../services/TaskService';
+import { GetFiles } from '../services/FileService';
 import { getSubtasks } from '../services/SubtaskService';
 import { Task } from '../types/TaskInterface';
 import { Subtask } from '../types/SubTaskInterface';
@@ -31,7 +32,6 @@ import {
     CuztomizedPaper,
     FileContainer,
 } from '../layouts/ViewTaskStyles';
-import { isAuthenticated } from '../services/AuthService';
 
 const ViewTaskComponent = () => {
     const { id } = useParams<{ id?: string }>();
@@ -42,7 +42,6 @@ const ViewTaskComponent = () => {
     const [error, setError] = useState('');
     const [objectURLs, setObjectURLs] = useState<string[]>();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const isUserAuthenticated = isAuthenticated();
 
     const handleDeleteSelected = () => {
         setIsModalOpen(true);
@@ -54,10 +53,6 @@ const ViewTaskComponent = () => {
 
     useEffect(() => {
         const fetchTaskDetails = async () => {
-            if (!isUserAuthenticated) {
-                navigate('/login');
-                return;
-            }
             if (!id) return;
             try {
                 const taskData = await GetTaskById(id);
@@ -90,10 +85,6 @@ const ViewTaskComponent = () => {
         fetchTaskDetails();
     }, [id]);
 
-    if (!task) {
-        return error ? <Typography color="error">{error}</Typography> : <Typography>Loading...</Typography>;
-    }
-
     const getPriorityIcon = (priority: string) => {
         switch (priority) {
             case 'Low':
@@ -119,6 +110,7 @@ const ViewTaskComponent = () => {
     };
 
     const handleConfirmDelete = async () => {
+        if (!task) return;
         try {
             task.id && (await DeleteTask(task.id));
             setIsModalOpen(false);
@@ -130,138 +122,142 @@ const ViewTaskComponent = () => {
 
     return (
         <DashboardComponent>
-            <FormContainer>
-                <Typography variant="h6" gutterBottom>
-                    <Link to="/" style={{ textDecoration: 'none', color: '#027CEC' }}>
-                        <img src={BackIcon} alt="Back" style={{ height: '12px', marginRight: '8px' }} />
-                        Home
-                    </Link>{' '}
-                    | View Task
-                </Typography>
-                <CuztomizedPaper elevation={3}>
-                    <Container>
-                        <Box mt={4}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                <Box display="flex" alignItems="center">
-                                    <img
-                                        src={getPriorityIcon(task.priority)}
-                                        alt={task.priority}
-                                        style={{ height: '20px' }}
-                                    />
-                                    <Box display="flex" alignItems="center" marginLeft={4}>
-                                        <img
-                                            src={getStatusIcon(task.status)}
-                                            alt={task.status}
-                                            style={{ height: '20px' }}
-                                        />
-                                        <Typography variant="body2" marginLeft={1}>
-                                            {task.status}{' '}
-                                            {task.status === 'Complete'
-                                                ? `- ${moment(task.date_completed).format('DD MMM YYYY')}`
-                                                : ''}
-                                        </Typography>
+            {task && (
+                <>
+                    {' '}
+                    <FormContainer>
+                        <Typography variant="h6" gutterBottom>
+                            <Link to="/" style={{ textDecoration: 'none', color: '#027CEC' }}>
+                                <img src={BackIcon} alt="Back" style={{ height: '12px', marginRight: '8px' }} />
+                                Home
+                            </Link>{' '}
+                            | View Task
+                        </Typography>
+                        <CuztomizedPaper elevation={3}>
+                            <Container>
+                                <Box mt={4}>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                        <Box display="flex" alignItems="center">
+                                            <img
+                                                src={getPriorityIcon(task.priority)}
+                                                alt={task.priority}
+                                                style={{ height: '20px' }}
+                                            />
+                                            <Box display="flex" alignItems="center" marginLeft={4}>
+                                                <img
+                                                    src={getStatusIcon(task.status)}
+                                                    alt={task.status}
+                                                    style={{ height: '20px' }}
+                                                />
+                                                <Typography variant="body2" marginLeft={1}>
+                                                    {task.status}{' '}
+                                                    {task.status === 'Complete'
+                                                        ? `- ${moment(task.date_completed).format('DD MMM YYYY')}`
+                                                        : ''}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+
+                                        <Box>
+                                            <IconButton aria-label="edit" onClick={() => navigate(`/edit-task/${id}`)}>
+                                                <img src={EditIcon} alt="Edit" style={{ height: '20px' }} />
+                                            </IconButton>
+                                            <IconButton aria-label="delete" onClick={() => handleDeleteSelected()}>
+                                                <img src={DeleteIcon} alt="Delete" style={{ height: '20px' }} />
+                                            </IconButton>
+                                        </Box>
                                     </Box>
+
+                                    <Typography variant="h5">{task.title}</Typography>
+
+                                    <Typography variant="body2" color="textSecondary">
+                                        {moment(task.created_at).format('DD MMM YYYY')} -{' '}
+                                        {moment(task.due_date).format('DD MMM YYYY')}
+                                    </Typography>
+
+                                    <Typography variant="body1" paragraph mt={2}>
+                                        {task.description}
+                                    </Typography>
+
+                                    {attachments?.length > 0 && (
+                                        <AttachmentBoxContainer mt={2}>
+                                            {attachments.map((file, index) => (
+                                                <AttachmentBoxContent key={index}>
+                                                    {file.file?.type?.startsWith('image/') &&
+                                                        objectURLs &&
+                                                        objectURLs[index] && (
+                                                            <FileContainer>
+                                                                <img src={objectURLs[index]} alt={file.file?.name} />
+                                                                <div>
+                                                                    <Typography variant="body2" align="left">
+                                                                        {file.file?.name}
+                                                                    </Typography>
+                                                                    <Typography
+                                                                        variant="subtitle2"
+                                                                        color="textSecondary"
+                                                                        align="left"
+                                                                        fontSize={12}
+                                                                    >
+                                                                        {formatFileSize(file.file?.size)}
+                                                                    </Typography>
+                                                                </div>
+                                                            </FileContainer>
+                                                        )}
+                                                </AttachmentBoxContent>
+                                            ))}
+                                        </AttachmentBoxContainer>
+                                    )}
+
+                                    <CuztomizedDivider />
+
+                                    <Typography variant="h6" gutterBottom>
+                                        Subtask
+                                    </Typography>
+
+                                    {subtasks.map((subtask) => {
+                                        let statusIcon = null;
+                                        if (subtask.status === 'Done') {
+                                            statusIcon = DoneIcon;
+                                        } else if (subtask.status === 'Not Done') {
+                                            statusIcon = NotDoneIcon;
+                                        }
+                                        return (
+                                            <Grid container marginTop={1} key={`${subtask.id}`}>
+                                                <Grid sm={3} xs={7}>
+                                                    <Typography variant="body1" color="textPrimary">
+                                                        {subtask.title}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid sm={3} xs={5}>
+                                                    <Typography variant="body1" color="textSecondary">
+                                                        {statusIcon && (
+                                                            <img
+                                                                src={statusIcon}
+                                                                alt={subtask.status}
+                                                                style={{ height: '10px', marginRight: '8px' }}
+                                                            />
+                                                        )}
+                                                        {subtask.status}
+                                                    </Typography>
+                                                </Grid>
+                                            </Grid>
+                                        );
+                                    })}
                                 </Box>
-
-                                <Box>
-                                    <IconButton aria-label="edit" onClick={() => navigate(`/edit-task/${id}`)}>
-                                        <img src={EditIcon} alt="Edit" style={{ height: '20px' }} />
-                                    </IconButton>
-                                    <IconButton aria-label="delete" onClick={() => handleDeleteSelected()}>
-                                        <img src={DeleteIcon} alt="Delete" style={{ height: '20px' }} />
-                                    </IconButton>
-                                </Box>
-                            </Box>
-
-                            <Typography variant="h5">{task.title}</Typography>
-
-                            <Typography variant="body2" color="textSecondary">
-                                {moment(task.created_at).format('DD MMM YYYY')} -{' '}
-                                {moment(task.due_date).format('DD MMM YYYY')}
-                            </Typography>
-
-                            <Typography variant="body1" paragraph mt={2}>
-                                {task.description}
-                            </Typography>
-
-                            {attachments?.length > 0 && (
-                                <AttachmentBoxContainer mt={2}>
-                                    {attachments.map((file, index) => (
-                                        <AttachmentBoxContent key={index}>
-                                            {file.file?.type?.startsWith('image/') &&
-                                                objectURLs &&
-                                                objectURLs[index] && (
-                                                    <FileContainer>
-                                                        <img src={objectURLs[index]} alt={file.file?.name} />
-                                                        <div>
-                                                            <Typography variant="body2" align="left">
-                                                                {file.file?.name}
-                                                            </Typography>
-                                                            <Typography
-                                                                variant="subtitle2"
-                                                                color="textSecondary"
-                                                                align="left"
-                                                                fontSize={12}
-                                                            >
-                                                                {formatFileSize(file.file?.size)}
-                                                            </Typography>
-                                                        </div>
-                                                    </FileContainer>
-                                                )}
-                                        </AttachmentBoxContent>
-                                    ))}
-                                </AttachmentBoxContainer>
-                            )}
-
-                            <CuztomizedDivider />
-
-                            <Typography variant="h6" gutterBottom>
-                                Subtask
-                            </Typography>
-
-                            {subtasks.map((subtask) => {
-                                let statusIcon = null;
-                                if (subtask.status === 'Done') {
-                                    statusIcon = DoneIcon;
-                                } else if (subtask.status === 'Not Done') {
-                                    statusIcon = NotDoneIcon;
-                                }
-                                return (
-                                    <Grid container marginTop={1} key={`${subtask.id}`}>
-                                        <Grid sm={3} xs={7}>
-                                            <Typography variant="body1" color="textPrimary">
-                                                {subtask.title}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid sm={3} xs={5}>
-                                            <Typography variant="body1" color="textSecondary">
-                                                {statusIcon && (
-                                                    <img
-                                                        src={statusIcon}
-                                                        alt={subtask.status}
-                                                        style={{ height: '10px', marginRight: '8px' }}
-                                                    />
-                                                )}
-                                                {subtask.status}
-                                            </Typography>
-                                        </Grid>
-                                    </Grid>
-                                );
-                            })}
-                        </Box>
-                    </Container>
-                </CuztomizedPaper>
-            </FormContainer>
-
-            <ModalComponent
-                open={isModalOpen}
-                onCloseLabel={'Cancel'}
-                onConfirmLabel={'Delete'}
-                onClose={handleCloseModal}
-                onConfirm={() => handleConfirmDelete()}
-                firstLabel={'Delete this Task?'}
-                secondLabel={task.title}
-            />
+                            </Container>
+                        </CuztomizedPaper>
+                    </FormContainer>
+                    <ModalComponent
+                        open={isModalOpen}
+                        onCloseLabel={'Cancel'}
+                        onConfirmLabel={'Delete'}
+                        onClose={handleCloseModal}
+                        onConfirm={() => handleConfirmDelete()}
+                        firstLabel={'Delete this Task?'}
+                        secondLabel={task.title}
+                    />{' '}
+                </>
+            )}
         </DashboardComponent>
     );
 };
