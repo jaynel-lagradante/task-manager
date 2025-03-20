@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 interface Auth {
     isAuthenticated: boolean;
-    setAuth: (loading: boolean) => void;
+    setAuth: (status: boolean) => void;
 }
 
 export const useAuthState = create<Auth>((set) => ({

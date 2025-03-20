@@ -129,11 +129,14 @@ const ViewTaskComponent = () => {
                 <>
                     {' '}
                     <FormContainer>
-                        <Typography variant="h6" gutterBottom>
-                            <Link to="/" style={{ textDecoration: 'none', color: '#027CEC' }}>
+                        <Typography variant="h6" gutterBottom display={'flex'}>
+                            <Typography
+                                style={{ color: '#027CEC', marginRight: '4px', cursor: 'pointer', fontSize: '1.25rem' }}
+                                onClick={() => navigate(-1)}
+                            >
                                 <img src={BackIcon} alt="Back" style={{ height: '12px', marginRight: '8px' }} />
-                                Home
-                            </Link>{' '}
+                                Back
+                            </Typography>{' '}
                             | View Task
                         </Typography>
                         <CuztomizedPaper elevation={3}>
