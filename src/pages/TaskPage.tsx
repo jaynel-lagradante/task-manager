@@ -34,6 +34,7 @@ import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.sv
 import AttachmentComponent from './../components/AttachmentComponent';
 import { Attachment } from '../types/AttachmentInterface';
 import BackIcon from '../assets/Icons/Back.svg';
+import { useTaskState } from '../state/TaskState';
 
 const TaskPage: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -60,6 +61,7 @@ const TaskPage: React.FC = () => {
     const [attachmentFiles, setAttachmentFiles] = useState<Attachment[]>([]);
     const [attachmentData, setAttachmentData] = useState<Attachment[]>([]);
     const [subTaskError, setSubTaskError] = useState('');
+    const { updateTaskInState, addTask } = useTaskState();
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -184,8 +186,10 @@ const TaskPage: React.FC = () => {
             let response;
             if (id) {
                 response = await UpdateTask(id, taskData);
+                updateTaskInState(taskData);
             } else {
                 response = await CreateTask(taskData);
+                addTask({ ...taskData, id: response.id });
             }
 
             const newSubTask = subtasks.filter((subtask) => !subtask.hasOwnProperty('id'));

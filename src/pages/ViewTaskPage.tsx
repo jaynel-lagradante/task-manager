@@ -32,6 +32,7 @@ import {
     CuztomizedPaper,
     FileContainer,
 } from '../layouts/ViewTaskStyles';
+import { useTaskState } from '../state/TaskState';
 
 const ViewTaskComponent = () => {
     const { id } = useParams<{ id?: string }>();
@@ -39,9 +40,9 @@ const ViewTaskComponent = () => {
     const [task, setTask] = useState<Task | null>(null);
     const [subtasks, setSubtasks] = useState<Subtask[]>([]);
     const [attachments, setAttachments] = useState<Attachment[]>([]);
-    const [error, setError] = useState('');
     const [objectURLs, setObjectURLs] = useState<string[]>();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { deleteTaskFromState } = useTaskState();
 
     const handleDeleteSelected = () => {
         setIsModalOpen(true);
@@ -77,7 +78,6 @@ const ViewTaskComponent = () => {
                     setObjectURLs(urls);
                 }
             } catch (err: any) {
-                setError(err.response?.data?.message || 'Failed to fetch task');
                 navigate('/');
             }
         };
@@ -112,7 +112,10 @@ const ViewTaskComponent = () => {
     const handleConfirmDelete = async () => {
         if (!task) return;
         try {
-            task.id && (await DeleteTask(task.id));
+            if (task.id) {
+                await DeleteTask(task.id);
+                deleteTaskFromState(task.id);
+            }
             setIsModalOpen(false);
             navigate('/');
         } catch (error) {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useLoadingState } from '../state/LoadingState';
+import { useAuthState } from '../state/AuthState';
 
 const api = axios.create({
     baseURL: 'http://localhost:5000/',
@@ -33,12 +34,11 @@ api.interceptors.response.use(
     async (error) => {
         setLoading(false);
         if (error.response) {
-            if (error.response.status === 401) {
-                console.error('Unauthorized! Redirecting to login...');
+            if (error.response.status === 401 || error.response.status === 403) {
+                console.error('Unauthorized or Forbidden! Logging out...');
                 localStorage.removeItem('token');
-            } else if (error.response.status === 403) {
-                console.error('Forbidden access.');
-                localStorage.removeItem('token');
+                const { setAuth } = useAuthState.getState();
+                setAuth(false);
             } else if (error.response.status === 500) {
                 console.error('Server error. Please try again later.');
             }

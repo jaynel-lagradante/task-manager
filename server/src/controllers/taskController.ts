@@ -94,6 +94,8 @@ export const updateTask = async (req: Request, res: Response) => {
 export const deleteTask = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+        await Subtask.destroy({ where: { task_id: id } });
+        await File.destroy({ where: { task_id: id } });
         await Task.destroy({ where: { id } });
         res.json({ message: 'Task deleted successfully' });
     } catch (error) {

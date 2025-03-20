@@ -6,6 +6,7 @@ import ShowPasswordIcon from './../assets/Icons/Show.svg';
 import HidePasswordIcon from './../assets/Icons/Hide.svg';
 import { SignupLink, SignupMessageItem, SubmitButton } from '../layouts/CoverPageStyles';
 import CoverPageComponent from './../components/CoverPageComponent';
+import { useAuthState } from '../state/AuthState';
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -17,6 +18,7 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [registrationMessage, setRegistrationMessage] = useState<string | null>(null);
+    const { setAuth } = useAuthState();
 
     useEffect(() => {
         if (location.state && location.state.registrationMessage) {
@@ -46,6 +48,7 @@ const LoginPage: React.FC = () => {
 
         try {
             await Login({ username, password });
+            setAuth(true);
             navigate('/');
         } catch (err: any) {
             setLoginError(err.response?.data?.message || 'Login failed');

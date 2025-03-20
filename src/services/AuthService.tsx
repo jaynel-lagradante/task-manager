@@ -48,9 +48,3 @@ const decodeJWT = (token: string) => {
         return null;
     }
 };
-
-export const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
-    return true;
-};

@@ -15,23 +15,17 @@ import ChipHigh from '../assets/Chips/Chip_High.svg';
 import ChipCritical from '../assets/Chips/Chip_Critical.svg';
 import { FilterContainerBox, FilterIconImg, TableContainer } from '../layouts/TaskListStyles';
 import TableComponent from './../components/TableComponent';
+import { selectTasks, useTaskState } from '../state/TaskState';
 
 const TaskListPage: React.FC = () => {
-    const [tasks, setTasks] = useState<Task[]>([]);
     const navigate = useNavigate();
     const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
     const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
 
+    const tasks = useTaskState(selectTasks);
+    const { fetchTasks, setTasks } = useTaskState();
     useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                const fetchedTasks = await GetTasks();
-                setTasks(fetchedTasks);
-            } catch (error) {
-                console.error('Error fetching tasks:', error);
-            }
-        };
-        fetchTasks();
+        if (tasks.length === 0) fetchTasks();
     }, []);
 
     const filteredTasks = tasks.filter((task) => {
@@ -152,7 +146,7 @@ const TaskListPage: React.FC = () => {
                 <TableComponent
                     data={filteredTasks}
                     getRowCanExpand={(row) => !!row.original.subtasks?.length}
-                    setTasksValue={(tasks) => setTasks(tasks)}
+                    setTasksValue={setTasks}
                     handleEdit={(taskId) => navigate(`/view-task/${taskId}`)}
                 ></TableComponent>
             </TableContainer>

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthState, selectIsAuthenticated } from '../state/AuthState';
 
 interface Props {
     children: React.ReactNode;
@@ -7,10 +8,11 @@ interface Props {
 
 const Authentication: React.FC<Props> = ({ children }) => {
     const navigate = useNavigate();
+    const isAuthenticated = useAuthState(selectIsAuthenticated);
 
     useEffect(() => {
-        if (!localStorage.getItem('token')) navigate('/login');
-    }, [navigate]);
+        if (!localStorage.getItem('token') && !isAuthenticated) navigate('/login');
+    }, [isAuthenticated, navigate]);
 
     return <>{children}</>;
 };
