@@ -58,7 +58,7 @@ const renderSubComponent = ({ row }: { row: Row<Task> }) => {
     return (
         <>
             {subtasks &&
-                subtasks.map((subtask) => {
+                subtasks.map((subtask, index) => {
                     let statusIcon = null;
                     if (subtask.status === 'Done') {
                         statusIcon = DoneIcon;
@@ -67,7 +67,7 @@ const renderSubComponent = ({ row }: { row: Row<Task> }) => {
                     }
 
                     return (
-                        <RenderedContainer key={subtask.id}>
+                        <RenderedContainer key={index}>
                             <div className="title">{subtask.title}</div>
                             <div className="status" style={{ display: 'flex', alignItems: 'center' }}>
                                 {statusIcon && (

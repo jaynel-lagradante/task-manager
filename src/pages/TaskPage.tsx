@@ -181,15 +181,16 @@ const TaskPage: React.FC = () => {
                 status: isMarkAsComplete ? 'Complete' : task.status,
                 description: task.description,
                 date_completed: completionDate,
+                hasAttachment: !!(attachmentFiles.length > 0),
             };
 
             let response;
             if (id) {
                 response = await UpdateTask(id, taskData);
-                updateTaskInState(taskData);
+                updateTaskInState({ ...taskData, id, subtasks });
             } else {
                 response = await CreateTask(taskData);
-                addTask({ ...taskData, id: response.id });
+                addTask({ ...taskData, id: response.id, subtasks });
             }
 
             const newSubTask = subtasks.filter((subtask) => !subtask.hasOwnProperty('id'));
