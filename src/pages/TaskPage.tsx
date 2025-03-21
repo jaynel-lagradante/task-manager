@@ -323,7 +323,6 @@ const TaskPage: React.FC = () => {
                                                     value={task.status}
                                                     onChange={handleSelectChange}
                                                     label="Status"
-                                                    disabled={isMarkAsComplete}
                                                 >
                                                     <MenuItem value="Not Started">Not Started</MenuItem>
                                                     <MenuItem value="In Progress">In Progress</MenuItem>

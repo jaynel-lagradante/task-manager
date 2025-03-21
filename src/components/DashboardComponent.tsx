@@ -66,6 +66,7 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
                                     <span>Home</span>
                                 </MenuDivContainer>
                             }
+                            onClick={() => navigate('/')}
                         />
                         <Tab
                             label={
@@ -96,6 +97,7 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
                                         <img src={HomeIcon} alt="Home" />
                                     </div>
                                 }
+                                onClick={() => navigate('/')}
                             />
                             <Tab
                                 label={
