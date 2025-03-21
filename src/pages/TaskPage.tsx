@@ -456,6 +456,7 @@ const TaskPage: React.FC = () => {
                                         onStatusChange={handleSubtaskStatusChange}
                                         onDelete={() => handleDeleteSubtask(index, subtask.id ?? null)}
                                         titleError={subtaskTitleErrors[index]}
+                                        disableStatus={!id}
                                     />
                                 ))}
                             </Box>

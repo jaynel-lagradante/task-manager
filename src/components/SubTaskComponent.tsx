@@ -11,6 +11,7 @@ interface SubtaskProps {
     onStatusChange: (index: number, status: string) => void;
     onDelete: (index: number) => void;
     titleError?: string;
+    disableStatus?: boolean;
 }
 
 const SubtaskComponent: React.FC<SubtaskProps> = ({
@@ -20,6 +21,7 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
     onStatusChange,
     onDelete,
     titleError,
+    disableStatus = false,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -50,6 +52,7 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
                     value={subtask.status}
                     label="Status"
                     onChange={(e) => onStatusChange(index, e.target.value)}
+                    disabled={disableStatus}
                 >
                     <MenuItem value="Not Done">Not Done</MenuItem>
                     <MenuItem value="Done">Done</MenuItem>
