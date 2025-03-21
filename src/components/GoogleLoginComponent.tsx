@@ -4,15 +4,18 @@ import { SigninOptionButton, IconWrapper } from '../layouts/CoverPageStyles';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { GoogleAuth } from '../services/AuthService';
+import { useTaskState } from '../state/TaskState';
 
 const GoogleLoginComponent: React.FC = () => {
     const navigate = useNavigate();
+    const { setTasks } = useTaskState();
 
     const GoogleLoginButton = () => {
         const handleGoogleAuth = useGoogleLogin({
             onSuccess: async (credentialResponse: any) => {
                 if (credentialResponse && credentialResponse.code) {
                     await GoogleAuth(credentialResponse.code);
+                    setTasks([]);
                     navigate('/');
                 } else {
                     console.error('Credential not found in response');
