@@ -2,7 +2,6 @@ import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 
 export const TableContainer = styled('div')(({ theme }) => ({
-    //  height: '85%',
     width: '100%',
     marginTop: '20px',
     borderRadius: '16px',
@@ -16,6 +15,7 @@ export const FilterIconImg = styled('img')(({ theme }) => ({
     height: '30px',
     marginRight: '5px',
     cursor: 'pointer',
+    margin: theme.spacing(0.5),
 }));
 
 export const FilterContainerBox = styled(Box)(({ theme }) => ({

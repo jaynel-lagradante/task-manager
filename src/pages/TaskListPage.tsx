@@ -66,15 +66,19 @@ const TaskListPage: React.FC = () => {
                 setSelectedPriorities([]);
                 return;
             }
-            const priority = [...selectedPriorities, subMenu];
-            setSelectedPriorities(priority);
+            if (!selectedPriorities.includes(subMenu)) {
+                const priority = [...selectedPriorities, subMenu];
+                setSelectedPriorities(priority);
+            }
         } else if (mainMenu === 'Status' && subMenu) {
             if (subMenu === 'All') {
                 setSelectedStatuses([]);
                 return;
             }
-            const status = [...selectedStatuses, subMenu];
-            setSelectedStatuses(status);
+            if (!selectedStatuses.includes(subMenu)) {
+                const status = [...selectedStatuses, subMenu];
+                setSelectedStatuses(status);
+            }
         }
     };
 
@@ -117,7 +121,7 @@ const TaskListPage: React.FC = () => {
                         buttonLabel="Filter"
                         onSubMenuItemClick={(mainMenu, subMenu) => handleFilter(mainMenu, subMenu)}
                     />
-                    <Box display="flex" ml={1}>
+                    <Box display="flex" flexWrap="wrap" ml={1}>
                         {selectedStatuses &&
                             selectedStatuses.map((status) => (
                                 <FilterIconImg
