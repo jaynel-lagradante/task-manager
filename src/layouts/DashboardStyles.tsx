@@ -5,7 +5,7 @@ export const DesktopMenu = styled(Grid)(() => ({
     '@media (max-width: 899px)': {
         display: 'none',
     },
-    height: '100vh',
+    height: '100%',
 }));
 
 export const MobileMenu = styled(Grid)(() => ({

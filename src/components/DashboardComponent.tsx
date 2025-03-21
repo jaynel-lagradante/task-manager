@@ -16,6 +16,8 @@ import {
 } from '../layouts/DashboardStyles';
 import HomeIcon from './../assets/Icons/Home.svg';
 import SignoutIcon from './../assets/Icons/Signout.svg';
+import LoadingScreen from './LoadingScreen';
+import { selectIsLoading, useLoadingState } from '../state/LoadingState';
 
 interface DashboardComponentProps {
     children: ReactNode;
@@ -26,6 +28,7 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
     const navigate = useNavigate();
     const username = localStorage.getItem('username');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const isLoading = useLoadingState(selectIsLoading);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -112,6 +115,7 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
                 </MobileMenu>
             </MenuGridContainer>
             <Grid item xs={12} sm={12} md={10} style={{ padding: '16px' }}>
+                <LoadingScreen open={isLoading} />
                 <CuztomzedContainer>{children}</CuztomzedContainer>
             </Grid>
             <Modal open={isModalOpen} onClose={() => handleCloseModal(value)}>
