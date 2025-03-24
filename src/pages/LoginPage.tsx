@@ -19,7 +19,7 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [registrationMessage, setRegistrationMessage] = useState<string | null>(null);
-    const { setAuth } = useAuthState();
+    const { setAuth, setToken } = useAuthState();
     const { setTasks } = useTaskState();
 
     useEffect(() => {
@@ -51,6 +51,7 @@ const LoginPage: React.FC = () => {
         try {
             await Login({ username, password });
             setAuth(true);
+            setToken(true);
             setTasks([]);
             navigate('/');
         } catch (err: any) {

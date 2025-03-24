@@ -5,10 +5,12 @@ import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { GoogleAuth } from '../services/AuthService';
 import { useTaskState } from '../state/TaskState';
+import { useAuthState } from '../state/AuthState';
 
 const GoogleLoginComponent: React.FC = () => {
     const navigate = useNavigate();
     const { setTasks } = useTaskState();
+    const { setToken } = useAuthState();
 
     const GoogleLoginButton = () => {
         const handleGoogleAuth = useGoogleLogin({
@@ -16,6 +18,7 @@ const GoogleLoginComponent: React.FC = () => {
                 if (credentialResponse && credentialResponse.code) {
                     await GoogleAuth(credentialResponse.code);
                     setTasks([]);
+                    setToken(true);
                     navigate('/');
                 } else {
                     console.error('Credential not found in response');

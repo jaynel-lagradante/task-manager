@@ -15,7 +15,7 @@ const Authentication: React.FC<Props> = ({ children }) => {
 
     useEffect(() => {
         if ((!tokenState || !token) && !isAuthenticated) navigate('/login');
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, tokenState, navigate]);
 
     return <>{children}</>;
 };
