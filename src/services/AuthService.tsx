@@ -1,12 +1,12 @@
 import axios from 'axios';
+import { User } from '../types/UserInterface';
 
 const API_BASE_URL = 'http://localhost:5000/auth';
 
 export const Login = async (credentials: { username: string; password: string }) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/login`, credentials);
-        localStorage.setItem('username', decodeJWT(response.data.token).username);
-        localStorage.setItem('token', response.data.token);
+        setUserInfo(response.data);
         return response.data;
     } catch (error) {
         throw error;
@@ -25,8 +25,7 @@ export const Register = async (credentials: { username: string; password: string
 export const GoogleAuth = async (code: string) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/google`, { code });
-        localStorage.setItem('username', decodeJWT(response.data.token).username);
-        localStorage.setItem('token', response.data.token);
+        setUserInfo(response.data);
         return response.data;
     } catch (error) {
         throw error;
@@ -46,5 +45,13 @@ const decodeJWT = (token: string) => {
     } catch (error) {
         console.error('Error decoding JWT:', error);
         return null;
+    }
+};
+
+const setUserInfo = (data: User) => {
+    if (data.token) {
+        const token = data.token;
+        localStorage.setItem('username', decodeJWT(data.token).username);
+        localStorage.setItem('token', token);
     }
 };

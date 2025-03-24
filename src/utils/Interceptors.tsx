@@ -10,6 +10,7 @@ const api = axios.create({
     },
 });
 const { setLoading } = useLoadingState.getState();
+const { setToken, setAuth } = useAuthState.getState();
 
 api.interceptors.request.use(
     (config) => {
@@ -37,8 +38,8 @@ api.interceptors.response.use(
             if (error.response.status === 401 || error.response.status === 403) {
                 console.error('Unauthorized or Forbidden! Logging out...');
                 localStorage.removeItem('token');
-                const { setAuth } = useAuthState.getState();
                 setAuth(false);
+                setToken(false);
             } else if (error.response.status === 500) {
                 console.error('Server error. Please try again later.');
             }
