@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 import Wallpaper from './../assets/Wallpaper.svg';
 import BrandAndLogo from './../assets/Brand and logo.svg';
 import Facebook from './../assets/Icons/Facebook.svg';
-// import Google from './../assets/Icons/Google.svg'
 import {
     GridContainer,
     ImageGridItem,
@@ -38,16 +37,6 @@ const CoverPageComponent: React.FC<CoverPageComponentProps> = ({ children }) => 
                 {children}
                 <OrDivider>OR</OrDivider>
                 <GoogleLoginComponent></GoogleLoginComponent>
-                {/* <SigninOptionButton
-                    fullWidth
-                    startIcon={
-                        <IconWrapper>
-                            <img src={Google} alt="Google Icon" />
-                        </IconWrapper>
-                    }
-                >
-                    Continue with Google
-                </SigninOptionButton> */}
 
                 <SigninOptionButton
                     fullWidth
