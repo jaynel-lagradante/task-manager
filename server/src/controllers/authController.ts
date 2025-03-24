@@ -31,6 +31,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         const token = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        await Account.update({ active_token: token }, { where: { id: account.id } });
+
         res.json({ token });
     } catch (error) {
         console.error(error);
