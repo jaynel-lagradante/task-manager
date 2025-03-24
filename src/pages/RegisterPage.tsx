@@ -26,14 +26,14 @@ const RegisterPage: React.FC = () => {
     const [lengthCheck, setLengthCheck] = useState(false);
     const [numberSymbolCheck, setNumberSymbolCheck] = useState(false);
     const [passwordCheck, setPasswordCheck] = useState(0);
-    const allowedUsernameSymbols = /^[a-zA-Z0-9\s!#()_-]*$/;
+    const allowedSymbols = /^[a-zA-Z0-9\s!#()_-]*$/;
     const navigate = useNavigate();
 
     const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const username = e.target.value;
         setUsername(username);
         setUsernameError('');
-        if (!allowedUsernameSymbols.test(username)) {
+        if (!allowedSymbols.test(username)) {
             setUsernameError('Username can only contain letters, numbers, spaces, and !#()_-');
         }
         if (password) {
@@ -71,6 +71,10 @@ const RegisterPage: React.FC = () => {
     useEffect(() => {
         const checks = [nameEmailCheck, lengthCheck, numberSymbolCheck].filter(Boolean).length;
         setPasswordCheck(checks);
+        if (!allowedSymbols.test(password)) {
+            setPasswordError('Password can only contain letters, numbers, spaces, and !#()_-');
+            return;
+        }
         if (checks === 3) {
             setPasswordError('Password strength: Strong');
         } else if (password || checks >= 1) {
@@ -87,8 +91,13 @@ const RegisterPage: React.FC = () => {
             hasError = true;
         }
 
-        if (!allowedUsernameSymbols.test(username)) {
+        if (!allowedSymbols.test(username)) {
             setUsernameError('Username can only contain letters, numbers, spaces, and !#()_-');
+            hasError = true;
+        }
+
+        if (!allowedSymbols.test(password)) {
+            setPasswordError('Password can only contain letters, numbers, spaces, and !#()_-');
             hasError = true;
         }
 
@@ -146,7 +155,7 @@ const RegisterPage: React.FC = () => {
                 helperText={passwordError}
                 FormHelperTextProps={{
                     sx: {
-                        color: passwordCheck === 3 ? '#027CEC' : 'red',
+                        color: passwordCheck === 3 && allowedSymbols.test(password) ? '#027CEC' : 'red',
                     },
                 }}
                 InputProps={{
