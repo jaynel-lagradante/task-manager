@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Badge, Box, Container, Grid, Tabs } from '@mui/material';
+import { Badge, Box, Container, Divider, Grid, Tabs } from '@mui/material';
 
 export const DesktopMenu = styled(Grid)(() => ({
     '@media (max-width: 899px)': {
@@ -23,7 +23,7 @@ export const MenuGridContainer = styled(Grid)(() => ({
     padding: '16px',
 }));
 
-export const CuztomizedDivider = styled('div')(() => ({
+export const CuztomizedDivider = styled(Divider)(() => ({
     width: '100%',
     marginBottom: '16px',
 }));

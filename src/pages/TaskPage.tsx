@@ -49,7 +49,7 @@ const TaskPage: React.FC = () => {
         date_completed: null,
     });
     const [error, setError] = useState('');
-    const [dateCreated] = useState(moment());
+    const [dateCreated] = useState(moment().startOf('day'));
     const [subtasks, setSubtasks] = useState<Subtask[]>([]);
     const [titleError, setTitleError] = useState('');
     const [detailsError, setDetailsError] = useState('');
@@ -121,7 +121,8 @@ const TaskPage: React.FC = () => {
 
     const handleDateChange = (date: Moment | null) => {
         if (date) {
-            if (date.isBefore(dateCreated, 'day')) {
+            const dateTomorrow = moment().add(1, 'day').startOf('day');
+            if (date.isBefore(dateTomorrow, 'day')) {
                 setDueDateError('Must be later than Date Created');
             } else {
                 setDueDateError('');
@@ -288,7 +289,20 @@ const TaskPage: React.FC = () => {
                         <img src={BackIcon} alt="Back" style={{ height: '12px', marginRight: '8px' }} />
                         Back
                     </Typography>{' '}
-                    | {id ? 'View Task / Edit' : 'New Task'}
+                    |{' '}
+                    {id ? (
+                        <>
+                            <Typography
+                                color="textSecondary"
+                                style={{ fontSize: '1.25rem', marginLeft: 5, marginRight: 5 }}
+                            >
+                                View Task /
+                            </Typography>{' '}
+                            Edit{' '}
+                        </>
+                    ) : (
+                        'New Task'
+                    )}
                 </Typography>
 
                 <CuztomizedPaper>

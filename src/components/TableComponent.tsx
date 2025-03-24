@@ -148,20 +148,25 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                     }}
                 />
             ),
+            size: 5,
         },
         {
             id: 'expand',
             header: '',
-            cell: ({ row }) =>
-                row.getCanExpand() && (
-                    <IconButton onClick={row.getToggleExpandedHandler()} size="small">
-                        {row.getIsExpanded() ? (
-                            <img src={AccordionExpandIcon} alt="Expand" style={{ height: '6px' }} />
-                        ) : (
-                            <img src={AccordionSuppressIcon} alt="Suppress" style={{ height: '10px' }} />
-                        )}
-                    </IconButton>
-                ),
+            cell: ({ row }) => (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    {row.getCanExpand() && (
+                        <IconButton onClick={row.getToggleExpandedHandler()} size="small">
+                            {row.getIsExpanded() ? (
+                                <img src={AccordionExpandIcon} alt="Expand" style={{ height: '6px' }} />
+                            ) : (
+                                <img src={AccordionSuppressIcon} alt="Suppress" style={{ height: '10px' }} />
+                            )}
+                        </IconButton>
+                    )}
+                </Box>
+            ),
+            size: 5,
         },
         {
             accessorKey: 'title',
@@ -297,6 +302,7 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                     onClick={() => handleEdit && handleEdit(row.original.id ?? '')}
                 />
             ),
+            size: 5,
         },
     ];
 
@@ -318,7 +324,14 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
-                                    <TableCell key={header.id} colSpan={header.colSpan}>
+                                    <TableCell
+                                        key={header.id}
+                                        colSpan={header.colSpan}
+                                        sx={{
+                                            width: header.column.columnDef.size ?? '100%',
+                                            maxWidth: header.column.columnDef.size ?? '100%',
+                                        }}
+                                    >
                                         {header.isPlaceholder ? null : (
                                             <div
                                                 style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
@@ -347,7 +360,12 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                                 <TableRow>
                                     {row.getVisibleCells().map((cell) => {
                                         return (
-                                            <TableCell key={cell.id}>
+                                            <TableCell
+                                                key={cell.id}
+                                                sx={{
+                                                    maxWidth: cell.column.columnDef.size ?? '100%',
+                                                }}
+                                            >
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </TableCell>
                                         );

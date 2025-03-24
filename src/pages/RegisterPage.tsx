@@ -59,7 +59,10 @@ const RegisterPage: React.FC = () => {
         if (!password || !username) {
             setNameEmailCheck(false);
         } else {
-            setNameEmailCheck(!password.toLowerCase().includes(username.toLowerCase()));
+            const usernameLower = username.toLowerCase();
+            const passwordLower = password.toLowerCase();
+            const firstThreeUsername = usernameLower.slice(0, 3);
+            setNameEmailCheck(!passwordLower.includes(usernameLower) && !passwordLower.includes(firstThreeUsername));
         }
         setLengthCheck(password.length >= 8);
         setNumberSymbolCheck(/\d|[!@#$%^&*(),.?":{}|<>]/.test(password));
