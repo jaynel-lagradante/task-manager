@@ -24,7 +24,7 @@ const CoverPageComponent: React.FC<CoverPageComponentProps> = ({ children }) => 
                 item
                 xs={12}
                 md={6}
-                style={{
+                sx={{
                     backgroundImage: `url(${Wallpaper})`,
                 }}
             >

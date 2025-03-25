@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { useLoadingState } from '../state/LoadingState';
 import { useAuthState } from '../state/AuthState';
+import { API_ENDPOINTS } from '../constants/Api';
+import { MESSAGES } from '../constants/Messages';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/',
+    baseURL: API_ENDPOINTS.BASE,
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
@@ -14,10 +16,11 @@ const { setToken, setAuth } = useAuthState.getState();
 
 api.interceptors.request.use(
     (config) => {
-        setLoading(true);
         const token = localStorage.getItem('token');
+        const BEARER_TOKEN = `Bearer ${token}`;
+        setLoading(true);
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers.Authorization = BEARER_TOKEN;
         }
         return config;
     },
@@ -36,12 +39,12 @@ api.interceptors.response.use(
         setLoading(false);
         if (error.response) {
             if (error.response.status === 401 || error.response.status === 403) {
-                console.error('Unauthorized or Forbidden! Logging out...');
+                console.error(MESSAGES.ERROR.UNAUTHORIZED);
                 localStorage.removeItem('token');
                 setAuth(false);
                 setToken(false);
             } else if (error.response.status === 500) {
-                console.error('Server error. Please try again later.');
+                console.error(MESSAGES.ERROR.NETWORK);
             }
         }
         return Promise.reject(error);

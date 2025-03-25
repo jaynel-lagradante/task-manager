@@ -6,6 +6,11 @@ export const CuztomizedPaper = styled(Paper)(() => ({
     height: '100%',
     boxShadow: 'none',
     borderRadius: '8px',
+    paddingBottom: '20px',
+    // desktop view
+    '@media (min-width: 900px)': {
+        paddingBottom: '0px',
+    },
 }));
 
 export const AttachmentBoxContainer = styled(Box)(({ theme }) => ({

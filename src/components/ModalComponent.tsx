@@ -4,6 +4,8 @@ import AlertIcon from './../assets/Icons/Alert.svg';
 import DeleteButton from './../assets/Buttons/Button_Delete.svg';
 import CancelButton from './../assets/Buttons/Button_Cancel.svg';
 import CancelIcon from './../assets/Icons/Cancel.svg';
+import { ModalComponentBox } from '../layouts/ModalStyles';
+import { MESSAGES } from '../constants/Messages';
 
 interface ModalComponentProps {
     open: boolean;
@@ -26,52 +28,38 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
 }) => {
     let closeIcon = null;
     switch (onCloseLabel) {
-        case 'Cancel':
+        case MESSAGES.BUTTON.CANCEL:
             closeIcon = CancelButton;
             break;
-        case 'Close':
+        case MESSAGES.BUTTON.CLOSE:
             closeIcon = CancelIcon;
             break;
     }
     return (
         <Modal open={open} onClose={onClose}>
-            <Box
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 300,
-                    bgcolor: 'background.paper',
-                    boxShadow: 24,
-                    p: 4,
-                    textAlign: 'center',
-                    borderRadius: 2,
-                    padding: '16px 32px',
-                }}
-            >
-                <img src={AlertIcon} alt="Alert" style={{ height: '60px', marginBottom: '16px' }} />
+            <ModalComponentBox>
+                <img src={AlertIcon} alt="Alert" />
                 <Typography variant="h6" component="h2" gutterBottom>
                     {firstLabel}
                 </Typography>
                 {secondLabel && (
-                    <Typography variant="h6" component="h2" gutterBottom style={{ textDecoration: 'underline' }}>
+                    <Typography variant="h6" component="h2" gutterBottom className="secondLabel">
                         {secondLabel}
                     </Typography>
                 )}
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                <Box className="buttonContainer">
                     {closeIcon && (
                         <IconButton onClick={onClose}>
-                            <img src={closeIcon} alt="Cancel" style={{ height: '40px' }} />
+                            <img src={closeIcon} alt="Cancel" />
                         </IconButton>
                     )}
                     {onConfirmLabel && (
                         <IconButton onClick={onConfirm}>
-                            <img src={DeleteButton} alt="Delete" style={{ height: '40px' }} />
+                            <img src={DeleteButton} alt="Delete" />
                         </IconButton>
                     )}
                 </Box>
-            </Box>
+            </ModalComponentBox>
         </Modal>
     );
 };

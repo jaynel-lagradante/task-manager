@@ -1,21 +1,37 @@
 import { styled } from '@mui/material/styles';
-import { Badge, Box, Container, Divider, Grid, Tabs } from '@mui/material';
+import { Avatar, Badge, Box, Container, Divider, Grid, Tabs } from '@mui/material';
+import { TEMPLATE } from './TemplateStyles';
 
 export const DesktopMenu = styled(Grid)(() => ({
-    '@media (max-width: 899px)': {
-        display: 'none',
-    },
+    display: 'none',
     height: '100%',
+    // desktop view
+    '@media (min-width: 900px)': {
+        display: 'flex',
+        flexDirection: 'column',
+    },
 }));
 
 export const MobileMenu = styled(Grid)(() => ({
+    display: 'flex',
+    justifyContent: 'space-between',
+    // desktop view
     '@media (min-width: 900px)': {
         display: 'none',
     },
 }));
 
+export const MobileMenuBox = styled(Box)(() => ({
+    display: 'flex',
+    flexDirection: 'row',
+}));
+
 export const MainGridContainer = styled(Grid)(() => ({
-    height: '100vh',
+    // desktop view
+    '@media (min-width: 900px)': {
+        height: '100vh',
+    },
+    height: 'auto',
 }));
 
 export const MenuGridContainer = styled(Grid)(() => ({
@@ -53,7 +69,7 @@ export const MenuTabs = styled(Tabs)(({ theme }) => ({
         justifyContent: 'flex-start',
         padding: '12px 16px',
         '&.Mui-selected': {
-            backgroundColor: '#F2F8FD',
+            backgroundColor: TEMPLATE.COLOR.BACKGROUND,
             color: theme.palette.text.primary,
             borderRadius: 10,
         },
@@ -63,25 +79,56 @@ export const MenuTabs = styled(Tabs)(({ theme }) => ({
 export const DeleteButtonBadge = styled(Badge)(() => ({
     '& .MuiBadge-badge': {
         right: -3,
-        top: 18,
+        top: 16,
         padding: '0 4px',
-        backgroundColor: '#62C6FF',
+        backgroundColor: TEMPLATE.COLOR.BADGE,
         color: '#fff',
     },
 }));
 
 export const CuztomizedHeaderBox = styled(Box)(() => ({
     width: 53,
-    border: '1px solid #E0E0E0',
+    border: `1px solid ${TEMPLATE.COLOR.BORDER}`,
     borderRadius: 10,
 }));
 
 export const CuztomzedContainer = styled(Container)(() => ({
     padding: '16px',
-    backgroundColor: '#F2F8FD',
+    backgroundColor: TEMPLATE.COLOR.BACKGROUND,
     borderRadius: '16px',
-    height: '100%',
+    height: 'auto',
+    // desktop view
+    '@media (min-width: 900px)': {
+        height: '95vh',
+    },
     '@media (min-width: 1200px)': {
         maxWidth: '100%',
     },
+}));
+
+export const ChildGridContainer = styled(Grid)(() => ({
+    padding: '16px',
+}));
+
+export const HeaderImgBox = styled(Box)(() => ({
+    display: 'flex',
+    justifyContent: 'flex-start',
+    width: '100%',
+    marginBottom: '16px',
+}));
+
+export const HeaderImg = styled('img')(() => ({
+    height: '60px',
+}));
+
+export const AvatarBox = styled(Box)(() => ({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: '16px',
+}));
+
+export const CuztomizedAvatar = styled(Avatar)(() => ({
+    marginBottom: '8px',
 }));

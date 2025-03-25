@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleAuth } from '../services/AuthService';
 import { useTaskState } from '../state/TaskState';
 import { useAuthState } from '../state/AuthState';
+import { MESSAGES } from '../constants/Messages';
 
 const GoogleLoginComponent: React.FC = () => {
     const navigate = useNavigate();
@@ -21,10 +22,10 @@ const GoogleLoginComponent: React.FC = () => {
                     setToken(true);
                     navigate('/');
                 } else {
-                    console.error('Credential not found in response');
+                    console.error(MESSAGES.ERROR.CREDENTIAL_NOT_FOUND);
                 }
             },
-            onError: () => console.log('Login Failed'),
+            onError: () => console.log(MESSAGES.ERROR.LOGIN_FAILED),
             flow: 'auth-code',
         });
 

@@ -34,13 +34,25 @@ import EditIcon from './../assets/Icons/Edit.svg';
 import AccordionExpandIcon from './../assets/Icons/Accordion_expand.svg';
 import AccordionSuppressIcon from './../assets/Icons/Accordion_supress.svg';
 import SortDesktopIcon from './../assets/Icons/Sort_desktop.svg';
-import { CuztomizedImg, RenderedContainer } from '../layouts/TableStyle';
+import {
+    CuztomizedImg,
+    EditImg,
+    ExpandCustomizeBox,
+    PriorityImg,
+    RenderedContainer,
+    SortContainer,
+    StatusContainer,
+    TitleContainer,
+} from '../layouts/TableStyle';
 import DoneIcon from './../assets/Icons/Done.svg';
 import NotDoneIcon from './../assets/Icons/Not Done.svg';
 import LowPriorityIcon from './../assets/Icons/Low_table.svg';
 import HighPriorityIcon from './../assets/Icons/High_table.svg';
 import CriticalPriorityIcon from './../assets/Icons/Critical_table.svg';
 import AttachmentIcon from './../assets/Icons/attachment.svg';
+import { MESSAGES } from '../constants/Messages';
+import { STATUS } from '../constants/Status';
+import { TEMPLATE } from '../layouts/TemplateStyles';
 
 type TableProps<TData> = {
     data: TData[];
@@ -51,6 +63,7 @@ type TableProps<TData> = {
 
 const renderSubComponent = ({ row }: { row: Row<Task> }) => {
     const subtasks = row.original.subtasks;
+    const { DONE, NOT_DONE } = STATUS.SUBTASK;
     if (!row.original.subtasks || row.original.subtasks.length === 0) {
         return null;
     }
@@ -60,23 +73,17 @@ const renderSubComponent = ({ row }: { row: Row<Task> }) => {
             {subtasks &&
                 subtasks.map((subtask, index) => {
                     let statusIcon = null;
-                    if (subtask.status === 'Done') {
+                    if (subtask.status === DONE) {
                         statusIcon = DoneIcon;
-                    } else if (subtask.status === 'Not Done') {
+                    } else if (subtask.status === NOT_DONE) {
                         statusIcon = NotDoneIcon;
                     }
 
                     return (
                         <RenderedContainer key={index}>
                             <div className="title">{subtask.title}</div>
-                            <div className="status" style={{ display: 'flex', alignItems: 'center' }}>
-                                {statusIcon && (
-                                    <img
-                                        src={statusIcon}
-                                        alt={subtask.status}
-                                        style={{ height: '10px', marginRight: '8px' }}
-                                    />
-                                )}
+                            <div className="status">
+                                {statusIcon && <img src={statusIcon} alt={subtask.status} />}
                                 <span>{subtask.status}</span>
                             </div>
                         </RenderedContainer>
@@ -89,6 +96,8 @@ const renderSubComponent = ({ row }: { row: Row<Task> }) => {
 const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: TableProps<Task>): JSX.Element => {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const DUE_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+    const DUE_DATE_DISPLAY_FORMAT = 'MM/DD/YYYY';
 
     const handleDeleteSelected = () => {
         setIsModalOpen(true);
@@ -113,7 +122,7 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
             setSelectedRows([]);
             setIsModalOpen(false);
         } catch (error) {
-            console.error('Error deleting selected tasks:', error);
+            console.error(MESSAGES.ERROR.DELETE_SUBTASK, error);
         }
     };
 
@@ -148,23 +157,23 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                     }}
                 />
             ),
-            size: 5,
+            size: 30,
         },
         {
             id: 'expand',
             header: '',
             cell: ({ row }) => (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ExpandCustomizeBox>
                     {row.getCanExpand() && (
                         <IconButton onClick={row.getToggleExpandedHandler()} size="small">
                             {row.getIsExpanded() ? (
-                                <img src={AccordionExpandIcon} alt="Expand" style={{ height: '6px' }} />
+                                <img src={AccordionExpandIcon} alt="Expand" className="expand" />
                             ) : (
-                                <img src={AccordionSuppressIcon} alt="Suppress" style={{ height: '10px' }} />
+                                <img src={AccordionSuppressIcon} alt="Suppress" className="suppress" />
                             )}
                         </IconButton>
                     )}
-                </Box>
+                </ExpandCustomizeBox>
             ),
             size: 5,
         },
@@ -172,20 +181,16 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
             accessorKey: 'title',
             header: 'Title',
             cell: ({ row, getValue }) => (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div
-                        style={{ paddingLeft: `${row.depth * 2}rem`, fontWeight: 'bold', textDecoration: 'underline' }}
-                    >
+                <TitleContainer>
+                    <Box className="title" sx={{ paddingLeft: `${row.depth * 2}rem` }}>
                         {getValue<string>()}
-                    </div>
-                    {row.original.hasAttachment && (
-                        <img src={AttachmentIcon} alt="Attachment" style={{ height: '20px', marginLeft: '8px' }} />
-                    )}
-                </div>
+                    </Box>
+                    {row.original.hasAttachment && <img src={AttachmentIcon} alt="Attachment" />}
+                </TitleContainer>
             ),
         },
         {
-            accessorFn: (row) => (row.due_date ? moment(row.due_date).format('YYYY-MM-DD HH:mm:ss') : 'N/A'),
+            accessorFn: (row) => (row.due_date ? moment(row.due_date).format(DUE_DATE_FORMAT) : 'N/A'),
             id: 'due_date',
             cell: ({ row, getValue }) => {
                 const dueDate = getValue<string>();
@@ -193,44 +198,46 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                 const taskDueDate = dueDate !== 'N/A' ? moment(dueDate) : null;
                 const isOverdue = taskDueDate && taskDueDate.isBefore(today, 'day');
                 const isDueToday = taskDueDate && taskDueDate.isSame(today, 'day');
+                const { COMPLETE, CANCELLED } = STATUS.TASK;
+                const { CRITICAL } = STATUS.TASK_PRIORITY;
+                const { OVERDUE, DUE_DATE } = TEMPLATE.COLOR;
                 const isNearingDueDate =
                     taskDueDate &&
                     taskDueDate.isAfter(today) &&
-                    row.original.status !== 'Complete' &&
-                    row.original.status !== 'Cancelled' &&
-                    (row.original.priority === 'Critical'
+                    row.original.status !== COMPLETE &&
+                    row.original.status !== CANCELLED &&
+                    (row.original.priority === CRITICAL
                         ? taskDueDate.diff(today, 'hours') <= 48
                         : taskDueDate.diff(today, 'hours') <= 24);
 
                 let color = '';
                 let statusText = '';
-                let fontWeight = 'normal';
+                let fontWeight = 'bold';
 
-                if (row.original.status === 'Complete') {
+                if (row.original.status === COMPLETE) {
                     color = '';
                     statusText = '';
                     fontWeight = 'normal';
                 } else if (isOverdue) {
-                    color = '#CA0061';
+                    color = OVERDUE;
                     statusText = 'Overdue';
-                    fontWeight = 'bold';
                 } else if (isDueToday) {
-                    color = '#009292';
+                    color = DUE_DATE;
                     statusText = 'Today';
-                    fontWeight = 'bold';
                 } else if (isNearingDueDate) {
-                    color = '#EB0000';
+                    color = DUE_DATE;
                     statusText = 'Nearing Due Date';
-                    fontWeight = 'bold';
+                } else {
+                    fontWeight = 'normal';
                 }
 
                 return (
                     <div>
                         <div style={{ color: color, fontWeight: fontWeight }}>
-                            {dueDate !== 'N/A' ? moment(dueDate).format('MM/DD/YYYY') : 'N/A'}
+                            {dueDate !== 'N/A' ? moment(dueDate).format(DUE_DATE_DISPLAY_FORMAT) : 'N/A'}
                         </div>
                         {statusText && (
-                            <div style={{ color: color, fontSize: '12px', fontWeight: fontWeight }}>{statusText}</div>
+                            <Box sx={{ color: color, fontSize: '12px', fontWeight: fontWeight }}>{statusText}</Box>
                         )}
                     </div>
                 );
@@ -242,21 +249,22 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
             header: () => 'Priority',
             cell: ({ getValue }) => {
                 const priority = getValue<string>();
+                const { LOW, HIGH, CRITICAL } = STATUS.TASK_PRIORITY;
                 let icon = null;
 
                 switch (priority) {
-                    case 'Low':
+                    case LOW:
                         icon = LowPriorityIcon;
                         break;
-                    case 'High':
+                    case HIGH:
                         icon = HighPriorityIcon;
                         break;
-                    case 'Critical':
+                    case CRITICAL:
                         icon = CriticalPriorityIcon;
                         break;
                 }
 
-                return <div>{icon && <img src={icon} alt={priority} style={{ height: '20px' }} />}</div>;
+                return <div>{icon && <PriorityImg src={icon} alt={priority} />}</div>;
             },
         },
         {
@@ -264,19 +272,20 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
             header: 'Status',
             cell: ({ getValue }) => {
                 const status = getValue<string>();
+                const { NOT_STARTED, IN_PROGRESS, COMPLETE, CANCELLED } = STATUS.TASK;
                 let icon;
 
                 switch (status) {
-                    case 'Not Started':
+                    case NOT_STARTED:
                         icon = NotStartedIcon;
                         break;
-                    case 'In Progress':
+                    case IN_PROGRESS:
                         icon = InProgressIcon;
                         break;
-                    case 'Complete':
+                    case COMPLETE:
                         icon = CompleteIcon;
                         break;
-                    case 'Cancelled':
+                    case CANCELLED:
                         icon = CancelledIcon;
                         break;
                     default:
@@ -284,10 +293,10 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                 }
 
                 return (
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        {icon && <img src={icon} alt={status} style={{ height: '20px', marginRight: '8px' }} />}
+                    <StatusContainer>
+                        {icon && <img src={icon} alt={status} />}
                         <span>{status}</span>
-                    </div>
+                    </StatusContainer>
                 );
             },
         },
@@ -295,14 +304,9 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
             id: 'edit',
             header: '',
             cell: ({ row }) => (
-                <img
-                    src={EditIcon}
-                    alt="Edit"
-                    style={{ height: '20px', cursor: 'pointer' }}
-                    onClick={() => handleEdit && handleEdit(row.original.id ?? '')}
-                />
+                <EditImg src={EditIcon} alt="Edit" onClick={() => handleEdit && handleEdit(row.original.id ?? '')} />
             ),
-            size: 5,
+            size: 15,
         },
     ];
 
@@ -333,19 +337,12 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
                                         }}
                                     >
                                         {header.isPlaceholder ? null : (
-                                            <div
-                                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                                                onClick={header.column.getToggleSortingHandler()}
-                                            >
+                                            <SortContainer onClick={header.column.getToggleSortingHandler()}>
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
                                                 {header.column.getIsSorted() && (
-                                                    <img
-                                                        src={SortDesktopIcon}
-                                                        alt="Sort"
-                                                        style={{ height: '15px', marginLeft: '5px' }}
-                                                    />
+                                                    <img src={SortDesktopIcon} alt="Sort" />
                                                 )}
-                                            </div>
+                                            </SortContainer>
                                         )}
                                     </TableCell>
                                 );
@@ -386,8 +383,8 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
 
             <ModalComponent
                 open={isModalOpen}
-                onCloseLabel={'Cancel'}
-                onConfirmLabel={'Delete'}
+                onCloseLabel={MESSAGES.BUTTON.CANCEL}
+                onConfirmLabel={MESSAGES.BUTTON.DELETE}
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
                 firstLabel={`${selectedRows.length} Task${selectedRows.length !== 1 ? 's' : ''} will be deleted.`}

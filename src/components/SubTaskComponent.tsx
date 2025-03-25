@@ -3,6 +3,9 @@ import { TextField, FormControl, Select, MenuItem, IconButton, Box, InputLabel }
 import DeleteIcon from './../assets/Icons/Delete_active.svg';
 import { Subtask } from '../types/SubTaskInterface';
 import ModalComponent from './ModalComponent';
+import { ContainerBox } from '../layouts/SubTaskStyles';
+import { MESSAGES } from '../constants/Messages';
+import { STATUS } from '../constants/Status';
 
 interface SubtaskProps {
     index: number;
@@ -24,6 +27,7 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
     disableStatus = false,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { DONE, NOT_DONE } = STATUS.SUBTASK;
 
     const handleDeleteSelected = () => {
         setIsModalOpen(true);
@@ -34,18 +38,18 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
     };
 
     return (
-        <Box display="flex" alignItems="flex-start" gap={2} marginBottom={2}>
+        <ContainerBox>
             <TextField
                 label="Title"
                 value={subtask.title}
                 onChange={(e) => onTitleChange(index, e.target.value)}
                 size="small"
+                className="titleInput"
                 fullWidth
-                sx={{ flex: 2 }}
                 error={!!titleError}
                 helperText={titleError}
             />
-            <FormControl size="small" sx={{ flex: 1 }}>
+            <FormControl size="small" className="selectStatus">
                 <InputLabel id="status-label">Status</InputLabel>
                 <Select
                     labelId="status-label"
@@ -54,26 +58,26 @@ const SubtaskComponent: React.FC<SubtaskProps> = ({
                     onChange={(e) => onStatusChange(index, e.target.value)}
                     disabled={disableStatus}
                 >
-                    <MenuItem value="Not Done">Not Done</MenuItem>
-                    <MenuItem value="Done">Done</MenuItem>
+                    <MenuItem value={NOT_DONE}>{NOT_DONE}</MenuItem>
+                    <MenuItem value={DONE}>{DONE}</MenuItem>
                 </Select>
             </FormControl>
             <IconButton onClick={() => handleDeleteSelected()}>
-                <img src={DeleteIcon} alt="Delete" style={{ height: '20px' }} />
+                <img src={DeleteIcon} className="deleteIcon" alt="Delete" />
             </IconButton>
 
             <ModalComponent
                 open={isModalOpen}
-                onCloseLabel={'Cancel'}
-                onConfirmLabel={'Delete'}
+                onCloseLabel={MESSAGES.BUTTON.CANCEL}
+                onConfirmLabel={MESSAGES.BUTTON.DELETE}
                 onClose={handleCloseModal}
                 onConfirm={() => {
                     onDelete(index), handleCloseModal();
                 }}
-                firstLabel={'Delete this Subtask?'}
+                firstLabel={MESSAGES.SUBTASK.DELETE_SUBTASK}
                 secondLabel={subtask.title}
             />
-        </Box>
+        </ContainerBox>
     );
 };
 

@@ -6,6 +6,8 @@ export const TableContainer = styled('div')(({ theme }) => ({
     marginTop: '20px',
     borderRadius: '16px',
     backgroundColor: 'white',
+    overflowX: 'auto',
+    maxHeight: '70vh',
     '& .MuiDataGrid-root': {
         borderRadius: '16px',
     },

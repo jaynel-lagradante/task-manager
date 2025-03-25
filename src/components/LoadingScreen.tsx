@@ -1,5 +1,5 @@
 import React from 'react';
-import { LinearProgress, Backdrop } from '@mui/material';
+import { LinearProgress } from '@mui/material';
 import { selectIsLoading, useLoadingState } from '../state/LoadingState';
 
 interface LoadingScreenProps {

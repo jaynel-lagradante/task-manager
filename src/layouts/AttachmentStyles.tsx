@@ -1,4 +1,5 @@
-import { Box, IconButton, styled, Typography } from '@mui/material';
+import { Box, IconButton, Stack, styled, Typography } from '@mui/material';
+import { TEMPLATE } from './TemplateStyles';
 
 export const AttachmentBox = styled(Box)(({ theme }) => ({
     position: 'relative',
@@ -6,6 +7,7 @@ export const AttachmentBox = styled(Box)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     padding: theme.spacing(3),
     textAlign: 'center',
+    marginTop: theme.spacing(2),
 }));
 
 export const LegendTypography = styled(Typography)(({ theme }) => ({
@@ -14,6 +16,7 @@ export const LegendTypography = styled(Typography)(({ theme }) => ({
     left: theme.spacing(1),
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(0, 1),
+    color: TEMPLATE.COLOR.SECONDARY,
 }));
 
 export const AttachmentBoxContent = styled(Box)(({ theme }) => ({
@@ -43,16 +46,46 @@ export const CuztomizedImgDiv = styled('div')(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'left',
     marginTop: theme.spacing(1.5),
+    textAlign: 'left',
+    '& h6': {
+        fontSize: '12px',
+        color: TEMPLATE.COLOR.SECONDARY,
+    },
 }));
 
 export const CuztomizedIconButton = styled(IconButton)(({ theme }) => ({
     position: 'absolute',
     top: theme.spacing(-2.5),
     right: 5,
+    '& img': {
+        height: 15,
+    },
 }));
 
 export const FileDivContainer = styled('div')(() => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+}));
+
+export const BrowseContainer = styled('span')(() => ({
+    cursor: 'pointer',
+    color: TEMPLATE.COLOR.PRIMARY,
+}));
+
+export const UploadImageIcon = styled('img')(() => ({
+    height: '25px',
+}));
+
+export const CustomInput = styled('input')(() => ({
+    display: 'none',
+}));
+
+export const CustomizedStack = styled(Stack)(({ theme }) => ({
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    spacing: theme.spacing(1),
+    marginTop: theme.spacing(2),
 }));

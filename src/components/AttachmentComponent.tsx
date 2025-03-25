@@ -17,8 +17,13 @@ import {
     CuztomizedImgDiv,
     CuztomizedIconButton,
     FileDivContainer,
+    BrowseContainer,
+    UploadImageIcon,
+    CustomInput,
+    CustomizedStack,
 } from '../layouts/AttachmentStyles';
 import ModalComponent from './ModalComponent';
+import { MESSAGES } from '../constants/Messages';
 
 interface AttachmentComponentProps {
     attachments: Attachment[];
@@ -77,10 +82,10 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
 
     const handleModalRemoveFile = (index: number, file: Attachment) => {
         setModalProp({
-            firstLabel: `Remove file?`,
+            firstLabel: MESSAGES.LABEL.REMOVE_FILE,
             secondLabel: `${file.file.name}`,
-            onCloseLabel: 'Cancel',
-            onConfirmLabel: 'Delete',
+            onCloseLabel: MESSAGES.BUTTON.CANCEL,
+            onConfirmLabel: MESSAGES.BUTTON.DELETE,
             onClose: () => setIsModalOpen(false),
             onConfirm: () => {
                 handleRemoveFile(index, file?.id), setIsModalOpen(false);
@@ -133,12 +138,13 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
         const totalFiles = newFilesList.length + (selectedFiles?.length || 0);
         let largeFilesLabel = '';
         let invalidTypeFilesLabel = '';
+        const { MAX_FILE, ALLOWED_FILE, MAX_FILE_SIZE } = MESSAGES.IDENTIFIER;
 
         if (totalFiles > maxFiles) {
             setModalProp({
-                firstLabel: `Maximum of ${maxFiles} files allowed.`,
+                firstLabel: MESSAGES.ERROR.MAXIMUM_FILE.replace(MAX_FILE, maxFiles.toString()),
                 secondLabel: ``,
-                onCloseLabel: 'Close',
+                onCloseLabel: MESSAGES.BUTTON.CLOSE,
                 onConfirmLabel: '',
                 onClose: () => setIsModalOpen(false),
                 onConfirm: () => {},
@@ -166,11 +172,11 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
             }
         });
 
-        if (largeFilesLabel) {
+        if (invalidTypeFilesLabel) {
             setModalProp({
-                firstLabel: `${largeFilesLabel}`,
-                secondLabel: `Exceeds the maximum size of ${formatFileSize(maxFileSize)}.`,
-                onCloseLabel: 'Close',
+                firstLabel: invalidTypeFilesLabel,
+                secondLabel: MESSAGES.ERROR.INVALID_FILE.replace(ALLOWED_FILE, allowedFileTypes?.join(', ') ?? ''),
+                onCloseLabel: MESSAGES.BUTTON.CLOSE,
                 onConfirmLabel: '',
                 onClose: () => setIsModalOpen(false),
                 onConfirm: () => {},
@@ -178,11 +184,11 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
             setIsModalOpen(true);
         }
 
-        if (invalidTypeFilesLabel) {
+        if (largeFilesLabel) {
             setModalProp({
-                firstLabel: `${invalidTypeFilesLabel}`,
-                secondLabel: `Has an invalid file type. Allowed types are: ${allowedFileTypes?.join(', ')}.`,
-                onCloseLabel: 'Close',
+                firstLabel: largeFilesLabel,
+                secondLabel: MESSAGES.ERROR.EXCEED_FILE_SIZE.replace(MAX_FILE_SIZE, formatFileSize(maxFileSize)),
+                onCloseLabel: MESSAGES.BUTTON.CLOSE,
                 onConfirmLabel: '',
                 onClose: () => setIsModalOpen(false),
                 onConfirm: () => {},
@@ -199,25 +205,15 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
     };
 
     return (
-        <AttachmentBox marginTop={2} onDrop={handleDrop} onDragOver={handleDragOver}>
-            <LegendTypography variant="subtitle2" color="textSecondary">
-                Attachments
-            </LegendTypography>
+        <AttachmentBox onDrop={handleDrop} onDragOver={handleDragOver}>
+            <LegendTypography variant="subtitle2">Attachments</LegendTypography>
             <Box>
-                <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} marginTop={2}>
-                    <img src={NewSubtaskIconSelected} alt="Upload" style={{ height: '25px' }} />
+                <CustomizedStack>
+                    <UploadImageIcon src={NewSubtaskIconSelected} alt="Upload" />
                     <Typography variant="body2">
-                        Drop files to attach, or{' '}
-                        <Typography
-                            component="span"
-                            color="primary"
-                            style={{ cursor: 'pointer' }}
-                            onClick={handleBrowseClick}
-                        >
-                            browse
-                        </Typography>
+                        Drop files to attach, or <BrowseContainer onClick={handleBrowseClick}>browse</BrowseContainer>
                     </Typography>
-                </Stack>
+                </CustomizedStack>
             </Box>
 
             <AttachmentBoxContent>
@@ -227,23 +223,19 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
                             <FileDivContainer>
                                 <CuztomizedImg src={objectURLs[index]} alt={file.file.name} />
                                 <CuztomizedImgDiv>
-                                    <Typography variant="body2" align="left">
-                                        {file.file.name}
-                                    </Typography>
-                                    <Typography variant="subtitle2" color="textSecondary" align="left" fontSize={12}>
-                                        {formatFileSize(file.file.size)}
-                                    </Typography>
+                                    <Typography variant="body2">{file.file.name}</Typography>
+                                    <Typography variant="subtitle2">{formatFileSize(file.file.size)}</Typography>
                                 </CuztomizedImgDiv>
                             </FileDivContainer>
                         )}
                         <CuztomizedIconButton onClick={() => handleModalRemoveFile(index, file)} size="small">
-                            <img src={CancelIcon} alt="Remove" style={{ height: '15px' }} />
+                            <img src={CancelIcon} alt="Remove" />
                         </CuztomizedIconButton>
                     </ImageBoxContainer>
                 ))}
             </AttachmentBoxContent>
 
-            <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} multiple />
+            <CustomInput type="file" ref={fileInputRef} onChange={handleFileChange} multiple />
 
             <ModalComponent open={isModalOpen} {...modalProp} />
         </AttachmentBox>

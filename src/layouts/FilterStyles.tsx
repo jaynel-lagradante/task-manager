@@ -1,15 +1,16 @@
 import { styled } from '@mui/material/styles';
 import { Button, MenuItem } from '@mui/material';
+import { TEMPLATE } from './TemplateStyles';
 
 export const FilterButton = styled(Button)(({ theme }) => ({
     textTransform: 'none',
     fontSize: '16px',
     fontWeight: 400,
     color: '#000000',
-    backgroundColor: '#F2F8FD',
+    backgroundColor: TEMPLATE.COLOR.BACKGROUND,
     borderRadius: '8px',
     padding: '8px 16px',
-    border: '1px solid #E0E0E0',
+    border: `1px solid ${TEMPLATE.COLOR.BORDER}`,
 }));
 
 export const FilterIconImg = styled('img')(({ theme }) => ({

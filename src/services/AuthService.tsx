@@ -1,33 +1,36 @@
 import axios from 'axios';
 import { User } from '../types/UserInterface';
-
-const API_BASE_URL = 'http://localhost:5000/auth';
+import { API_ENDPOINTS } from '../constants/Api';
+import { MESSAGES } from '../constants/Messages';
 
 export const Login = async (credentials: { username: string; password: string }) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/login`, credentials);
+        const response = await axios.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.LOGIN}`, credentials);
         setUserInfo(response.data);
         return response.data;
     } catch (error) {
+        console.error(MESSAGES.ERROR.LOGIN, error);
         throw error;
     }
 };
 
 export const Register = async (credentials: { username: string; password: string }) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/register`, credentials);
+        const response = await axios.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.REGISTER}`, credentials);
         return response.data;
     } catch (error) {
+        console.error(MESSAGES.ERROR.REGISTER, error);
         throw error;
     }
 };
 
 export const GoogleAuth = async (code: string) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/google`, { code });
+        const response = await axios.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.LOGIN_GOOGLE}`, { code });
         setUserInfo(response.data);
         return response.data;
     } catch (error) {
+        console.error(MESSAGES.ERROR.LOGIN, error);
         throw error;
     }
 };
@@ -43,7 +46,7 @@ const decodeJWT = (token: string) => {
         const decodedPayload = JSON.parse(atob(base64));
         return decodedPayload;
     } catch (error) {
-        console.error('Error decoding JWT:', error);
+        console.error(MESSAGES.ERROR.DECODING_JWT, error);
         return null;
     }
 };

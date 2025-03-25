@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles';
 import { Grid, Button, Typography, Divider, ListItem } from '@mui/material';
+import { TEMPLATE } from './TemplateStyles';
 
 export const GridContainer = styled(Grid)(({ theme }) => ({
     '@media (min-width: 900px)': {
@@ -34,7 +35,7 @@ export const ImageGridMobile = styled(Grid)(({ theme }) => ({
     '@media (min-width: 900px)': {
         display: 'none',
     },
-    backgroundColor: '#027CEC',
+    backgroundColor: TEMPLATE.COLOR.PRIMARY,
     width: '100%',
     height: 70,
     padding: 5,
@@ -66,7 +67,7 @@ export const SignupMessageItem = styled(Grid)(({ theme }) => ({
 }));
 
 export const SignupLink = styled(Typography)(({ theme }) => ({
-    color: 'blue',
+    color: TEMPLATE.COLOR.PRIMARY,
     cursor: 'pointer',
     textDecoration: 'underline',
 }));
