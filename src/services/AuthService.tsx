@@ -2,6 +2,7 @@ import axios from 'axios';
 import { User } from '../types/UserInterface';
 import { API_ENDPOINTS } from '../constants/Api';
 import { MESSAGES } from '../constants/Messages';
+import api from '../utils/Interceptors';
 
 export const Login = async (credentials: { username: string; password: string }) => {
     try {
@@ -35,8 +36,15 @@ export const GoogleAuth = async (code: string) => {
     }
 };
 
-export const Logout = () => {
-    localStorage.removeItem('token');
+export const Logout = async () => {
+    try {
+        const response = await api.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.LOGOUT}`);
+        localStorage.removeItem('token');
+        return response.data;
+    } catch (error) {
+        console.error(MESSAGES.ERROR.LOGOUT, error);
+        throw error;
+    }
 };
 
 const decodeJWT = (token: string) => {

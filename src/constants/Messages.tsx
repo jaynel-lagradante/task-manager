@@ -14,6 +14,7 @@ export const MESSAGES = {
         UPLOAD_FILE: 'Error uploading file',
         DELETE_FILE: 'Error deleting file',
         LOGIN: 'Error logging in',
+        LOGOUT: 'Error logging out',
         REGISTER: 'Error registering account',
         MAXIMUM_FILE: 'Maximum of {maxFiles} files allowed.',
         INVALID_FILE: 'Has an invalid file type. Allowed types are: {allowedFileTypes}',

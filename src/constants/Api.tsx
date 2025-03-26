@@ -3,6 +3,7 @@ export const API_ENDPOINTS = {
     LOGIN: '/auth/login',
     LOGIN_GOOGLE: '/auth/google',
     REGISTER: '/auth/register',
+    LOGOUT: '/auth/logout',
     FILES: '/files',
     SUBTASKS: '/subtasks',
     TASKS: '/tasks',

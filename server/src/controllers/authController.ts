@@ -120,3 +120,30 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
         res.status(401).json({ message: 'Error verifying Google token' });
     }
 };
+
+export const logout = async (req: Request, res: Response) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+
+        if (!token) {
+            res.status(401).json({ message: 'No token provided' });
+            return;
+        }
+
+        jwt.verify(token, process.env.JWT_SECRET!, async (err, decoded: any) => {
+            if (err) {
+                res.status(401).json({ message: 'Invalid token' });
+            }
+
+            if (decoded && decoded.id) {
+                await Account.update({ active_token: null }, { where: { id: decoded.id } });
+                res.status(200).json({ message: 'Logged out successfully' });
+            } else {
+                res.status(401).json({ message: 'Invalid token payload' });
+            }
+        });
+    } catch (error) {
+        console.error('Error during logout:', error);
+        res.status(500).json({ message: 'Internal server error during logout' });
+    }
+};
