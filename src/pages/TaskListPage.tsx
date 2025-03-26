@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Box, IconButton } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { GetTasks } from '../services/TaskService';
 import DashboardComponent from './../components/DashboardComponent';
 import NewTaskButtonIcon from './../assets/Buttons/Button_New Task.svg';
-import { Task } from '../types/TaskInterface';
 import FilterComponent from './../components/FilterComponent';
 import ChipCancelled from '../assets/Chips/Chip_Cancelled.svg';
 import ChipComplete from '../assets/Chips/Chip_Complete.svg';
@@ -13,14 +11,20 @@ import ChipNotStarted from '../assets/Chips/Chip_Not started.svg';
 import ChipLow from '../assets/Chips/Chip_Low.svg';
 import ChipHigh from '../assets/Chips/Chip_High.svg';
 import ChipCritical from '../assets/Chips/Chip_Critical.svg';
-import { FilterContainerBox, FilterIconImg, TableContainer } from '../layouts/TaskListStyles';
+import { CuztomizedIconButton, FilterContainerBox, FilterIconImg, TableContainer } from '../layouts/TaskListStyles';
 import TableComponent from './../components/TableComponent';
 import { selectTasks, useTaskState } from '../state/TaskState';
+import { STATUS } from '../constants/Status';
+import { MESSAGES } from '../constants/Messages';
+import { ROUTES } from '../constants/Routes';
 
 const TaskListPage: React.FC = () => {
     const navigate = useNavigate();
     const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
     const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
+    const { COMPLETE, CANCELLED, NOT_STARTED, IN_PROGRESS } = STATUS.TASK;
+    const { LOW, HIGH, CRITICAL } = STATUS.TASK_PRIORITY;
+    const { PRIORITY, STATUS_LABEL } = MESSAGES.LABEL;
 
     const tasks = useTaskState(selectTasks);
     const { fetchTasks, setTasks } = useTaskState();
@@ -45,23 +49,23 @@ const TaskListPage: React.FC = () => {
 
     const menuItems = [
         {
-            label: 'Priority',
-            subMenu: [{ label: 'All' }, { label: 'Low' }, { label: 'High' }, { label: 'Critical' }],
+            label: PRIORITY,
+            subMenu: [{ label: 'All' }, { label: LOW }, { label: HIGH }, { label: CRITICAL }],
         },
         {
-            label: 'Status',
+            label: STATUS_LABEL,
             subMenu: [
                 { label: 'All' },
-                { label: 'Not Started' },
-                { label: 'In Progress' },
-                { label: 'Complete' },
-                { label: 'Cancelled' },
+                { label: NOT_STARTED },
+                { label: IN_PROGRESS },
+                { label: COMPLETE },
+                { label: CANCELLED },
             ],
         },
     ];
 
     const handleFilter = (mainMenu: string | null, subMenu: string | null) => {
-        if (mainMenu === 'Priority' && subMenu) {
+        if (mainMenu === PRIORITY && subMenu) {
             if (subMenu === 'All') {
                 setSelectedPriorities([]);
                 return;
@@ -70,7 +74,7 @@ const TaskListPage: React.FC = () => {
                 const priority = [...selectedPriorities, subMenu];
                 setSelectedPriorities(priority);
             }
-        } else if (mainMenu === 'Status' && subMenu) {
+        } else if (mainMenu === STATUS_LABEL && subMenu) {
             if (subMenu === 'All') {
                 setSelectedStatuses([]);
                 return;
@@ -84,19 +88,19 @@ const TaskListPage: React.FC = () => {
 
     const getChipIcon = (label: string) => {
         switch (label) {
-            case 'Cancelled':
+            case CANCELLED:
                 return ChipCancelled;
-            case 'Complete':
+            case COMPLETE:
                 return ChipComplete;
-            case 'In Progress':
+            case IN_PROGRESS:
                 return ChipInProgress;
-            case 'Not Started':
+            case NOT_STARTED:
                 return ChipNotStarted;
-            case 'Low':
+            case LOW:
                 return ChipLow;
-            case 'High':
+            case HIGH:
                 return ChipHigh;
-            case 'Critical':
+            case CRITICAL:
                 return ChipCritical;
         }
     };
@@ -142,16 +146,16 @@ const TaskListPage: React.FC = () => {
                             ))}
                     </Box>
                 </Box>
-                <IconButton onClick={() => navigate('/create-task')} style={{ padding: '0px' }}>
-                    <img src={NewTaskButtonIcon} alt="New Task" style={{ height: '45px' }} />
-                </IconButton>
+                <CuztomizedIconButton onClick={() => navigate(ROUTES.CREATE_TASK)}>
+                    <img src={NewTaskButtonIcon} alt="New Task" />
+                </CuztomizedIconButton>
             </FilterContainerBox>
             <TableContainer>
                 <TableComponent
                     data={filteredTasks}
                     getRowCanExpand={(row) => !!row.original.subtasks?.length}
                     setTasksValue={setTasks}
-                    handleEdit={(taskId) => navigate(`/view-task/${taskId}`)}
+                    handleEdit={(taskId) => navigate(`${ROUTES.VIEW_TASK}/${taskId}`)}
                 ></TableComponent>
             </TableContainer>
         </DashboardComponent>

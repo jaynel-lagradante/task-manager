@@ -25,7 +25,7 @@ function App() {
                                     <Route path={ROUTES.DASHBOARD} element={<TaskListPage />} />
                                     <Route path={ROUTES.CREATE_TASK} element={<TaskPage />} />
                                     <Route path={ROUTES.EDIT_TASK} element={<TaskPage />} />
-                                    <Route path={ROUTES.VIEW_TASK} element={<ViewTaskPage />} />
+                                    <Route path={ROUTES.VIEW_TASK_ID} element={<ViewTaskPage />} />
                                 </Routes>
                             </Authentication>
                         }

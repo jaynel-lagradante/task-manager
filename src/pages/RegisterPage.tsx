@@ -14,6 +14,7 @@ import HidePasswordIcon from './../assets/Icons/Hide.svg';
 import Bullet from './../assets/Icons/Bullet.svg';
 import Check from './../assets/Icons/Check.svg';
 import CoverPageComponent from './../components/CoverPageComponent';
+import { MESSAGES } from '../constants/Messages';
 
 const RegisterPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -28,13 +29,23 @@ const RegisterPage: React.FC = () => {
     const [passwordCheck, setPasswordCheck] = useState(0);
     const allowedSymbols = /^[a-zA-Z0-9\s!#()_-]*$/;
     const navigate = useNavigate();
+    const {
+        PASSWORD_STRONG,
+        PASSWORD_WEAK,
+        PASSWORD_SYMBOL,
+        USERNAME_SYMBOL,
+        REQUIRED_USERNAME,
+        REQUIRED_PASSWORD,
+        USERNAME_EXIST,
+        REGISTER_FAILED,
+    } = MESSAGES.ERROR;
 
     const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const username = e.target.value;
         setUsername(username);
         setUsernameError('');
         if (!allowedSymbols.test(username)) {
-            setUsernameError('Username can only contain letters, numbers, spaces, and !#()_-');
+            setUsernameError(MESSAGES.ERROR.USERNAME_SYMBOL);
         }
         if (password) {
             checkPasswordStrength(password);
@@ -72,13 +83,13 @@ const RegisterPage: React.FC = () => {
         const checks = [nameEmailCheck, lengthCheck, numberSymbolCheck].filter(Boolean).length;
         setPasswordCheck(checks);
         if (!allowedSymbols.test(password)) {
-            setPasswordError('Password can only contain letters, numbers, spaces, and !#()_-');
+            setPasswordError(PASSWORD_SYMBOL);
             return;
         }
         if (checks === 3) {
-            setPasswordError('Password strength: Strong');
+            setPasswordError(PASSWORD_STRONG);
         } else if (password || checks >= 1) {
-            setPasswordError('Password strength: Weak');
+            setPasswordError(PASSWORD_WEAK);
         } else {
             setPasswordError('');
         }
@@ -87,22 +98,22 @@ const RegisterPage: React.FC = () => {
     const handleRegister = async () => {
         let hasError = false;
         if (!username) {
-            setUsernameError('Username is required');
+            setUsernameError(REQUIRED_USERNAME);
             hasError = true;
         }
 
         if (!allowedSymbols.test(username)) {
-            setUsernameError('Username can only contain letters, numbers, spaces, and !#()_-');
+            setUsernameError(USERNAME_SYMBOL);
             hasError = true;
         }
 
         if (!allowedSymbols.test(password)) {
-            setPasswordError('Password can only contain letters, numbers, spaces, and !#()_-');
+            setPasswordError(PASSWORD_SYMBOL);
             hasError = true;
         }
 
         if (!password) {
-            setPasswordError('Password is required');
+            setPasswordError(REQUIRED_PASSWORD);
             hasError = true;
         }
 
@@ -116,12 +127,12 @@ const RegisterPage: React.FC = () => {
 
         try {
             await Register({ username, password });
-            navigate('/login', { state: { registrationMessage: 'Account successfully created' } });
+            navigate('/login', { state: { registrationMessage: MESSAGES.SUCCESS.REGISTRATION_SUCCESS } });
         } catch (err: any) {
-            if (err.response?.data?.message === 'Username already exist') {
-                setUsernameError('Username already exist');
+            if (err.response?.data?.message === USERNAME_EXIST) {
+                setUsernameError(USERNAME_EXIST);
             } else {
-                setRegisterError(err.response?.data?.message || 'Registration failed');
+                setRegisterError(err.response?.data?.message || REGISTER_FAILED);
             }
         }
     };

@@ -28,13 +28,22 @@ import { bufferToFile } from '../utils/FileHelper';
 import {
     AttachmentBoxContainer,
     AttachmentBoxContent,
+    CustomizedTypography,
     CuztomizedDivider,
     CuztomizedPaper,
     FileContainer,
 } from '../layouts/ViewTaskStyles';
 import { useTaskState } from '../state/TaskState';
+import { STATUS } from '../constants/Status';
+import { MESSAGES } from '../constants/Messages';
 
 const ViewTaskComponent = () => {
+    const { COMPLETE, CANCELLED, NOT_STARTED, IN_PROGRESS } = STATUS.TASK;
+    const { LOW, HIGH, CRITICAL } = STATUS.TASK_PRIORITY;
+    const { DONE, NOT_DONE } = STATUS.SUBTASK;
+    const { DELETE_TASK } = MESSAGES.ERROR;
+    const { CANCEL, DELETE } = MESSAGES.BUTTON;
+    const dateFormat = 'DD MMM YYYY';
     const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
     const [task, setTask] = useState<Task | null>(null);
@@ -87,24 +96,24 @@ const ViewTaskComponent = () => {
 
     const getPriorityIcon = (priority: string) => {
         switch (priority) {
-            case 'Low':
+            case LOW:
                 return LowPriorityIcon;
-            case 'High':
+            case HIGH:
                 return HighPriorityIcon;
-            case 'Critical':
+            case CRITICAL:
                 return CriticalPriorityIcon;
         }
     };
 
     const getStatusIcon = (status: string) => {
         switch (status) {
-            case 'Not Started':
+            case NOT_STARTED:
                 return NotStartedIcon;
-            case 'In Progress':
+            case IN_PROGRESS:
                 return InProgressIcon;
-            case 'Complete':
+            case COMPLETE:
                 return CompleteIcon;
-            case 'Cancelled':
+            case CANCELLED:
                 return CancelledIcon;
         }
     };
@@ -119,7 +128,7 @@ const ViewTaskComponent = () => {
             setIsModalOpen(false);
             navigate('/');
         } catch (error) {
-            console.error('Error deleting selected tasks:', error);
+            console.error(DELETE_TASK, error);
         }
     };
 
@@ -127,36 +136,25 @@ const ViewTaskComponent = () => {
         <DashboardComponent>
             {task && (
                 <FormContainer>
-                    <Typography variant="h6" gutterBottom display={'flex'}>
-                        <Typography
-                            style={{ color: '#027CEC', marginRight: '4px', cursor: 'pointer', fontSize: '1.25rem' }}
-                            onClick={() => navigate(-1)}
-                        >
-                            <img src={BackIcon} alt="Back" style={{ height: '12px', marginRight: '8px' }} />
+                    <Typography className="backContainer" variant="h6" gutterBottom display={'flex'}>
+                        <CustomizedTypography onClick={() => navigate(-1)}>
+                            <img src={BackIcon} alt="Back" />
                             Back
-                        </Typography>{' '}
+                        </CustomizedTypography>{' '}
                         | View Task
                     </Typography>
                     <CuztomizedPaper elevation={3}>
                         <Container>
                             <Box mt={4}>
-                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                    <Box display="flex" alignItems="center">
-                                        <img
-                                            src={getPriorityIcon(task.priority)}
-                                            alt={task.priority}
-                                            style={{ height: '20px' }}
-                                        />
-                                        <Box display="flex" alignItems="center" marginLeft={4}>
-                                            <img
-                                                src={getStatusIcon(task.status)}
-                                                alt={task.status}
-                                                style={{ height: '20px' }}
-                                            />
-                                            <Typography variant="body2" marginLeft={1}>
+                                <Box className="priorityContainer">
+                                    <Box className="iconContainer">
+                                        <img src={getPriorityIcon(task.priority)} alt={task.priority} />
+                                        <Box>
+                                            <img src={getStatusIcon(task.status)} alt={task.status} />
+                                            <Typography variant="body2">
                                                 {task.status}{' '}
-                                                {task.status === 'Complete'
-                                                    ? `- ${moment(task.date_completed).format('DD MMM YYYY')}`
+                                                {task.status === COMPLETE
+                                                    ? `- ${moment(task.date_completed).format(dateFormat)}`
                                                     : ''}
                                             </Typography>
                                         </Box>
@@ -164,10 +162,10 @@ const ViewTaskComponent = () => {
 
                                     <Box>
                                         <IconButton aria-label="edit" onClick={() => navigate(`/edit-task/${id}`)}>
-                                            <img src={EditIcon} alt="Edit" style={{ height: '20px' }} />
+                                            <img src={EditIcon} alt="Edit" />
                                         </IconButton>
                                         <IconButton aria-label="delete" onClick={() => handleDeleteSelected()}>
-                                            <img src={DeleteIcon} alt="Delete" style={{ height: '20px' }} />
+                                            <img src={DeleteIcon} alt="Delete" />
                                         </IconButton>
                                     </Box>
                                 </Box>
@@ -175,8 +173,8 @@ const ViewTaskComponent = () => {
                                 <Typography variant="h5">{task.title}</Typography>
 
                                 <Typography variant="body2" color="textSecondary">
-                                    {moment(task.created_at).format('DD MMM YYYY')} -{' '}
-                                    {moment(task.due_date).format('DD MMM YYYY')}
+                                    {moment(task.created_at).format(dateFormat)} -{' '}
+                                    {moment(task.due_date).format(dateFormat)}
                                 </Typography>
 
                                 <Typography variant="body1" paragraph mt={2}>
@@ -220,9 +218,9 @@ const ViewTaskComponent = () => {
 
                                 {subtasks.map((subtask) => {
                                     let statusIcon = null;
-                                    if (subtask.status === 'Done') {
+                                    if (subtask.status === DONE) {
                                         statusIcon = DoneIcon;
-                                    } else if (subtask.status === 'Not Done') {
+                                    } else if (subtask.status === NOT_DONE) {
                                         statusIcon = NotDoneIcon;
                                     }
                                     return (
@@ -236,9 +234,9 @@ const ViewTaskComponent = () => {
                                                 <Typography variant="body1" color="textSecondary">
                                                     {statusIcon && (
                                                         <img
+                                                            className="fileSizeLabel"
                                                             src={statusIcon}
                                                             alt={subtask.status}
-                                                            style={{ height: '10px', marginRight: '8px' }}
                                                         />
                                                     )}
                                                     {subtask.status}
@@ -252,11 +250,11 @@ const ViewTaskComponent = () => {
                     </CuztomizedPaper>
                     <ModalComponent
                         open={isModalOpen}
-                        onCloseLabel={'Cancel'}
-                        onConfirmLabel={'Delete'}
+                        onCloseLabel={CANCEL}
+                        onConfirmLabel={DELETE}
                         onClose={handleCloseModal}
                         onConfirm={() => handleConfirmDelete()}
-                        firstLabel={'Delete this Task?'}
+                        firstLabel={MESSAGES.TASK.DELETE_TASK}
                         secondLabel={task.title}
                     />
                 </FormContainer>

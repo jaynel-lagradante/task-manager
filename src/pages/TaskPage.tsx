@@ -9,7 +9,6 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    Divider,
     IconButton,
     Grid,
 } from '@mui/material';
@@ -25,7 +24,15 @@ import SubtaskComponent from './../components/SubTaskComponent';
 import NewSubtaskIconSelected from './../assets/Buttons/Button_New Subtask_selected.svg';
 import NewSubtaskIconActive from './../assets/Buttons/Button_New Subtask_active.svg';
 import NewSubtaskIconInactive from './../assets/Buttons/Button_New Subtask_inactive.svg';
-import { CuztomizedImg, CuztomizedPaper, FormContainer } from '../layouts/TaskStyles';
+import {
+    CuztomizedImg,
+    CuztomizedPaper,
+    CuztomizedTypography,
+    FormContainer,
+    CuztomizedDivider,
+    SubtaskBox,
+    ButtonBox,
+} from '../layouts/TaskStyles';
 import SaveButton from './../assets/Buttons/Button_Save.svg';
 import CancelButton from './../assets/Buttons/Button_Cancel.svg';
 import { createSubtasks, deleteSubtasks, getSubtasks, updateSubtasks } from '../services/SubtaskService';
@@ -35,15 +42,34 @@ import AttachmentComponent from './../components/AttachmentComponent';
 import { Attachment } from '../types/AttachmentInterface';
 import BackIcon from '../assets/Icons/Back.svg';
 import { useTaskState } from '../state/TaskState';
+import { STATUS } from '../constants/Status';
+import { MESSAGES } from '../constants/Messages';
 
 const TaskPage: React.FC = () => {
+    const { COMPLETE, CANCELLED, NOT_STARTED, IN_PROGRESS } = STATUS.TASK;
+    const { LOW, HIGH, CRITICAL } = STATUS.TASK_PRIORITY;
+    const { DONE, NOT_DONE } = STATUS.SUBTASK;
+    const {
+        TITLE_LENGTH,
+        DETAILS_LENGTH,
+        GET_TASKS,
+        DUE_DATE_LATER,
+        REQUIRED_DUE_DATE,
+        REQUIRED_TITLE,
+        UPDATE_TASK,
+        SUBTASK_LENGTH,
+        DELETE_SUBTASK,
+    } = MESSAGES.ERROR;
+    const dateFormat = 'MM/DD/YYYY';
+    const allowedFiles = ['image/png', 'image/jpeg'];
+
     const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
     const [task, setTask] = useState<Task>({
         title: 'Task 01',
         due_date: null,
-        priority: 'Low',
-        status: 'Not Started',
+        priority: LOW,
+        status: NOT_STARTED,
         description: '',
         subtasks: [],
         date_completed: null,
@@ -84,11 +110,11 @@ const TaskPage: React.FC = () => {
                     if (subtasksData) {
                         setSubtasks(subtasksData || []);
                     }
-                    if (data.status === 'Complete') {
+                    if (data.status === COMPLETE) {
                         setCompletionDate(moment(data.completion_date));
                     }
                 } catch (err: any) {
-                    setError(err.response?.data?.message || 'Failed to fetch task');
+                    setError(err.response?.data?.message || GET_TASKS);
                 }
             }
         };
@@ -100,12 +126,12 @@ const TaskPage: React.FC = () => {
         if (name === 'title') {
             if (titleError) setTitleError('');
             if (value.length > 25) {
-                setTitleError('Must be at most 25 characters');
+                setTitleError(TITLE_LENGTH);
             }
         } else if (name === 'description') {
             if (detailsError) setDetailsError('');
             if (value.length > 300) {
-                setDetailsError('Must be at most 300 characters');
+                setDetailsError(DETAILS_LENGTH);
             }
         }
         setTask({ ...task, [name]: value });
@@ -113,9 +139,9 @@ const TaskPage: React.FC = () => {
 
     const handleSelectChange = (e: any) => {
         const { name, value } = e.target;
-        if (value === 'Complete') {
+        if (value === COMPLETE) {
             setCompletionDate(moment());
-        } else if (task.status === 'Complete') {
+        } else if (task.status === COMPLETE) {
             setCompletionDate(null);
         }
         setTask({ ...task, [name]: value });
@@ -125,12 +151,12 @@ const TaskPage: React.FC = () => {
         if (date) {
             const dateTomorrow = moment().add(1, 'day').startOf('day');
             if (date.isBefore(dateTomorrow, 'day')) {
-                setDueDateError('Must be later than Date Created');
+                setDueDateError(DUE_DATE_LATER);
             } else {
                 setDueDateError('');
             }
         } else {
-            setDueDateError('Due Date is required');
+            setDueDateError(REQUIRED_DUE_DATE);
         }
         setTask({ ...task, due_date: date });
     };
@@ -145,27 +171,27 @@ const TaskPage: React.FC = () => {
         let hasError = false;
 
         if (!task.title.trim()) {
-            setTitleError('Must not be empty');
+            setTitleError(REQUIRED_TITLE);
             hasError = true;
         } else if (task.title.length > 25) {
-            setTitleError('Must be at most 25 characters');
+            setTitleError(TITLE_LENGTH);
             hasError = true;
         }
 
         if (task.description.length > 300) {
-            setDetailsError('Must be at most 300 characters');
+            setDetailsError(DETAILS_LENGTH);
             hasError = true;
         }
 
         if (!task.due_date) {
-            setDueDateError('Due Date is required');
+            setDueDateError(REQUIRED_DUE_DATE);
             hasError = true;
         } else if (task.due_date.isBefore(dateCreated, 'day')) {
-            setDueDateError('Must be later than Date Created');
+            setDueDateError(DUE_DATE_LATER);
             hasError = true;
         }
 
-        const newSubtaskTitleErrors = subtasks.map((subtask) => (!subtask.title.trim() ? 'Must not be empty' : ''));
+        const newSubtaskTitleErrors = subtasks.map((subtask) => (!subtask.title.trim() ? REQUIRED_TITLE : ''));
         setSubtaskTitleErrors(newSubtaskTitleErrors);
 
         if (newSubtaskTitleErrors.some((error) => error)) {
@@ -181,7 +207,7 @@ const TaskPage: React.FC = () => {
                 title: task.title,
                 due_date: task.due_date,
                 priority: task.priority,
-                status: isMarkAsComplete ? 'Complete' : task.status,
+                status: isMarkAsComplete ? COMPLETE : task.status,
                 description: task.description,
                 date_completed: completionDate,
                 hasAttachment: !!(attachmentFiles.length > 0),
@@ -225,19 +251,19 @@ const TaskPage: React.FC = () => {
 
             navigate('/');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to save task');
+            setError(err.response?.data?.message || UPDATE_TASK);
             navigate('/');
         }
     };
 
     const handleAddSubtask = () => {
         if (subtasks.length >= 10) {
-            setSubTaskError('Maximum of 10 subtasks allowed');
+            setSubTaskError(SUBTASK_LENGTH);
             return;
         } else {
             setSubTaskError('');
         }
-        setSubtasks([...subtasks, { title: '', status: 'Not Done' }]);
+        setSubtasks([...subtasks, { title: '', status: NOT_DONE }]);
     };
 
     const handleSubtaskTitleChange = (index: number, title: string) => {
@@ -245,7 +271,7 @@ const TaskPage: React.FC = () => {
 
         const newErrors = [...subtaskTitleErrors];
         if (!title.trim()) {
-            newErrors[index] = 'Must not be empty';
+            newErrors[index] = REQUIRED_TITLE;
         } else {
             newErrors[index] = '';
         }
@@ -262,7 +288,7 @@ const TaskPage: React.FC = () => {
                 setSubTaskToDelete([...subTaskToDelete, subtaskId]);
                 setSubtasks(subtasks.filter((subtask) => subtask?.id !== subtaskId));
             } catch (error) {
-                console.error('Error deleting subtask:', error);
+                console.error(DELETE_SUBTASK, error);
             }
         } else {
             setSubtasks(subtasks.filter((_, i) => i !== index));
@@ -274,17 +300,17 @@ const TaskPage: React.FC = () => {
     };
 
     const disableCompleteStatus = () => {
-        return (subtasks.length > 0 && subtasks.every((subtask) => subtask.status === 'Done')) || subtasks.length === 0;
+        return (subtasks.length > 0 && subtasks.every((subtask) => subtask.status === DONE)) || subtasks.length === 0;
     };
 
     const handleMarkAsComplete = () => {
         setIsMarkAsComplete(true);
         setCompletionDate(moment());
-        setTask({ ...task, status: 'Complete' });
+        setTask({ ...task, status: COMPLETE });
     };
 
     const showMarkAsComplete =
-        subtasks.length > 0 && subtasks.every((subtask) => subtask.status === 'Done') && task.status !== 'Complete';
+        subtasks.length > 0 && subtasks.every((subtask) => subtask.status === DONE) && task.status !== COMPLETE;
 
     const handleAttachmentFilesChange = (files: Attachment[]) => {
         setAttachmentFiles(files);
@@ -297,21 +323,15 @@ const TaskPage: React.FC = () => {
     return (
         <DashboardComponent>
             <FormContainer>
-                <Typography variant="h6" gutterBottom display={'flex'}>
-                    <Typography
-                        style={{ color: '#027CEC', marginRight: '4px', cursor: 'pointer', fontSize: '1.25rem' }}
-                        onClick={() => navigate(-1)}
-                    >
-                        <img src={BackIcon} alt="Back" style={{ height: '12px', marginRight: '8px' }} />
+                <CuztomizedTypography variant="h6" gutterBottom>
+                    <Typography className="backContainer" onClick={() => navigate(-1)}>
+                        <img src={BackIcon} alt="Back" />
                         Back
                     </Typography>{' '}
                     |{' '}
                     {id ? (
                         <>
-                            <Typography
-                                color="textSecondary"
-                                style={{ fontSize: '1.25rem', marginLeft: 5, marginRight: 5 }}
-                            >
+                            <Typography color="textSecondary" className="viewTaskLabel">
                                 View Task /
                             </Typography>{' '}
                             Edit{' '}
@@ -319,12 +339,12 @@ const TaskPage: React.FC = () => {
                     ) : (
                         'New Task'
                     )}
-                </Typography>
+                </CuztomizedTypography>
 
                 <CuztomizedPaper>
                     <LocalizationProvider dateAdapter={AdapterMoment}>
-                        <Container maxWidth="md" style={{ paddingBottom: '16px' }}>
-                            <Box mt={4}>
+                        <Container className="mainContainer" maxWidth="md">
+                            <Box className="formContainer">
                                 {error && <Typography color="error">{error}</Typography>}
                                 <form>
                                     <Grid container spacing={2}>
@@ -339,9 +359,9 @@ const TaskPage: React.FC = () => {
                                                     label="Priority"
                                                     disabled={!!id}
                                                 >
-                                                    <MenuItem value="Low">Low</MenuItem>
-                                                    <MenuItem value="High">High</MenuItem>
-                                                    <MenuItem value="Critical">Critical</MenuItem>
+                                                    <MenuItem value={LOW}>{LOW}</MenuItem>
+                                                    <MenuItem value={HIGH}>{HIGH}</MenuItem>
+                                                    <MenuItem value={CRITICAL}>{CRITICAL}</MenuItem>
                                                 </Select>
                                             </FormControl>
                                         </Grid>
@@ -355,21 +375,21 @@ const TaskPage: React.FC = () => {
                                                     onChange={handleSelectChange}
                                                     label="Status"
                                                 >
-                                                    <MenuItem value="Not Started">Not Started</MenuItem>
-                                                    <MenuItem value="In Progress">In Progress</MenuItem>
-                                                    <MenuItem value="Complete" disabled={!disableCompleteStatus()}>
-                                                        Complete
+                                                    <MenuItem value={NOT_STARTED}>{NOT_STARTED}</MenuItem>
+                                                    <MenuItem value={IN_PROGRESS}>{IN_PROGRESS}</MenuItem>
+                                                    <MenuItem value={COMPLETE} disabled={!disableCompleteStatus()}>
+                                                        {COMPLETE}
                                                     </MenuItem>
-                                                    <MenuItem value="Cancelled">Cancelled</MenuItem>
+                                                    <MenuItem value={CANCELLED}>{CANCELLED}</MenuItem>
                                                 </Select>
                                             </FormControl>
                                         </Grid>
 
-                                        {task.status === 'Complete' && (
+                                        {task.status === COMPLETE && (
                                             <Grid item xs={12} sm={3}>
                                                 <TextField
                                                     label="Completion Date"
-                                                    value={completionDate ? completionDate.format('MM/DD/YYYY') : ''}
+                                                    value={completionDate ? completionDate.format(dateFormat) : ''}
                                                     fullWidth
                                                     margin="normal"
                                                     disabled
@@ -391,7 +411,7 @@ const TaskPage: React.FC = () => {
                                                 error={!!titleError}
                                                 helperText={titleError}
                                                 InputProps={{
-                                                    style: {
+                                                    sx: {
                                                         fontSize: '1.25rem',
                                                         fontWeight: 500,
                                                     },
@@ -401,7 +421,7 @@ const TaskPage: React.FC = () => {
                                         <Grid item xs={12} sm={6}>
                                             <TextField
                                                 label="Date Created"
-                                                value={dateCreated.format('MM/DD/YYYY')}
+                                                value={dateCreated.format(dateFormat)}
                                                 fullWidth
                                                 margin="normal"
                                                 disabled
@@ -412,7 +432,7 @@ const TaskPage: React.FC = () => {
                                                 label="Due Date"
                                                 value={task.due_date}
                                                 onChange={(date) => handleDateChange(date)}
-                                                format="MM/DD/YYYY"
+                                                format={dateFormat}
                                                 slotProps={{
                                                     textField: {
                                                         fullWidth: true,
@@ -447,28 +467,22 @@ const TaskPage: React.FC = () => {
                                     attachments={attachmentData}
                                     maxFiles={5}
                                     maxFileSize={10 * 1024 * 1024}
-                                    allowedFileTypes={['image/png', 'image/jpeg']}
+                                    allowedFileTypes={allowedFiles}
                                 />
 
-                                <Divider style={{ width: '100%', marginTop: '32px' }} />
+                                <CuztomizedDivider />
 
-                                <Box
-                                    mt={2}
-                                    display="flex"
-                                    justifyContent="space-between"
-                                    alignItems="center"
-                                    style={{ marginBottom: '16px', marginTop: '4px' }}
-                                >
+                                <SubtaskBox>
                                     <Typography variant="h6" gutterBottom>
                                         Subtask
                                     </Typography>
                                     <IconButton
                                         onClick={handleAddSubtask}
-                                        disabled={task.status === 'Complete'}
+                                        disabled={task.status === COMPLETE}
                                         onMouseEnter={() => setIsAddSubtaskHovered(true)}
                                         onMouseLeave={() => setIsAddSubtaskHovered(false)}
                                     >
-                                        {task.status === 'Complete' ? (
+                                        {task.status === COMPLETE ? (
                                             <CuztomizedImg src={NewSubtaskIconInactive} alt="Add Subtask" />
                                         ) : isAddSubtaskHovered ? (
                                             <CuztomizedImg src={NewSubtaskIconSelected} alt="Add Subtask" />
@@ -476,7 +490,7 @@ const TaskPage: React.FC = () => {
                                             <CuztomizedImg src={NewSubtaskIconActive} alt="Add Subtask" />
                                         )}
                                     </IconButton>
-                                </Box>
+                                </SubtaskBox>
                                 {subTaskError && <Typography color="error">{subTaskError}</Typography>}
 
                                 {subtasks.map((subtask, index) => (
@@ -496,7 +510,7 @@ const TaskPage: React.FC = () => {
                     </LocalizationProvider>
                 </CuztomizedPaper>
 
-                <Box display="flex" justifyContent="flex-end" marginTop="32px" marginRight="16px">
+                <ButtonBox>
                     <IconButton onClick={() => navigate(-1)}>
                         <CuztomizedImg src={CancelButton} alt="Add Subtask" />
                     </IconButton>
@@ -509,7 +523,7 @@ const TaskPage: React.FC = () => {
                             <CuztomizedImg src={SaveButton} alt="Add Subtask" />
                         </IconButton>
                     )}
-                </Box>
+                </ButtonBox>
             </FormContainer>
         </DashboardComponent>
     );

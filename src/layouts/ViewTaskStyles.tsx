@@ -1,6 +1,6 @@
 import { Box, Divider, Paper, styled } from '@mui/material';
 
-export const CuztomizedPaper = styled(Paper)(() => ({
+export const CuztomizedPaper = styled(Paper)(({ theme }) => ({
     overflowY: 'auto',
     maxHeight: 'calc(100vh - 110px)',
     height: '100%',
@@ -10,6 +10,32 @@ export const CuztomizedPaper = styled(Paper)(() => ({
     // desktop view
     '@media (min-width: 900px)': {
         paddingBottom: '0px',
+    },
+    '& .priorityContainer': {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: theme.spacing(2),
+        '& img': {
+            height: '20px',
+        },
+
+        '& .iconContainer': {
+            display: 'flex',
+            alignItems: 'center',
+            '& div': {
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: theme.spacing(4),
+                '& p': {
+                    marginLeft: theme.spacing(1),
+                },
+            },
+        },
+    },
+    '& .fileSizeLabel': {
+        height: '10px',
+        marginRight: '8px',
     },
 }));
 
@@ -48,4 +74,15 @@ export const FileContainer = styled('div')(() => ({
 
 export const CuztomizedDivider = styled(Divider)(({ theme }) => ({
     margin: '20px 0',
+}));
+
+export const CustomizedTypography = styled(Divider)(({ theme }) => ({
+    color: '#027CEC',
+    marginRight: '4px',
+    cursor: 'pointer',
+    fontSize: '1.25rem',
+    '& img': {
+        height: '12px',
+        marginRight: '8px',
+    },
 }));

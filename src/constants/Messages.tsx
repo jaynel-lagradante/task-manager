@@ -21,7 +21,21 @@ export const MESSAGES = {
         EXCEED_FILE_SIZE: 'Exceeds the maximum size of {maxFileSize}.',
         CREDENTIAL_NOT_FOUND: 'Credential not found',
         LOGIN_FAILED: 'Login Failed',
+        REGISTER_FAILED: 'Registration failed',
         DECODING_JWT: 'Error decoding JWT:',
+        REQUIRED_USERNAME: 'Username is required',
+        REQUIRED_PASSWORD: 'Password is required',
+        USERNAME_SYMBOL: 'Username can only contain letters, numbers, spaces, and !#()_-',
+        PASSWORD_SYMBOL: 'Password can only contain letters, numbers, spaces, and !#()_-',
+        PASSWORD_STRONG: 'Password strength: Strong',
+        PASSWORD_WEAK: 'Password strength: Weak',
+        USERNAME_EXIST: 'Username already exist',
+        TITLE_LENGTH: 'Must be at most 25 characters',
+        DETAILS_LENGTH: 'Must be at most 300 characters',
+        DUE_DATE_LATER: 'Must be later than Date Created',
+        REQUIRED_DUE_DATE: 'Due Date is required',
+        REQUIRED_TITLE: 'Must not be empty',
+        SUBTASK_LENGTH: 'Maximum of 10 subtasks allowed',
     },
     IDENTIFIER: {
         MAX_FILE: '{maxFiles}',
@@ -30,9 +44,12 @@ export const MESSAGES = {
     },
     SUCCESS: {
         TASK_CREATED: 'Task created successfully!',
+        REGISTRATION_SUCCESS: 'Account successfully created',
     },
     LABEL: {
         REMOVE_FILE: 'Remove file?',
+        STATUS_LABEL: 'Status',
+        PRIORITY: 'Priority',
     },
     BUTTON: {
         CANCEL: 'Cancel',
@@ -41,5 +58,8 @@ export const MESSAGES = {
     },
     SUBTASK: {
         DELETE_SUBTASK: 'Delete this Subtask?',
+    },
+    TASK: {
+        DELETE_TASK: 'Delete this Task?',
     },
 };

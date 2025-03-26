@@ -8,6 +8,8 @@ import { SignupLink, SignupMessageItem, SubmitButton } from '../layouts/CoverPag
 import CoverPageComponent from './../components/CoverPageComponent';
 import { useAuthState } from '../state/AuthState';
 import { useTaskState } from '../state/TaskState';
+import { MESSAGES } from '../constants/Messages';
+import { ROUTES } from '../constants/Routes';
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -33,14 +35,15 @@ const LoginPage: React.FC = () => {
         setPasswordError('');
         setLoginError('');
         let hasError = false;
+        const { REQUIRED_USERNAME, REQUIRED_PASSWORD, LOGIN_FAILED } = MESSAGES.ERROR;
 
         if (!username) {
-            setUsernameError('Username is required');
+            setUsernameError(REQUIRED_USERNAME);
             hasError = true;
         }
 
         if (!password) {
-            setPasswordError('Password is required');
+            setPasswordError(REQUIRED_PASSWORD);
             hasError = true;
         }
 
@@ -55,7 +58,7 @@ const LoginPage: React.FC = () => {
             setTasks([]);
             navigate('/');
         } catch (err: any) {
-            setLoginError(err.response?.data?.message || 'Login failed');
+            setLoginError(err.response?.data?.message || LOGIN_FAILED);
         }
     };
 
@@ -119,7 +122,7 @@ const LoginPage: React.FC = () => {
             <SignupMessageItem>
                 <Typography>Don't have an account?</Typography>
 
-                <SignupLink onClick={() => navigate('/register')}>Sign up</SignupLink>
+                <SignupLink onClick={() => navigate(ROUTES.REGISTER)}>Sign up</SignupLink>
             </SignupMessageItem>
         </CoverPageComponent>
     );

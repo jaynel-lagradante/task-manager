@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 
 export const TableContainer = styled('div')(({ theme }) => ({
     width: '100%',
@@ -29,4 +29,11 @@ export const FilterContainerBox = styled(Box)(({ theme }) => ({
     borderRadius: '16px',
     border: '1px solid #E0E0E0',
     marginTop: theme.spacing(2),
+}));
+
+export const CuztomizedIconButton = styled(IconButton)(() => ({
+    padding: '0px',
+    '& img': {
+        height: '45px',
+    },
 }));
