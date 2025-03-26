@@ -52,22 +52,27 @@ export const getFilesByTaskId = async (req: Request, res: Response): Promise<voi
     }
 };
 
-export const deleteFileById = async (req: Request, res: Response): Promise<void> => {
+export const deleteFilesByIds = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { fileId } = req.params;
+        const { fileIds } = req.body;
 
-        const deletedFile = await File.destroy({
-            where: {
-                id: fileId,
-            },
-        });
-
-        if (deletedFile === 0) {
-            res.status(404).json({ message: 'File not found' });
+        if (!Array.isArray(fileIds) || fileIds.length === 0) {
+            res.status(400).json({ message: 'Invalid fileIds provided' });
             return;
         }
 
-        res.status(200).json({ message: 'File deleted successfully' });
+        const deletedFilesCount = await File.destroy({
+            where: {
+                id: fileIds,
+            },
+        });
+
+        if (deletedFilesCount === 0) {
+            res.status(404).json({ message: 'No files found with the provided IDs' });
+            return;
+        }
+
+        res.status(200).json({ message: `${deletedFilesCount} files deleted successfully` });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });

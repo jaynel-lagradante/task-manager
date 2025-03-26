@@ -19,7 +19,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import moment, { Moment } from 'moment';
 import { Task } from '../types/TaskInterface';
 import { CreateTask, GetTaskById, UpdateTask } from '../services/TaskService';
-import { GetFiles, UploadFiles } from '../services/FileService';
+import { DeleteFiles, GetFiles, UploadFiles } from '../services/FileService';
 import DashboardComponent from './../components/DashboardComponent';
 import SubtaskComponent from './../components/SubTaskComponent';
 import NewSubtaskIconSelected from './../assets/Buttons/Button_New Subtask_selected.svg';
@@ -28,7 +28,7 @@ import NewSubtaskIconInactive from './../assets/Buttons/Button_New Subtask_inact
 import { CuztomizedImg, CuztomizedPaper, FormContainer } from '../layouts/TaskStyles';
 import SaveButton from './../assets/Buttons/Button_Save.svg';
 import CancelButton from './../assets/Buttons/Button_Cancel.svg';
-import { createSubtasks, deleteSubtask, getSubtasks, updateSubtasks } from '../services/SubtaskService';
+import { createSubtasks, deleteSubtasks, getSubtasks, updateSubtasks } from '../services/SubtaskService';
 import { Subtask } from '../types/SubTaskInterface';
 import MarkAsCompleteButton from './../assets/Buttons/Button_Mark as Complete.svg';
 import AttachmentComponent from './../components/AttachmentComponent';
@@ -60,6 +60,8 @@ const TaskPage: React.FC = () => {
     const [isMarkAsComplete, setIsMarkAsComplete] = useState(false);
     const [attachmentFiles, setAttachmentFiles] = useState<Attachment[]>([]);
     const [attachmentData, setAttachmentData] = useState<Attachment[]>([]);
+    const [fileToDelete, setFileToDelete] = useState<string[]>([]);
+    const [subTaskToDelete, setSubTaskToDelete] = useState<string[]>([]);
     const [subTaskError, setSubTaskError] = useState('');
     const { updateTaskInState, addTask } = useTaskState();
 
@@ -204,6 +206,16 @@ const TaskPage: React.FC = () => {
                 await updateSubtasks(updatedSubtasks);
             }
 
+            if (fileToDelete?.length > 0) {
+                await DeleteFiles(fileToDelete);
+                setFileToDelete([]);
+            }
+
+            if (subTaskToDelete?.length > 0) {
+                await deleteSubtasks(subTaskToDelete);
+                setSubTaskToDelete([]);
+            }
+
             if (attachmentFiles && attachmentFiles.length > 0) {
                 const files = attachmentFiles
                     .filter((attachment) => !attachment.id)
@@ -247,7 +259,7 @@ const TaskPage: React.FC = () => {
     const handleDeleteSubtask = async (index: number, subtaskId: string | null) => {
         if (subtaskId) {
             try {
-                await deleteSubtask(subtaskId);
+                setSubTaskToDelete([...subTaskToDelete, subtaskId]);
                 setSubtasks(subtasks.filter((subtask) => subtask?.id !== subtaskId));
             } catch (error) {
                 console.error('Error deleting subtask:', error);
@@ -276,6 +288,10 @@ const TaskPage: React.FC = () => {
 
     const handleAttachmentFilesChange = (files: Attachment[]) => {
         setAttachmentFiles(files);
+    };
+
+    const handleFileToDelete = (fileIds: string[]) => {
+        setFileToDelete(fileIds);
     };
 
     return (
@@ -427,6 +443,7 @@ const TaskPage: React.FC = () => {
 
                                 <AttachmentComponent
                                     onFilesChange={handleAttachmentFilesChange}
+                                    onDelete={handleFileToDelete}
                                     attachments={attachmentData}
                                     maxFiles={5}
                                     maxFileSize={10 * 1024 * 1024}

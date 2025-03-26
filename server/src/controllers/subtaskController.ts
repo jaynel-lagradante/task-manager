@@ -80,11 +80,24 @@ export const updateSubtasks = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteSubtask = async (req: Request, res: Response) => {
+export const deleteSubtasks = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
-        await Subtask.destroy({ where: { id } });
-        res.json({ message: 'Subtask deleted successfully' });
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            res.status(400).json({ message: 'Invalid subtask IDs provided' });
+        }
+
+        const deletedCount = await Subtask.destroy({
+            where: {
+                id: ids,
+            },
+        });
+
+        if (deletedCount === 0) {
+            res.status(404).json({ message: 'No subtasks found with the provided IDs' });
+        }
+
+        res.json({ message: `${deletedCount} subtasks deleted successfully` });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });

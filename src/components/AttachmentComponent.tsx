@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { Stack } from '@mui/material';
 import NewSubtaskIconSelected from './../assets/Icons/Upload.svg';
 import CancelIcon from './../assets/Icons/Cancel.svg';
 import { Attachment } from '../types/AttachmentInterface';
-import { DeleteFile } from '../services/FileService';
 import { formatFileSize } from '../utils/TextHelper';
 import { bufferToFile } from '../utils/FileHelper';
 import {
@@ -31,6 +29,7 @@ interface AttachmentComponentProps {
     maxFileSize?: number;
     allowedFileTypes?: string[];
     onFilesChange?: (files: Attachment[]) => void;
+    onDelete?: (id: string[]) => void;
 }
 
 const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
@@ -39,11 +38,13 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
     maxFileSize = 10 * 1024 * 1024, // 10 MB
     allowedFileTypes,
     onFilesChange,
+    onDelete,
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = useState<Attachment[]>();
     const [objectURLs, setObjectURLs] = useState<string[]>();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [fileToDelete, setFileToDelete] = useState<string[]>();
     const [modalProp, setModalProp] = useState({
         firstLabel: '',
         secondLabel: '',
@@ -73,6 +74,10 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
     useEffect(() => {
         onFilesChange && onFilesChange(selectedFiles ?? []);
     }, [selectedFiles]);
+
+    useEffect(() => {
+        onDelete && onDelete(fileToDelete ?? []);
+    }, [fileToDelete]);
 
     const handleBrowseClick = () => {
         if (fileInputRef.current) {
@@ -109,7 +114,7 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
             return updatedURLs;
         });
         if (fileId) {
-            await DeleteFile(fileId);
+            setFileToDelete([...(fileToDelete ?? []), fileId]);
         }
     };
 

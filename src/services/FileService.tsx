@@ -27,9 +27,11 @@ export const GetFiles = async (taskId: string) => {
     }
 };
 
-export const DeleteFile = async (fileId: string) => {
+export const DeleteFiles = async (fileIds: string[]) => {
     try {
-        await api.delete(`${API_ENDPOINTS.FILES}/${fileId}`);
+        await api.delete(API_ENDPOINTS.FILES, {
+            data: { fileIds },
+        });
     } catch (error) {
         console.error(MESSAGES.ERROR.DELETE_FILE, error);
         throw error;

@@ -33,9 +33,11 @@ export const updateSubtasks = async (subtasks: Subtask[]) => {
     }
 };
 
-export const deleteSubtask = async (id: string) => {
+export const deleteSubtasks = async (ids: string[]) => {
     try {
-        const response = await api.delete(`${API_ENDPOINTS.SUBTASKS}/${id}`);
+        const response = await api.delete(API_ENDPOINTS.SUBTASKS, {
+            data: { ids },
+        });
         return response.data;
     } catch (error) {
         console.error(MESSAGES.ERROR.DELETE_SUBTASK, error);
