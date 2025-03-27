@@ -42,6 +42,7 @@ export const TitleContainer = styled(Box)(() => ({
     '& .title': {
         fontWeight: 'bold',
         textDecoration: 'underline',
+        cursor: 'pointer',
     },
     '& img': {
         height: '20px',

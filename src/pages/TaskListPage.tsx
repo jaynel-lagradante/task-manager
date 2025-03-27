@@ -157,7 +157,8 @@ const TaskListPage: React.FC = () => {
                     data={filteredTasks}
                     getRowCanExpand={(row) => !!row.original.subtasks?.length}
                     setTasksValue={setTasks}
-                    handleEdit={(taskId) => navigate(`${ROUTES.VIEW_TASK}/${taskId}`)}
+                    handleEdit={(taskId) => navigate(`${ROUTES.EDIT_TASK}/${taskId}`)}
+                    handleView={(taskId) => navigate(`${ROUTES.VIEW_TASK}/${taskId}`)}
                 ></TableComponent>
             </TableContainer>
         </DashboardComponent>

@@ -59,6 +59,7 @@ type TableProps<TData> = {
     getRowCanExpand: (row: Row<TData>) => boolean;
     setTasksValue: (tasks: Task[]) => void;
     handleEdit?: (taskId: string) => void;
+    handleView?: (taskId: string) => void;
 };
 
 const renderSubComponent = ({ row }: { row: Row<Task> }) => {
@@ -93,7 +94,13 @@ const renderSubComponent = ({ row }: { row: Row<Task> }) => {
     );
 };
 
-const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: TableProps<Task>): JSX.Element => {
+const TableComponent = ({
+    data,
+    getRowCanExpand,
+    setTasksValue,
+    handleEdit,
+    handleView,
+}: TableProps<Task>): JSX.Element => {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const DUE_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
@@ -182,7 +189,11 @@ const TableComponent = ({ data, getRowCanExpand, setTasksValue, handleEdit }: Ta
             header: 'Title',
             cell: ({ row, getValue }) => (
                 <TitleContainer>
-                    <Box className="title" sx={{ paddingLeft: `${row.depth * 2}rem` }}>
+                    <Box
+                        className="title"
+                        sx={{ paddingLeft: `${row.depth * 2}rem` }}
+                        onClick={() => handleView && handleView(row.original.id ?? '')}
+                    >
                         {getValue<string>()}
                     </Box>
                     {row.original.hasAttachment && <img src={AttachmentIcon} alt="Attachment" />}

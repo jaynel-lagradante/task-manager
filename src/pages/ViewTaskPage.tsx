@@ -36,6 +36,7 @@ import {
 import { useTaskState } from '../state/TaskState';
 import { STATUS } from '../constants/Status';
 import { MESSAGES } from '../constants/Messages';
+import { ROUTES } from '../constants/Routes';
 
 const ViewTaskComponent = () => {
     const { COMPLETE, CANCELLED, NOT_STARTED, IN_PROGRESS } = STATUS.TASK;
@@ -161,7 +162,10 @@ const ViewTaskComponent = () => {
                                     </Box>
 
                                     <Box>
-                                        <IconButton aria-label="edit" onClick={() => navigate(`/edit-task/${id}`)}>
+                                        <IconButton
+                                            aria-label="edit"
+                                            onClick={() => navigate(`${ROUTES.EDIT_TASK}/${id}`)}
+                                        >
                                             <img src={EditIcon} alt="Edit" />
                                         </IconButton>
                                         <IconButton aria-label="delete" onClick={() => handleDeleteSelected()}>
