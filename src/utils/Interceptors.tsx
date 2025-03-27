@@ -13,7 +13,7 @@ const api = axios.create({
     withCredentials: true,
 });
 const { setLoading } = useLoadingState.getState();
-const { setToken, setAuth } = useAuthState.getState();
+const { setAuth } = useAuthState.getState();
 
 api.interceptors.request.use(
     (config) => {
@@ -37,7 +37,6 @@ api.interceptors.response.use(
             if (error.response.status === 401 || error.response.status === 403) {
                 console.error(MESSAGES.ERROR.UNAUTHORIZED);
                 setAuth(false);
-                setToken(false);
             } else if (error.response.status === 500) {
                 console.error(MESSAGES.ERROR.NETWORK);
             }
