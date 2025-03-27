@@ -3,6 +3,7 @@ import { Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import DashboardComponent from './../components/DashboardComponent';
 import NewTaskButtonIcon from './../assets/Buttons/Button_New Task.svg';
+import NewTaskButtonIconMobile from './../assets/Buttons/Button_New Task_mobile.svg';
 import FilterComponent from './../components/FilterComponent';
 import ChipCancelled from '../assets/Chips/Chip_Cancelled.svg';
 import ChipComplete from '../assets/Chips/Chip_Complete.svg';
@@ -119,13 +120,13 @@ const TaskListPage: React.FC = () => {
                 To-do
             </Typography>
             <FilterContainerBox>
-                <Box display="flex" alignItems="center">
+                <Box className="filterContainer">
                     <FilterComponent
                         menuItems={menuItems}
                         buttonLabel="Filter"
                         onSubMenuItemClick={(mainMenu, subMenu) => handleFilter(mainMenu, subMenu)}
                     />
-                    <Box display="flex" flexWrap="wrap" ml={1}>
+                    <Box className="filterIconContainer">
                         {selectedStatuses &&
                             selectedStatuses.map((status) => (
                                 <FilterIconImg
@@ -147,7 +148,8 @@ const TaskListPage: React.FC = () => {
                     </Box>
                 </Box>
                 <CuztomizedIconButton onClick={() => navigate(ROUTES.CREATE_TASK)}>
-                    <img src={NewTaskButtonIcon} alt="New Task" />
+                    <img className="newTask" src={NewTaskButtonIcon} alt="New Task" />
+                    <img className="newTaskMobile" src={NewTaskButtonIconMobile} alt="New Task" />
                 </CuztomizedIconButton>
             </FilterContainerBox>
             <TableContainer>

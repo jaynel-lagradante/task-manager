@@ -9,8 +9,20 @@ export const FilterButton = styled(Button)(({ theme }) => ({
     color: '#000000',
     backgroundColor: TEMPLATE.COLOR.BACKGROUND,
     borderRadius: '8px',
-    padding: '8px 16px',
     border: `1px solid ${TEMPLATE.COLOR.BORDER}`,
+    '& .buttonLabel': {
+        display: 'none',
+    },
+    padding: '8px',
+    minWidth: '50px',
+
+    // desktop view
+    '@media (min-width: 900px)': {
+        padding: '8px 16px',
+        '& .buttonLabel': {
+            display: 'block',
+        },
+    },
 }));
 
 export const FilterIconImg = styled('img')(({ theme }) => ({

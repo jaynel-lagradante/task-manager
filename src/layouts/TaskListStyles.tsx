@@ -29,11 +29,35 @@ export const FilterContainerBox = styled(Box)(({ theme }) => ({
     borderRadius: '16px',
     border: '1px solid #E0E0E0',
     marginTop: theme.spacing(2),
+    '& .filterContainer': {
+        display: 'flex',
+        alignItems: 'center',
+        '& .filterIconContainer': {
+            display: 'flex',
+            flexWrap: 'wrap',
+            marginLeft: theme.spacing(1),
+        },
+    },
 }));
 
 export const CuztomizedIconButton = styled(IconButton)(() => ({
     padding: '0px',
     '& img': {
         height: '45px',
+    },
+    '& .newTask': {
+        display: 'none',
+    },
+    '& .newTaskMobile': {
+        display: 'block',
+    },
+    // desktop view
+    '@media (min-width: 900px)': {
+        '& .newTask': {
+            display: 'block',
+        },
+        '& .newTaskMobile': {
+            display: 'none',
+        },
     },
 }));

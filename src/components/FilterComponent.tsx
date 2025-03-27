@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, MenuItem, Popover, MenuList } from '@mui/material';
+import { Menu, MenuItem, Popover, MenuList, Typography } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import FilterIcon from './../assets/Icons/Filter.svg';
 import { CuztomizedMenuItem, FilterButton, FilterIconImg } from '../layouts/FilterStyles';
@@ -73,7 +73,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({ menuItems, buttonLabe
                 onClick={handleClick}
             >
                 <FilterIconImg src={FilterIcon} alt="Filter" />
-                {buttonLabel}
+                <Typography className="buttonLabel">{buttonLabel}</Typography>
             </FilterButton>
             <Menu
                 id="basic-menu"
