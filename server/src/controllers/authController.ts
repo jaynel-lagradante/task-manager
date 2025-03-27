@@ -6,6 +6,21 @@ import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
+import { ALLOWED_USERNAME_SYMBOLS, JWT_EXPIRATION_TIME, APPLICATION_URI, GOOGLE_OAUTH2_URI } from '../config/constants';
+import {
+    MESSAGE_USERNAME_PASSWORD_REQUIRED,
+    MESSAGE_INVALID_CREDENTIALS,
+    MESSAGE_USERNAME_INVALID_CHARACTERS,
+    MESSAGE_USERNAME_ALREADY_EXISTS,
+    MESSAGE_ACCOUNT_CREATED_SUCCESSFULLY,
+    MESSAGE_INVALID_TOKEN,
+    MESSAGE_GOOGLE_TOKEN_VERIFICATION_ERROR,
+    MESSAGE_NO_TOKEN_PROVIDED,
+    MESSAGE_LOGGED_OUT_SUCCESSFULLY,
+    MESSAGE_INVALID_TOKEN_PAYLOAD,
+    MESSAGE_INTERNAL_SERVER_ERROR,
+    MESSAGE_INTERNAL_SERVER_ERROR_LOGOUT,
+} from '../config/messages';
 
 dotenv.config();
 
@@ -13,52 +28,53 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     try {
         const { username, password } = req.body;
         if (!username || !password) {
-            res.status(400).json({ message: 'Username and password are required' });
+            res.status(400).json({ message: MESSAGE_USERNAME_PASSWORD_REQUIRED });
             return;
         }
 
         const account = await Account.findOne({ where: { username } });
         if (!account) {
-            res.status(401).json({ message: 'Invalid credentials' });
+            res.status(401).json({ message: MESSAGE_INVALID_CREDENTIALS });
             return;
         }
         if (account.password) {
             const passwordMatch = await bcrypt.compare(password, account.password);
             if (!passwordMatch) {
-                res.status(401).json({ message: 'Invalid credentials' });
+                res.status(401).json({ message: MESSAGE_INVALID_CREDENTIALS });
                 return;
             }
         }
 
-        const token = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        const token = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, {
+            expiresIn: JWT_EXPIRATION_TIME,
+        });
         await Account.update({ active_token: token }, { where: { id: account.id } });
 
         res.json({ token });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
 export const register = async (req: Request, res: Response) => {
-    const allowedUsernameSymbols = /^[a-zA-Z0-9\s!#()_-]*$/;
     try {
         const { username, password } = req.body;
         if (!username || !password) {
-            res.status(400).json({ message: 'Username and password are required' });
+            res.status(400).json({ message: MESSAGE_USERNAME_PASSWORD_REQUIRED });
             return;
         }
 
         // Validate username against allowed symbols
-        if (!allowedUsernameSymbols.test(username)) {
-            res.status(400).json({ message: 'Username can only contain letters, numbers, spaces, and !#()_-' });
+        if (!ALLOWED_USERNAME_SYMBOLS.test(username)) {
+            res.status(400).json({ message: MESSAGE_USERNAME_INVALID_CHARACTERS });
             return;
         }
 
         // Check if username already exists
         const existingUser = await Account.findOne({ where: { username } });
         if (existingUser) {
-            res.status(400).json({ message: 'Username already exist' });
+            res.status(400).json({ message: MESSAGE_USERNAME_ALREADY_EXISTS });
             return;
         }
 
@@ -66,10 +82,10 @@ export const register = async (req: Request, res: Response) => {
         const id = uuidv4();
 
         await Account.create({ id, username, password: hashedPassword, created_at: new Date() });
-        res.status(201).json({ message: 'Account created successfully' });
+        res.status(201).json({ message: MESSAGE_ACCOUNT_CREATED_SUCCESSFULLY });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -78,12 +94,12 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
         const { code } = req.body;
         const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-        const userInfo = await axios.post('https://oauth2.googleapis.com/token', {
+        const userInfo = await axios.post(GOOGLE_OAUTH2_URI, {
             client_id: process.env.GOOGLE_CLIENT_ID,
             client_secret: process.env.GOOGLE_CLIENT_SECRET,
             code,
             grant_type: 'authorization_code',
-            redirect_uri: 'http://localhost:5173',
+            redirect_uri: APPLICATION_URI,
         });
 
         const { id_token } = userInfo.data;
@@ -95,7 +111,7 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
         const payload = ticket.getPayload();
 
         if (!payload) {
-            res.status(401).json({ message: 'Invalid token' });
+            res.status(401).json({ message: MESSAGE_INVALID_TOKEN });
             return;
         }
 
@@ -111,13 +127,14 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
             });
         }
 
-        const jwtToken = jwt.sign({ id: account.id, username: payload.name }, process.env.JWT_SECRET!, {
-            expiresIn: '1h',
+        const token = jwt.sign({ id: account.id, username: payload.name }, process.env.JWT_SECRET!, {
+            expiresIn: JWT_EXPIRATION_TIME,
         });
-        res.json({ token: jwtToken });
+        await Account.update({ active_token: token }, { where: { id: account.id } });
+        res.json({ token });
     } catch (error) {
-        console.error('Error verifying Google token:', error);
-        res.status(401).json({ message: 'Error verifying Google token' });
+        console.error(error);
+        res.status(401).json({ message: MESSAGE_GOOGLE_TOKEN_VERIFICATION_ERROR });
     }
 };
 
@@ -126,24 +143,24 @@ export const logout = async (req: Request, res: Response) => {
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            res.status(401).json({ message: 'No token provided' });
+            res.status(401).json({ message: MESSAGE_NO_TOKEN_PROVIDED });
             return;
         }
 
         jwt.verify(token, process.env.JWT_SECRET!, async (err, decoded: any) => {
             if (err) {
-                res.status(401).json({ message: 'Invalid token' });
+                res.status(401).json({ message: MESSAGE_INVALID_TOKEN });
             }
 
             if (decoded && decoded.id) {
                 await Account.update({ active_token: null }, { where: { id: decoded.id } });
-                res.status(200).json({ message: 'Logged out successfully' });
+                res.status(200).json({ message: MESSAGE_LOGGED_OUT_SUCCESSFULLY });
             } else {
-                res.status(401).json({ message: 'Invalid token payload' });
+                res.status(401).json({ message: MESSAGE_INVALID_TOKEN_PAYLOAD });
             }
         });
     } catch (error) {
-        console.error('Error during logout:', error);
-        res.status(500).json({ message: 'Internal server error during logout' });
+        console.error(error);
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR_LOGOUT });
     }
 };

@@ -8,6 +8,7 @@ import fileRoutes from './routes/fileRoutes';
 import passport from 'passport';
 import './auth/jwtStrategy';
 import cors from 'cors';
+import { APPLICATION_URI } from './config/constants';
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.use(express.json());
 
 app.use(passport.initialize());
 const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: APPLICATION_URI,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 };

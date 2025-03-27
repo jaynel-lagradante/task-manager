@@ -1,13 +1,25 @@
 import { Request, Response } from 'express';
 import Subtask from '../models/Subtask';
 import { v4 as uuidv4 } from 'uuid';
+import {
+    MESSAGE_SUBTASKS_MUST_BE_ARRAY,
+    MESSAGE_NO_VALID_SUBTASKS_PROVIDED,
+    MESSAGE_SUBTASKS_CREATED_SUCCESSFULLY,
+    MESSAGE_INTERNAL_SERVER_ERROR,
+    MESSAGE_NO_VALID_SUBTASKS_FOR_UPDATE,
+    MESSAGE_SUBTASKS_UPDATED_SUCCESSFULLY,
+    MESSAGE_INVALID_SUBTASK_IDS_PROVIDED,
+    MESSAGE_NO_SUBTASKS_FOUND_WITH_IDS,
+    MESSAGE_SUBTASKS_DELETED_SUCCESSFULLY,
+} from '../config/messages';
 
 export const createSubtasks = async (req: Request, res: Response) => {
     try {
         const { subtasks, taskId } = req.body;
 
         if (!Array.isArray(subtasks)) {
-            res.status(400).json({ message: 'Subtasks must be an array' });
+            res.status(400).json({ message: MESSAGE_SUBTASKS_MUST_BE_ARRAY });
+            return;
         }
 
         const createdSubtasks = await Promise.all(
@@ -23,13 +35,14 @@ export const createSubtasks = async (req: Request, res: Response) => {
         const filteredSubtasks = createdSubtasks.filter((subtask) => subtask !== null); // Remove null values
 
         if (filteredSubtasks.length === 0) {
-            res.status(400).json({ message: 'No valid subtasks provided' });
+            res.status(400).json({ message: MESSAGE_NO_VALID_SUBTASKS_PROVIDED });
+            return;
         }
 
-        res.status(201).json({ message: 'Subtasks created successfully', createdSubtasks: filteredSubtasks });
+        res.status(201).json({ message: MESSAGE_SUBTASKS_CREATED_SUCCESSFULLY, createdSubtasks: filteredSubtasks });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -40,7 +53,7 @@ export const getSubtasks = async (req: Request, res: Response) => {
         res.json(subtasks);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -49,7 +62,8 @@ export const updateSubtasks = async (req: Request, res: Response) => {
         const { subtasks } = req.body;
 
         if (!Array.isArray(subtasks)) {
-            res.status(400).json({ message: 'Subtasks must be an array' });
+            res.status(400).json({ message: MESSAGE_SUBTASKS_MUST_BE_ARRAY });
+            return;
         }
 
         const updatedSubtasks = await Promise.all(
@@ -70,13 +84,14 @@ export const updateSubtasks = async (req: Request, res: Response) => {
         const filteredSubtasks = updatedSubtasks.filter((subtask) => subtask !== null); // Remove null values
 
         if (filteredSubtasks.length === 0) {
-            res.status(400).json({ message: 'No valid subtasks provided for update' });
+            res.status(400).json({ message: MESSAGE_NO_VALID_SUBTASKS_FOR_UPDATE });
+            return;
         }
 
-        res.json({ message: 'Subtasks updated successfully', updatedSubtasks: filteredSubtasks });
+        res.json({ message: MESSAGE_SUBTASKS_UPDATED_SUCCESSFULLY, updatedSubtasks: filteredSubtasks });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -84,7 +99,8 @@ export const deleteSubtasks = async (req: Request, res: Response) => {
     try {
         const { ids } = req.body;
         if (!Array.isArray(ids) || ids.length === 0) {
-            res.status(400).json({ message: 'Invalid subtask IDs provided' });
+            res.status(400).json({ message: MESSAGE_INVALID_SUBTASK_IDS_PROVIDED });
+            return;
         }
 
         const deletedCount = await Subtask.destroy({
@@ -94,12 +110,13 @@ export const deleteSubtasks = async (req: Request, res: Response) => {
         });
 
         if (deletedCount === 0) {
-            res.status(404).json({ message: 'No subtasks found with the provided IDs' });
+            res.status(404).json({ message: MESSAGE_NO_SUBTASKS_FOUND_WITH_IDS });
+            return;
         }
 
-        res.json({ message: `${deletedCount} subtasks deleted successfully` });
+        res.json({ message: MESSAGE_SUBTASKS_DELETED_SUCCESSFULLY(deletedCount) });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };

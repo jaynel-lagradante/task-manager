@@ -150,7 +150,7 @@ const TaskPage: React.FC = () => {
     const handleDateChange = (date: Moment | null) => {
         if (date) {
             const dateTomorrow = moment().add(1, 'day').startOf('day');
-            if (date.isBefore(dateTomorrow, 'day')) {
+            if (date.isBefore(dateTomorrow, 'day') && task.status !== COMPLETE) {
                 setDueDateError(DUE_DATE_LATER);
             } else {
                 setDueDateError('');
@@ -183,10 +183,11 @@ const TaskPage: React.FC = () => {
             hasError = true;
         }
 
+        const dateTomorrow = moment().add(1, 'day').startOf('day');
         if (!task.due_date) {
             setDueDateError(REQUIRED_DUE_DATE);
             hasError = true;
-        } else if (task.due_date.isBefore(dateCreated, 'day')) {
+        } else if (task.due_date.isBefore(dateTomorrow, 'day') && task.status !== COMPLETE) {
             setDueDateError(DUE_DATE_LATER);
             hasError = true;
         }

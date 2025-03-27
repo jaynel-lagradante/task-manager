@@ -2,6 +2,7 @@ import passportJwt, { StrategyOptionsWithRequest } from 'passport-jwt';
 import passport from 'passport';
 import Account from '../models/Account';
 import dotenv from 'dotenv';
+import { MESSAGE_INVALID_OR_INACTIVE_TOKEN } from '../config/messages';
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ passport.use(
             if (account) {
                 return done(null, account);
             }
-            return done(null, false, { message: 'Invalid or inactive token' });
+            return done(null, false, { message: MESSAGE_INVALID_OR_INACTIVE_TOKEN });
         } catch (error) {
             return done(error, false);
         }

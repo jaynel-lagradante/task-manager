@@ -3,6 +3,13 @@ import Task from '../models/Task';
 import { v4 as uuidv4 } from 'uuid';
 import Subtask from '../models/Subtask';
 import File from '../models/File';
+import {
+    MESSAGE_TASK_CREATED_SUCCESSFULLY,
+    MESSAGE_INTERNAL_SERVER_ERROR,
+    MESSAGE_TASK_NOT_FOUND,
+    MESSAGE_TASK_UPDATED_SUCCESSFULLY,
+    MESSAGE_TASK_DELETED_SUCCESSFULLY,
+} from '../config/messages';
 
 export const createTask = async (req: Request, res: Response) => {
     try {
@@ -22,10 +29,10 @@ export const createTask = async (req: Request, res: Response) => {
             user_id: userId,
             created_at: createdAt,
         });
-        res.status(201).json({ message: 'Task created successfully', id });
+        res.status(201).json({ message: MESSAGE_TASK_CREATED_SUCCESSFULLY, id });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -56,8 +63,8 @@ export const getTasks = async (req: Request, res: Response) => {
 
         res.json(tasksWithAttachment);
     } catch (error) {
-        console.error('Error fetching tasks:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -68,11 +75,11 @@ export const getTaskById = async (req: Request, res: Response) => {
         if (task) {
             res.json(task);
         } else {
-            res.status(404).json({ message: 'Task not found' });
+            res.status(404).json({ message: MESSAGE_TASK_NOT_FOUND });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -84,10 +91,10 @@ export const updateTask = async (req: Request, res: Response) => {
             { title, due_date, priority, status, description, attachments, updated_at: new Date(), date_completed },
             { where: { id } }
         );
-        res.json({ message: 'Task updated successfully' });
+        res.json({ message: MESSAGE_TASK_UPDATED_SUCCESSFULLY });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -97,9 +104,9 @@ export const deleteTask = async (req: Request, res: Response) => {
         await Subtask.destroy({ where: { task_id: id } });
         await File.destroy({ where: { task_id: id } });
         await Task.destroy({ where: { id } });
-        res.json({ message: 'Task deleted successfully' });
+        res.json({ message: MESSAGE_TASK_DELETED_SUCCESSFULLY });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
     }
 };
