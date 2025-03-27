@@ -1,4 +1,4 @@
-import passportJwt, { StrategyOptionsWithRequest } from 'passport-jwt';
+import { Strategy, StrategyOptionsWithRequest } from 'passport-jwt';
 import passport from 'passport';
 import Account from '../models/Account';
 import dotenv from 'dotenv';
@@ -6,26 +6,37 @@ import { MESSAGE_INVALID_OR_INACTIVE_TOKEN } from '../config/messages';
 
 dotenv.config();
 
-const JwtStrategy = passportJwt.Strategy;
-const ExtractJwt = passportJwt.ExtractJwt;
+const cookieExtractor = (req: any) => {
+    let token = null;
+    if (req && req.cookies) {
+        token = req.cookies['authToken'];
+    }
+    return token;
+};
 
-const options: StrategyOptionsWithRequest = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+const jwtOptions: StrategyOptionsWithRequest = {
+    jwtFromRequest: cookieExtractor,
     secretOrKey: process.env.JWT_SECRET!,
     passReqToCallback: true,
 };
 
 passport.use(
-    new JwtStrategy(options, async (req, payload, done) => {
+    new Strategy(jwtOptions, async (req, payload, done) => {
         try {
-            const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+            const tokenFromCookie = cookieExtractor(req);
+            if (!tokenFromCookie) {
+                return done(null, false, { message: MESSAGE_INVALID_OR_INACTIVE_TOKEN });
+            }
+
             const account = await Account.findOne({
-                where: { active_token: token },
+                where: { active_token: tokenFromCookie, id: payload.id },
             });
+
             if (account) {
                 return done(null, account);
+            } else {
+                return done(null, false);
             }
-            return done(null, false, { message: MESSAGE_INVALID_OR_INACTIVE_TOKEN });
         } catch (error) {
             return done(error, false);
         }

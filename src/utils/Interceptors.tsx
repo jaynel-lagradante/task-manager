@@ -10,18 +10,14 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
 });
 const { setLoading } = useLoadingState.getState();
 const { setToken, setAuth } = useAuthState.getState();
 
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
-        const BEARER_TOKEN = `Bearer ${token}`;
         setLoading(true);
-        if (token) {
-            config.headers.Authorization = BEARER_TOKEN;
-        }
         return config;
     },
     (error) => {
@@ -40,7 +36,6 @@ api.interceptors.response.use(
         if (error.response) {
             if (error.response.status === 401 || error.response.status === 403) {
                 console.error(MESSAGES.ERROR.UNAUTHORIZED);
-                localStorage.removeItem('token');
                 setAuth(false);
                 setToken(false);
             } else if (error.response.status === 500) {

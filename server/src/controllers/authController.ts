@@ -15,14 +15,15 @@ import {
     MESSAGE_ACCOUNT_CREATED_SUCCESSFULLY,
     MESSAGE_INVALID_TOKEN,
     MESSAGE_GOOGLE_TOKEN_VERIFICATION_ERROR,
-    MESSAGE_NO_TOKEN_PROVIDED,
     MESSAGE_LOGGED_OUT_SUCCESSFULLY,
-    MESSAGE_INVALID_TOKEN_PAYLOAD,
     MESSAGE_INTERNAL_SERVER_ERROR,
     MESSAGE_INTERNAL_SERVER_ERROR_LOGOUT,
 } from '../config/messages';
 
 dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET!;
+const maxAge = 60 * 60 * 1000; // 1hour
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -45,12 +46,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             }
         }
 
-        const token = jwt.sign({ id: account.id, username }, process.env.JWT_SECRET!, {
+        const token = jwt.sign({ id: account.id, username }, JWT_SECRET!, {
             expiresIn: JWT_EXPIRATION_TIME,
         });
         await Account.update({ active_token: token }, { where: { id: account.id } });
 
-        res.json({ token });
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge,
+            path: '/',
+        });
+
+        res.json({ account });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
@@ -127,11 +136,19 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
             });
         }
 
-        const token = jwt.sign({ id: account.id, username: payload.name }, process.env.JWT_SECRET!, {
+        const token = jwt.sign({ id: account.id, username: payload.name }, JWT_SECRET!, {
             expiresIn: JWT_EXPIRATION_TIME,
         });
         await Account.update({ active_token: token }, { where: { id: account.id } });
-        res.json({ token });
+
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge,
+            path: '/',
+        });
+        res.json({ account });
     } catch (error) {
         console.error(error);
         res.status(401).json({ message: MESSAGE_GOOGLE_TOKEN_VERIFICATION_ERROR });
@@ -140,25 +157,20 @@ export const signInUsingGoogle = async (req: Request, res: Response) => {
 
 export const logout = async (req: Request, res: Response) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-
-        if (!token) {
-            res.status(401).json({ message: MESSAGE_NO_TOKEN_PROVIDED });
-            return;
+        res.clearCookie('authToken', { path: '/' });
+        const tokenFromCookie = req.cookies.authToken;
+        if (tokenFromCookie) {
+            try {
+                const decodedToken: any = jwt.verify(tokenFromCookie, process.env.JWT_SECRET!);
+                if (decodedToken && decodedToken.id) {
+                    await Account.update({ active_token: null }, { where: { id: decodedToken.id } });
+                }
+            } catch (jwtError) {
+                console.error(jwtError);
+            }
         }
 
-        jwt.verify(token, process.env.JWT_SECRET!, async (err, decoded: any) => {
-            if (err) {
-                res.status(401).json({ message: MESSAGE_INVALID_TOKEN });
-            }
-
-            if (decoded && decoded.id) {
-                await Account.update({ active_token: null }, { where: { id: decoded.id } });
-                res.status(200).json({ message: MESSAGE_LOGGED_OUT_SUCCESSFULLY });
-            } else {
-                res.status(401).json({ message: MESSAGE_INVALID_TOKEN_PAYLOAD });
-            }
-        });
+        res.status(200).json({ message: MESSAGE_LOGGED_OUT_SUCCESSFULLY });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR_LOGOUT });

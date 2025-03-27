@@ -8,13 +8,12 @@ interface Props {
 
 const Authentication: React.FC<Props> = ({ children }) => {
     const navigate = useNavigate();
-    const token = localStorage.getItem('token');
 
     const isAuthenticated = useAuthState(selectIsAuthenticated);
     const tokenState = useAuthState(selectToken);
 
     useEffect(() => {
-        if ((!tokenState || !token) && !isAuthenticated) navigate('/login');
+        if (!tokenState && !isAuthenticated) navigate('/login');
     }, [isAuthenticated, tokenState, navigate]);
 
     return <>{children}</>;

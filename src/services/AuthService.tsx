@@ -6,7 +6,7 @@ import api from '../utils/Interceptors';
 
 export const Login = async (credentials: { username: string; password: string }) => {
     try {
-        const response = await axios.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.LOGIN}`, credentials);
+        const response = await api.post(`${API_ENDPOINTS.LOGIN}`, credentials);
         setUserInfo(response.data);
         return response.data;
     } catch (error) {
@@ -27,7 +27,7 @@ export const Register = async (credentials: { username: string; password: string
 
 export const GoogleAuth = async (code: string) => {
     try {
-        const response = await axios.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.LOGIN_GOOGLE}`, { code });
+        const response = await api.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.LOGIN_GOOGLE}`, { code });
         setUserInfo(response.data);
         return response.data;
     } catch (error) {
@@ -39,7 +39,6 @@ export const GoogleAuth = async (code: string) => {
 export const Logout = async () => {
     try {
         const response = await api.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.LOGOUT}`);
-        localStorage.removeItem('token');
         return response.data;
     } catch (error) {
         console.error(MESSAGES.ERROR.LOGOUT, error);
@@ -61,8 +60,8 @@ const decodeJWT = (token: string) => {
 
 const setUserInfo = (data: User) => {
     if (data.token) {
-        const token = data.token;
+        // const token = data.token;
         localStorage.setItem('username', decodeJWT(data.token).username);
-        localStorage.setItem('token', token);
+        // localStorage.setItem('token', token);
     }
 };

@@ -9,11 +9,13 @@ import passport from 'passport';
 import './auth/jwtStrategy';
 import cors from 'cors';
 import { APPLICATION_URI } from './config/constants';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(passport.initialize());
 const corsOptions = {
