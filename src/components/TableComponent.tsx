@@ -164,7 +164,7 @@ const TableComponent = ({
                     }}
                 />
             ),
-            size: 30,
+            size: 50,
         },
         {
             id: 'expand',
