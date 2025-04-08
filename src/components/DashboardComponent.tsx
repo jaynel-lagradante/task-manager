@@ -94,31 +94,36 @@ const DashboardComponent: React.FC<DashboardComponentProps> = ({ children }) => 
                     <Box>
                         <HeaderImg src={LogoHeader} alt="Logo" />
                     </Box>
-                    <MobileMenuBox>
-                        <MenuTabs
-                            value={value}
-                            onChange={handleChange}
-                            orientation="horizontal"
-                            aria-label="dashboard tabs"
-                        >
-                            <Tab
-                                label={
-                                    <div>
-                                        <img src={HomeIcon} alt="Home" />
-                                    </div>
-                                }
-                                onClick={() => navigate('/')}
-                            />
-                            <Tab
-                                label={
-                                    <div>
-                                        <img src={SignoutIcon} alt="Sign out" />
-                                    </div>
-                                }
-                                onClick={handleOpenModal}
-                            />
-                        </MenuTabs>
-                    </MobileMenuBox>
+                    <Box display={'flex'}>
+                        <AvatarBox mr={4}>
+                            <CuztomizedAvatar src={AvatarIcon} alt="Avatar" />
+                        </AvatarBox>
+                        <MobileMenuBox>
+                            <MenuTabs
+                                value={value}
+                                onChange={handleChange}
+                                orientation="horizontal"
+                                aria-label="dashboard tabs"
+                            >
+                                <Tab
+                                    label={
+                                        <div>
+                                            <img src={HomeIcon} alt="Home" />
+                                        </div>
+                                    }
+                                    onClick={() => navigate('/')}
+                                />
+                                <Tab
+                                    label={
+                                        <div>
+                                            <img src={SignoutIcon} alt="Sign out" />
+                                        </div>
+                                    }
+                                    onClick={handleOpenModal}
+                                />
+                            </MenuTabs>
+                        </MobileMenuBox>
+                    </Box>
                 </MobileMenu>
             </MenuGridContainer>
             <ChildGridContainer item xs={12} sm={12} md={10}>

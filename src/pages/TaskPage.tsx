@@ -208,9 +208,9 @@ const TaskPage: React.FC = () => {
                 title: task.title,
                 due_date: task.due_date,
                 priority: task.priority,
-                status: isMarkAsComplete ? COMPLETE : task.status,
+                status: task.status,
                 description: task.description,
-                date_completed: completionDate,
+                date_completed: task.status === COMPLETE ? completionDate : null,
                 hasAttachment: !!(attachmentFiles.length > 0),
             };
 
@@ -264,7 +264,7 @@ const TaskPage: React.FC = () => {
         } else {
             setSubTaskError('');
         }
-        setSubtasks([...subtasks, { title: '', status: NOT_DONE }]);
+        setSubtasks([...subtasks, { title: `Subtask ${subtasks.length + 1}`, status: NOT_DONE }]);
     };
 
     const handleSubtaskTitleChange = (index: number, title: string) => {
@@ -378,7 +378,10 @@ const TaskPage: React.FC = () => {
                                                 >
                                                     <MenuItem value={NOT_STARTED}>{NOT_STARTED}</MenuItem>
                                                     <MenuItem value={IN_PROGRESS}>{IN_PROGRESS}</MenuItem>
-                                                    <MenuItem value={COMPLETE} disabled={!disableCompleteStatus()}>
+                                                    <MenuItem
+                                                        value={COMPLETE}
+                                                        disabled={!disableCompleteStatus() || !id}
+                                                    >
                                                         {COMPLETE}
                                                     </MenuItem>
                                                     <MenuItem value={CANCELLED}>{CANCELLED}</MenuItem>

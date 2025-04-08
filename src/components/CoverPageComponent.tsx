@@ -38,7 +38,7 @@ const CoverPageComponent: React.FC<CoverPageComponentProps> = ({ children }) => 
                 <OrDivider>OR</OrDivider>
                 <GoogleLoginComponent></GoogleLoginComponent>
 
-                <SigninOptionButton
+                {/* <SigninOptionButton
                     fullWidth
                     startIcon={
                         <IconWrapper>
@@ -47,7 +47,7 @@ const CoverPageComponent: React.FC<CoverPageComponentProps> = ({ children }) => 
                     }
                 >
                     Continue with Facebook
-                </SigninOptionButton>
+                </SigninOptionButton> */}
             </FormGridItem>
         </GridContainer>
     );

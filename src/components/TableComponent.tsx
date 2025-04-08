@@ -18,6 +18,7 @@ import {
     IconButton,
     Box,
     Checkbox,
+    Typography,
 } from '@mui/material';
 import moment from 'moment';
 import { Task } from '../types/TaskInterface';
@@ -281,8 +282,11 @@ const TableComponent = ({
         {
             accessorKey: 'status',
             header: 'Status',
-            cell: ({ getValue }) => {
-                const status = getValue<string>();
+            cell: ({ row }) => {
+                const status = row.original.status;
+                const dateCompleted = row.original.date_completed
+                    ? moment(row.original.date_completed).format(DUE_DATE_DISPLAY_FORMAT)
+                    : null;
                 const { NOT_STARTED, IN_PROGRESS, COMPLETE, CANCELLED } = STATUS.TASK;
                 let icon;
 
@@ -304,10 +308,20 @@ const TableComponent = ({
                 }
 
                 return (
-                    <StatusContainer>
-                        {icon && <img src={icon} alt={status} />}
-                        <span>{status}</span>
-                    </StatusContainer>
+                    <>
+                        <StatusContainer>
+                            {icon && <img src={icon} alt={status} />}
+                            <Box display={'flex'} flexDirection="column">
+                                {status}
+                                {dateCompleted && (
+                                    <Typography color="textSecondary" fontSize={12}>
+                                        {dateCompleted}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </StatusContainer>
+                        <Box> </Box>
+                    </>
                 );
             },
         },

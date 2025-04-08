@@ -56,7 +56,7 @@ export const PriorityImg = styled('img')(() => ({
 
 export const StatusContainer = styled('div')(() => ({
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     '& img': {
         height: '20px',
         marginRight: '8px',
