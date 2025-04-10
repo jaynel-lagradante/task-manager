@@ -36,7 +36,12 @@ export const ImageBoxContainer = styled(Box)(() => ({
 }));
 
 export const CuztomizedImg = styled('img')(() => ({
-    height: '80px',
+    // desktop view
+    '@media (min-width: 900px)': {
+        height: '80px',
+        width: 'auto',
+    },
+    maxWidth: '100%',
     width: 'auto',
     objectFit: 'cover',
 }));
@@ -55,8 +60,14 @@ export const CuztomizedImgDiv = styled('div')(({ theme }) => ({
 
 export const CuztomizedIconButton = styled(IconButton)(({ theme }) => ({
     position: 'absolute',
+    // desktop view
+    '@media (min-width: 900px)': {
+        top: theme.spacing(-2.5),
+        right: 5,
+    },
+    maxWidth: '100%',
     top: theme.spacing(-2.5),
-    right: 5,
+    right: theme.spacing(-2.5),
     '& img': {
         height: 15,
     },

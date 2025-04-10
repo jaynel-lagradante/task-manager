@@ -60,8 +60,12 @@ export const FileContainer = styled('div')(() => ({
     flexDirection: 'column',
     alignItems: 'center',
     '& img': {
-        height: '80px',
-        width: 'auto',
+        // desktop view
+        '@media (min-width: 900px)': {
+            height: '80px',
+            width: 'auto',
+        },
+        maxWidth: '100%',
         objectFit: 'cover',
     },
     '& div': {
