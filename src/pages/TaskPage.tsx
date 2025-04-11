@@ -75,7 +75,7 @@ const TaskPage: React.FC = () => {
         date_completed: null,
     });
     const [error, setError] = useState('');
-    const [dateCreated] = useState(moment().startOf('day'));
+    const [dateCreated, setDateCreated] = useState(moment().startOf('day'));
     const [subtasks, setSubtasks] = useState<Subtask[]>([]);
     const [titleError, setTitleError] = useState('');
     const [detailsError, setDetailsError] = useState('');
@@ -116,6 +116,7 @@ const TaskPage: React.FC = () => {
                     if (data.status === COMPLETE) {
                         setCompletionDate(moment(data.date_completed));
                     }
+                    setDateCreated(moment(data.created_at));
                 } catch (err: any) {
                     setError(err.response?.data?.message || GET_TASKS);
                 }
@@ -154,8 +155,13 @@ const TaskPage: React.FC = () => {
 
     const handleDateChange = (date: Moment | null) => {
         if (date) {
-            const dateTomorrow = moment().add(1, 'day').startOf('day');
-            if (date.isBefore(dateTomorrow, 'day') && task.status !== COMPLETE) {
+            let dateCreated = null;
+            if (id) {
+                dateCreated = moment(task.created_at).add(1, 'day').startOf('day');
+            } else {
+                dateCreated = moment().add(1, 'day').startOf('day');
+            }
+            if (date.isBefore(dateCreated, 'day') && task.status !== COMPLETE) {
                 setDueDateError(DUE_DATE_LATER);
             } else {
                 setDueDateError('');
@@ -188,11 +194,16 @@ const TaskPage: React.FC = () => {
             hasError = true;
         }
 
-        const dateTomorrow = moment().add(1, 'day').startOf('day');
+        let dateCreated = null;
+        if (id) {
+            dateCreated = moment(task.created_at).add(1, 'day').startOf('day');
+        } else {
+            dateCreated = moment().add(1, 'day').startOf('day');
+        }
         if (!task.due_date) {
             setDueDateError(REQUIRED_DUE_DATE);
             hasError = true;
-        } else if (task.due_date.isBefore(dateTomorrow, 'day') && task.status !== COMPLETE) {
+        } else if (task.due_date.isBefore(dateCreated, 'day') && task.status !== COMPLETE) {
             setDueDateError(DUE_DATE_LATER);
             hasError = true;
         }
