@@ -14,7 +14,7 @@ export const CreateTask = async (taskData: Task) => {
     }
 };
 
-export const GetTasks = async () => {
+export const GetTasks = async (): Promise<Task[]> => {
     try {
         const response = await api.get(`${API_ENDPOINTS.TASKS}`);
         return response.data;
@@ -24,7 +24,7 @@ export const GetTasks = async () => {
     }
 };
 
-export const GetTaskById = async (taskId: string) => {
+export const GetTaskById = async (taskId: string): Promise<Task> => {
     try {
         const response = await api.get(`${API_ENDPOINTS.TASKS}/${taskId}`);
         return response.data;

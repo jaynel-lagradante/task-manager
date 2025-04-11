@@ -218,9 +218,9 @@ const TableComponent = ({
                     taskDueDate.isAfter(today) &&
                     row.original.status !== COMPLETE &&
                     row.original.status !== CANCELLED &&
-                    (row.original.priority === CRITICAL
-                        ? taskDueDate.diff(today, 'hours') <= 48
-                        : taskDueDate.diff(today, 'hours') <= 24);
+                    row.original.priority === CRITICAL &&
+                    row.original.priority === CRITICAL &&
+                    taskDueDate.diff(today, 'hours') <= 48;
 
                 let color = '';
                 let statusText = '';

@@ -22,6 +22,7 @@ import {
 } from '../layouts/AttachmentStyles';
 import ModalComponent from './ModalComponent';
 import { MESSAGES } from '../constants/Messages';
+import { LinearProgress } from '@mui/material';
 
 interface AttachmentComponentProps {
     attachments: Attachment[];
@@ -45,6 +46,8 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
     const [objectURLs, setObjectURLs] = useState<string[]>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileToDelete, setFileToDelete] = useState<string[]>();
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadingFileName, setUploadingFileName] = useState('');
     const [modalProp, setModalProp] = useState({
         firstLabel: '',
         secondLabel: '',
@@ -138,11 +141,14 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
     };
 
     const handleNewFiles = (newFilesList: File[]) => {
+        setIsUploading(true);
         const validFiles: Attachment[] = [];
         const newURLs: string[] = [];
         const totalFiles = newFilesList.length + (selectedFiles?.length || 0);
         let largeFilesLabel = '';
         let invalidTypeFilesLabel = '';
+        let uploadingFile = '';
+        setUploadingFileName('');
         const { MAX_FILE, ALLOWED_FILE, MAX_FILE_SIZE } = MESSAGES.IDENTIFIER;
 
         if (totalFiles > maxFiles) {
@@ -155,6 +161,7 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
                 onConfirm: () => {},
             });
             setIsModalOpen(true);
+            setIsUploading(false);
             return;
         }
 
@@ -169,6 +176,7 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
                 return;
             }
 
+            uploadingFile += `${file.name} `;
             validFiles.push({ file });
             if (file.type.startsWith('image/')) {
                 newURLs.push(URL.createObjectURL(file));
@@ -176,6 +184,7 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
                 newURLs.push('');
             }
         });
+        setUploadingFileName(uploadingFile);
 
         if (invalidTypeFilesLabel) {
             setModalProp({
@@ -207,38 +216,55 @@ const AttachmentComponent: React.FC<AttachmentComponentProps> = ({
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+        setIsUploading(false);
     };
 
     return (
         <AttachmentBox onDrop={handleDrop} onDragOver={handleDragOver}>
             <LegendTypography variant="subtitle2">Attachments</LegendTypography>
-            <Box>
-                <CustomizedStack>
-                    <UploadImageIcon src={NewSubtaskIconSelected} alt="Upload" />
-                    <Typography variant="body2">
-                        Drop files to attach, or <BrowseContainer onClick={handleBrowseClick}>browse</BrowseContainer>
-                    </Typography>
-                </CustomizedStack>
-            </Box>
 
-            <AttachmentBoxContent>
-                {selectedFiles?.map((file, index) => (
-                    <ImageBoxContainer key={index}>
-                        {file.file.type.startsWith('image/') && objectURLs && objectURLs[index] && (
-                            <FileDivContainer>
-                                <CuztomizedImg src={objectURLs[index]} alt={file.file.name} />
-                                <CuztomizedImgDiv>
-                                    <Typography variant="body2">{file.file.name}</Typography>
-                                    <Typography variant="subtitle2">{formatFileSize(file.file.size)}</Typography>
-                                </CuztomizedImgDiv>
-                            </FileDivContainer>
-                        )}
-                        <CuztomizedIconButton onClick={() => handleModalRemoveFile(index, file)} size="small">
-                            <img src={CancelIcon} alt="Remove" />
-                        </CuztomizedIconButton>
-                    </ImageBoxContainer>
-                ))}
-            </AttachmentBoxContent>
+            {isUploading && (
+                <Box className="fileUploadProgress">
+                    <Box className="fileUploadProgressContainer">
+                        {uploadingFileName}
+                        <LinearProgress />
+                    </Box>
+                </Box>
+            )}
+            {!isUploading && (
+                <Box className="attachmentBoxContainer">
+                    <Box>
+                        <CustomizedStack>
+                            <UploadImageIcon src={NewSubtaskIconSelected} alt="Upload" />
+                            <Typography variant="body2">
+                                Drop files to attach, or{' '}
+                                <BrowseContainer onClick={handleBrowseClick}>browse</BrowseContainer>
+                            </Typography>
+                        </CustomizedStack>
+                    </Box>
+
+                    <AttachmentBoxContent>
+                        {selectedFiles?.map((file, index) => (
+                            <ImageBoxContainer key={index}>
+                                {file.file.type.startsWith('image/') && objectURLs && objectURLs[index] && (
+                                    <FileDivContainer>
+                                        <CuztomizedImg src={objectURLs[index]} alt={file.file.name} />
+                                        <CuztomizedImgDiv>
+                                            <Typography variant="body2">{file.file.name}</Typography>
+                                            <Typography variant="subtitle2">
+                                                {formatFileSize(file.file.size)}
+                                            </Typography>
+                                        </CuztomizedImgDiv>
+                                    </FileDivContainer>
+                                )}
+                                <CuztomizedIconButton onClick={() => handleModalRemoveFile(index, file)} size="small">
+                                    <img src={CancelIcon} alt="Remove" />
+                                </CuztomizedIconButton>
+                            </ImageBoxContainer>
+                        ))}
+                    </AttachmentBoxContent>
+                </Box>
+            )}
 
             <CustomInput type="file" ref={fileInputRef} onChange={handleFileChange} multiple />
 

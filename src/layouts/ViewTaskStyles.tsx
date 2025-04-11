@@ -74,6 +74,9 @@ export const FileContainer = styled('div')(() => ({
         alignItems: 'left',
         marginTop: 10,
     },
+    '& .fileName': {
+        textDecoration: 'underline',
+    },
 }));
 
 export const CuztomizedDivider = styled(Divider)(({ theme }) => ({

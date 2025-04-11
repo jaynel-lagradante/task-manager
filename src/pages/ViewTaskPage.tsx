@@ -195,7 +195,11 @@ const ViewTaskComponent = () => {
                                                         <FileContainer>
                                                             <img src={objectURLs[index]} alt={file.file?.name} />
                                                             <div>
-                                                                <Typography variant="body2" align="left">
+                                                                <Typography
+                                                                    className="fileName"
+                                                                    variant="body2"
+                                                                    align="left"
+                                                                >
                                                                     {file.file?.name}
                                                                 </Typography>
                                                                 <Typography

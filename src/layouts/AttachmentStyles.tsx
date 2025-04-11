@@ -8,6 +8,15 @@ export const AttachmentBox = styled(Box)(({ theme }) => ({
     padding: theme.spacing(3),
     textAlign: 'center',
     marginTop: theme.spacing(2),
+    '& .fileUploadProgress': {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        '& .fileUploadProgressContainer': {
+            textAlign: 'left',
+            minWidth: '400px',
+        },
+    },
 }));
 
 export const LegendTypography = styled(Typography)(({ theme }) => ({

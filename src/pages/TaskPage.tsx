@@ -111,7 +111,7 @@ const TaskPage: React.FC = () => {
                         setSubtasks(subtasksData || []);
                     }
                     if (data.status === COMPLETE) {
-                        setCompletionDate(moment(data.completion_date));
+                        setCompletionDate(moment(data.date_completed));
                     }
                 } catch (err: any) {
                     setError(err.response?.data?.message || GET_TASKS);
@@ -141,9 +141,11 @@ const TaskPage: React.FC = () => {
         const { name, value } = e.target;
         if (value === COMPLETE) {
             setCompletionDate(moment());
-        } else if (task.status === COMPLETE) {
-            setCompletionDate(null);
         }
+        if (name === 'status' && value !== COMPLETE) {
+            setIsMarkAsComplete(false);
+        }
+
         setTask({ ...task, [name]: value });
     };
 
@@ -264,6 +266,7 @@ const TaskPage: React.FC = () => {
         } else {
             setSubTaskError('');
         }
+        setIsMarkAsComplete(false);
         setSubtasks([...subtasks, { title: `Subtask ${subtasks.length + 1}`, status: NOT_DONE }]);
     };
 
@@ -280,6 +283,10 @@ const TaskPage: React.FC = () => {
     };
 
     const handleSubtaskStatusChange = (index: number, status: string) => {
+        if (status === NOT_DONE) {
+            setTask({ ...task, status: IN_PROGRESS });
+            setIsMarkAsComplete(false);
+        }
         setSubtasks(subtasks.map((subtask, i) => (i === index ? { ...subtask, status } : subtask)));
     };
 
