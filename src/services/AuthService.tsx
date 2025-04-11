@@ -39,6 +39,7 @@ export const GoogleAuth = async (code: string) => {
 export const Logout = async () => {
     try {
         const response = await api.post(`${API_ENDPOINTS.BASE}${API_ENDPOINTS.LOGOUT}`);
+        localStorage.removeItem('username');
         return response.data;
     } catch (error) {
         console.error(MESSAGES.ERROR.LOGOUT, error);

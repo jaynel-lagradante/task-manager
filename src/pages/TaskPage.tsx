@@ -90,6 +90,9 @@ const TaskPage: React.FC = () => {
     const [subTaskToDelete, setSubTaskToDelete] = useState<string[]>([]);
     const [subTaskError, setSubTaskError] = useState('');
     const { updateTaskInState, addTask } = useTaskState();
+    if (!localStorage.getItem('username')) {
+        navigate('/login');
+    }
 
     useEffect(() => {
         const fetchTask = async () => {
