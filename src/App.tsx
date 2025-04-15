@@ -8,6 +8,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import ViewTaskPage from './pages/ViewTaskPage';
 import Authentication from './hooks/Authentication';
 import { ROUTES } from './constants/Routes';
+import NotFound from './pages/NotFound';
 
 function App() {
     return (
@@ -26,10 +27,12 @@ function App() {
                                     <Route path={ROUTES.CREATE_TASK} element={<TaskPage />} />
                                     <Route path={ROUTES.EDIT_TASK_ID} element={<TaskPage />} />
                                     <Route path={ROUTES.VIEW_TASK_ID} element={<ViewTaskPage />} />
+                                    <Route path="*" element={<NotFound />} />
                                 </Routes>
                             </Authentication>
                         }
                     />
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </Router>
         </LocalizationProvider>

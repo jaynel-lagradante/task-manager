@@ -10,6 +10,14 @@ import {
     MESSAGE_TASK_UPDATED_SUCCESSFULLY,
     MESSAGE_TASK_DELETED_SUCCESSFULLY,
 } from '../config/messages';
+import { verify } from 'jsonwebtoken';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+interface JWTPayload {
+    id: string;
+    username: string;
+    iat?: number;
+    exp?: number;
+}
 
 export const createTask = async (req: Request, res: Response) => {
     try {
@@ -71,15 +79,31 @@ export const getTasks = async (req: Request, res: Response) => {
 export const getTaskById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const task = await Task.findByPk(id);
-        if (task) {
-            res.json(task);
-        } else {
-            res.status(404).json({ message: MESSAGE_TASK_NOT_FOUND });
+        const token = req.cookies.authToken;
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized: Missing authentication token' });
+        }
+
+        try {
+            const decoded = verify(token, JWT_SECRET!) as JWTPayload;
+            const userIdFromToken = decoded.id;
+            const task = await Task.findByPk(id);
+            if (task) {
+                if (task.user_id === userIdFromToken) {
+                    res.json(task);
+                } else {
+                    res.status(404).json({ message: 'Forbidden: Task does not belong to this user' });
+                }
+            } else {
+                res.status(404).json({ message: 'Task not found' });
+            }
+        } catch (error) {
+            console.error('Error verifying token:', error);
+            return res.status(401).json({ message: 'Unauthorized: Invalid authentication token' });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: MESSAGE_INTERNAL_SERVER_ERROR });
+        console.error('Error fetching task:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
