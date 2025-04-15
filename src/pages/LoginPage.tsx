@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TextField, Typography, InputAdornment, IconButton } from '@mui/material';
 import { Login } from './../services/AuthService';
 import ShowPasswordIcon from './../assets/Icons/Show.svg';
@@ -19,16 +19,8 @@ const LoginPage: React.FC = () => {
     const [loginError, setLoginError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation();
-    const [registrationMessage, setRegistrationMessage] = useState<string | null>(null);
     const { setAuth } = useAuthState();
     const { setTasks } = useTaskState();
-
-    useEffect(() => {
-        if (location.state && location.state.registrationMessage) {
-            setRegistrationMessage(location.state.registrationMessage);
-        }
-    }, [location.state]);
 
     const handleLogin = async () => {
         setUsernameError('');
@@ -71,9 +63,8 @@ const LoginPage: React.FC = () => {
 
     return (
         <CoverPageComponent>
-            {registrationMessage && <Typography variant="h4">{registrationMessage}</Typography>}
             <Typography variant="h4" align="left" gutterBottom>
-                {registrationMessage ? 'Sign in to continue' : 'Sign In'}
+                Sign In
             </Typography>
             {loginError && <Typography color="error">{loginError}</Typography>}
             <TextField

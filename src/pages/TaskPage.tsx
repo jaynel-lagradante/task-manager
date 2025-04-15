@@ -68,7 +68,7 @@ const TaskPage: React.FC = () => {
     const [task, setTask] = useState<Task>({
         title: 'Task 01',
         due_date: null,
-        priority: LOW,
+        priority: HIGH,
         status: NOT_STARTED,
         description: '',
         subtasks: [],
@@ -161,7 +161,7 @@ const TaskPage: React.FC = () => {
             } else {
                 dateCreated = moment().add(1, 'day').startOf('day');
             }
-            if (date.isBefore(dateCreated, 'day') && task.status !== COMPLETE) {
+            if (date.isBefore(dateCreated, 'day')) {
                 setDueDateError(DUE_DATE_LATER);
             } else {
                 setDueDateError('');
@@ -203,7 +203,7 @@ const TaskPage: React.FC = () => {
         if (!task.due_date) {
             setDueDateError(REQUIRED_DUE_DATE);
             hasError = true;
-        } else if (task.due_date.isBefore(dateCreated, 'day') && task.status !== COMPLETE) {
+        } else if (task.due_date.isBefore(dateCreated, 'day')) {
             setDueDateError(DUE_DATE_LATER);
             hasError = true;
         }

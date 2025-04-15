@@ -27,6 +27,7 @@ const RegisterPage: React.FC = () => {
     const [lengthCheck, setLengthCheck] = useState(false);
     const [numberSymbolCheck, setNumberSymbolCheck] = useState(false);
     const [passwordCheck, setPasswordCheck] = useState(0);
+    const [registrationMessage, setRegistrationMessage] = useState<string | null>(null);
     const allowedSymbols = /^[a-zA-Z0-9\s!#()_-]*$/;
     const navigate = useNavigate();
     const {
@@ -127,7 +128,7 @@ const RegisterPage: React.FC = () => {
 
         try {
             await Register({ username, password });
-            navigate('/login', { state: { registrationMessage: MESSAGES.SUCCESS.REGISTRATION_SUCCESS } });
+            setRegistrationMessage(MESSAGES.SUCCESS.REGISTRATION_SUCCESS);
         } catch (err: any) {
             if (err.response?.data?.message === USERNAME_EXIST) {
                 setUsernameError(USERNAME_EXIST);
@@ -139,8 +140,9 @@ const RegisterPage: React.FC = () => {
 
     return (
         <CoverPageComponent>
+            {registrationMessage && <Typography variant="h4">{registrationMessage}</Typography>}
             <Typography variant="h4" align="left" gutterBottom>
-                Create an account
+                {registrationMessage ? 'Sign in to continue' : 'Create an account'}
             </Typography>
             {registerError && <Typography color="error">{registerError}</Typography>}
             <TextField
